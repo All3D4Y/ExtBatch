@@ -1,0 +1,1091 @@
+<UserControl x:Class="CmOxeProvisioner.Views.PersonTabView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="Transparent"
+             Foreground="{DynamicResource TextBrush}"
+             PreviewMouseLeftButtonUp="PersonTabView_PreviewMouseLeftButtonUp">
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <!-- SUB-HEADER BAR (3-Column: Title Left | Prominent Mode Switcher Center | Utility Buttons Right) -->
+    <Border Grid.Row="0"
+            Background="{DynamicResource SurfaceBrush}"
+            BorderBrush="{DynamicResource BorderBrush}"
+            BorderThickness="0,0,0,1"
+            Padding="14,8">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Left Title -->
+        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left">
+          <Border Style="{StaticResource BlockTitleAccentStyle}" />
+          <TextBlock Text="상담사 (Person) 관리" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" />
+        </StackPanel>
+
+        <!-- Center: Prominent Sub-Mode Switcher -->
+        <Border Grid.Column="1"
+                Background="{DynamicResource SurfaceAltBrush}"
+                BorderBrush="{DynamicResource PrimaryBrush}"
+                BorderThickness="1.5"
+                CornerRadius="9"
+                Padding="3"
+                VerticalAlignment="Center">
+          <StackPanel Orientation="Horizontal">
+            <Button x:Name="BtnSubModeCreate"
+                    Content="신규 생성"
+                    Click="BtnSubModeCreate_Click"
+                    Style="{StaticResource SegmentedBtnStyle}"
+                    FontSize="12.5"
+                    Padding="20,6" />
+            <Button x:Name="BtnSubModeManage"
+                    Content="조회 · 수정 / 삭제"
+                    Click="BtnSubModeManage_Click"
+                    Style="{StaticResource SegmentedBtnStyle}"
+                    FontSize="12.5"
+                    Padding="18,6"
+                    Margin="3,0,0,0" />
+          </StackPanel>
+        </Border>
+
+        <!-- Right: Sample Fill & Reset -->
+        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+          <Button x:Name="BtnFillSample" Content="예시 채우기 (PTEST)" Click="BtnFillSample_Click" Style="{StaticResource BaseBtn}" Height="28" Padding="11,0" FontSize="11.5" Margin="0,0,6,0" />
+          <Button x:Name="BtnResetPersonTab" Content="초기화" Click="BtnResetPersonTab_Click" Style="{StaticResource BaseBtn}" Height="28" Padding="11,0" FontSize="11.5" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- ==================== VIEW 1: 신규 생성 ==================== -->
+    <Grid x:Name="PnlCreateView" Grid.Row="1" Margin="14" Visibility="Visible">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="435" MinWidth="380" />
+        <ColumnDefinition Width="12" />
+        <ColumnDefinition Width="*" MinWidth="480" />
+      </Grid.ColumnDefinitions>
+
+      <!-- LEFT COLUMN -->
+      <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
+        <StackPanel>
+
+          <!-- BLOCK 1: 센터 및 기본값 -->
+          <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,10">
+            <StackPanel>
+              <DockPanel LastChildFill="False" Margin="0,0,0,10">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Left">
+                  <Border Style="{StaticResource BlockTitleAccentStyle}" />
+                  <TextBlock Text="센터 및 기본값" Style="{StaticResource BlockTitleTextStyle}" />
+                  <TextBlock x:Name="LblPersonCustHeader" Text="(0개)" Style="{StaticResource BlockSubtitleTextStyle}" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Right">
+                  <Border Background="{DynamicResource ChipBgBrush}" CornerRadius="5" Height="26" Padding="9,0" Margin="0,0,6,0" VerticalAlignment="Center">
+                    <TextBlock x:Name="TxtPersonFloorBadge" Text="-" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource ChipFgBrush}" VerticalAlignment="Center" />
+                  </Border>
+                  <Button x:Name="BtnTogglePersonPaths" Content="경로 ▾" Click="BtnTogglePersonPaths_Click" Style="{StaticResource BaseBtn}" Height="26" Padding="9,0" FontSize="11.5" />
+                </StackPanel>
+              </DockPanel>
+
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="1.65*" />
+                  <ColumnDefinition Width="10" />
+                  <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Column="0">
+                  <ComboBox x:Name="CmbPersonCustomer" Style="{StaticResource ModernComboBox}" Height="34" SelectionChanged="CmbPersonCustomer_SelectionChanged" />
+                  <TextBlock Text="센터를 선택하거나 검색..."
+                             FontSize="12"
+                             Foreground="{DynamicResource MutedBrush}"
+                             Opacity="0.65"
+                             VerticalAlignment="Center"
+                             HorizontalAlignment="Left"
+                             Margin="11,0,28,0"
+                             IsHitTestVisible="False">
+                    <TextBlock.Style>
+                      <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                          <DataTrigger Binding="{Binding SelectedItem, ElementName=CmbPersonCustomer}" Value="{x:Null}">
+                            <Setter Property="Visibility" Value="Visible" />
+                          </DataTrigger>
+                        </Style.Triggers>
+                      </Style>
+                    </TextBlock.Style>
+                  </TextBlock>
+                </Grid>
+
+                <Border Grid.Column="2" Style="{StaticResource SearchBoxFrameStyle}">
+                  <Grid>
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="Auto" />
+                      <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Viewbox Grid.Column="0" Width="14" Height="14" Margin="10,0,6,0" VerticalAlignment="Center">
+                      <Canvas Width="16" Height="16">
+                        <Ellipse Canvas.Left="2" Canvas.Top="2" Width="9" Height="9" Stroke="{DynamicResource MutedBrush}" StrokeThickness="1.7" />
+                        <Line X1="9.8" Y1="9.8" X2="14" Y2="14" Stroke="{DynamicResource MutedBrush}" StrokeThickness="1.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
+                      </Canvas>
+                    </Viewbox>
+                    <Grid Grid.Column="1">
+                      <TextBlock Text="검색..." FontSize="12" Foreground="{DynamicResource MutedBrush}" Opacity="0.65" VerticalAlignment="Center" Margin="2,0,8,0" IsHitTestVisible="False">
+                        <TextBlock.Style>
+                          <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                              <DataTrigger Binding="{Binding Text, ElementName=TxtPersonSearch}" Value="">
+                                <Setter Property="Visibility" Value="Visible" />
+                              </DataTrigger>
+                            </Style.Triggers>
+                          </Style>
+                        </TextBlock.Style>
+                      </TextBlock>
+                      <TextBox x:Name="TxtPersonSearch"
+                               Background="Transparent"
+                               Foreground="{DynamicResource TextBrush}"
+                               CaretBrush="{DynamicResource TextBrush}"
+                               BorderThickness="0"
+                               FontSize="12"
+                               Padding="0,2,8,2"
+                               VerticalContentAlignment="Center"
+                               UseLayoutRounding="True"
+                               TextChanged="TxtPersonSearch_TextChanged" />
+                    </Grid>
+                  </Grid>
+                </Border>
+              </Grid>
+
+              <StackPanel Margin="0,10,0,0">
+                <TextBlock Text="Last Name (센터명)" Style="{StaticResource FieldLabelStyle}" />
+                <Grid>
+                  <TextBox x:Name="TxtPersonLastName" Style="{StaticResource ModernTextBox}" Height="34" TextChanged="TxtPersonLastName_TextChanged" />
+                  <TextBlock Text="센터 선택 시 자동 입력" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" Opacity="0.6" VerticalAlignment="Center" Margin="10,0,8,0" IsHitTestVisible="False">
+                    <TextBlock.Style>
+                      <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                          <DataTrigger Binding="{Binding Text, ElementName=TxtPersonLastName}" Value="">
+                            <Setter Property="Visibility" Value="Visible" />
+                          </DataTrigger>
+                        </Style.Triggers>
+                      </Style>
+                    </TextBlock.Style>
+                  </TextBlock>
+                </Grid>
+              </StackPanel>
+
+              <Border x:Name="BdPersonPaths" Visibility="Collapsed"
+                      Background="{DynamicResource SurfaceAltBrush}"
+                      BorderBrush="{DynamicResource BorderBrush}"
+                      BorderThickness="1"
+                      CornerRadius="6"
+                      Padding="10"
+                      Margin="0,10,0,0">
+                <StackPanel>
+                  <TextBlock x:Name="TxtPersonPathTarget" FontFamily="Consolas" FontSize="12" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" Margin="0,0,0,2" />
+                  <TextBlock x:Name="TxtPersonPathLogin" FontFamily="Consolas" FontSize="12" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+            </StackPanel>
+          </Border>
+
+          <!-- BLOCK 2: Person 프리셋 설정 -->
+          <Border Style="{StaticResource CardBorderStyle}">
+            <StackPanel>
+              <DockPanel LastChildFill="False" Margin="0,0,0,10">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Left">
+                  <Border Style="{StaticResource BlockTitleAccentStyle}" />
+                  <TextBlock Text="Person 프리셋 설정" Style="{StaticResource BlockTitleTextStyle}" />
+                </StackPanel>
+
+                <Border Background="{DynamicResource SurfaceAltBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="6"
+                        Padding="2"
+                        DockPanel.Dock="Right">
+                  <StackPanel Orientation="Horizontal">
+                    <Button x:Name="BtnModeRule" Content="규칙 · 범위" Click="BtnModeRule_Click" Style="{StaticResource SegmentedBtnStyle}" Padding="9,3" FontSize="11.5" />
+                    <Button x:Name="BtnModePaste" Content="명단 붙여넣기" Click="BtnModePaste_Click" Style="{StaticResource SegmentedBtnStyle}" Padding="9,3" FontSize="11.5" Margin="2,0,0,0" />
+                  </StackPanel>
+                </Border>
+              </DockPanel>
+
+              <!-- PANEL A: 규칙 · 범위 -->
+              <StackPanel x:Name="PnlRuleMode" Visibility="Visible">
+                <DockPanel LastChildFill="False" Margin="0,0,0,6">
+                  <TextBlock Text="Employee ID 구성" Style="{StaticResource FieldLabelStyle}" Margin="0" DockPanel.Dock="Left" VerticalAlignment="Center" />
+                  <Border Background="{DynamicResource ChipBgBrush}" CornerRadius="8" Padding="8,2" DockPanel.Dock="Right" VerticalAlignment="Center">
+                    <TextBlock x:Name="TxtRuleEmpPreview" Text="예시: PTEST001~" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource ChipFgBrush}" />
+                  </Border>
+                </DockPanel>
+
+                <!-- Prefix + Number/Range on Same Row -->
+                <Grid Margin="0,0,0,10">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="1.45*" />
+                  </Grid.ColumnDefinitions>
+
+                  <StackPanel Grid.Column="0">
+                    <TextBlock Text="Employee ID 접두어" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource MutedBrush}" Margin="0,0,0,4" />
+                    <Grid>
+                      <TextBox x:Name="TxtPersonPrefix" Style="{StaticResource ModernTextBox}" Height="34" FontFamily="Consolas" TextChanged="TxtRuleInputs_Changed" />
+                      <TextBlock Text="예: PTEST" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" Opacity="0.6" VerticalAlignment="Center" Margin="10,0,8,0" IsHitTestVisible="False">
+                        <TextBlock.Style>
+                          <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                              <DataTrigger Binding="{Binding Text, ElementName=TxtPersonPrefix}" Value="">
+                                <Setter Property="Visibility" Value="Visible" />
+                              </DataTrigger>
+                            </Style.Triggers>
+                          </Style>
+                        </TextBlock.Style>
+                      </TextBlock>
+                    </Grid>
+                  </StackPanel>
+
+                  <StackPanel Grid.Column="2">
+                    <TextBlock Text="Employee ID 번호/범위" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource MutedBrush}" Margin="0,0,0,4" />
+                    <Grid>
+                      <TextBox x:Name="TxtRuleSeq" Style="{StaticResource ModernTextBox}" Height="34" FontFamily="Consolas" TextChanged="TxtRuleInputs_Changed" />
+                      <TextBlock Text="예: 001~010 또는 001, 003" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" Opacity="0.6" VerticalAlignment="Center" Margin="10,0,8,0" IsHitTestVisible="False">
+                        <TextBlock.Style>
+                          <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                              <DataTrigger Binding="{Binding Text, ElementName=TxtRuleSeq}" Value="">
+                                <Setter Property="Visibility" Value="Visible" />
+                              </DataTrigger>
+                            </Style.Triggers>
+                          </Style>
+                        </TextBlock.Style>
+                      </TextBlock>
+                    </Grid>
+                  </StackPanel>
+                </Grid>
+
+                <TextBlock Text="User Name / First Name 규칙" Style="{StaticResource FieldLabelStyle}" />
+                <Border Background="{DynamicResource SurfaceAltBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="6" Padding="10,8" Margin="0,0,0,10">
+                  <StackPanel>
+                    <RadioButton x:Name="RbUserSameAsEmp"
+                                 GroupName="PersonUserNameMode"
+                                 Content="Employee ID와 동일"
+                                 IsChecked="True"
+                                 Checked="RbUserMode_Changed"
+                                 Style="{StaticResource ModernRadioButton}"
+                                 Margin="0,0,0,6" />
+                    <RadioButton x:Name="RbUserManualList"
+                                 GroupName="PersonUserNameMode"
+                                 Content="상담원 이름 직접 입력"
+                                 Checked="RbUserMode_Changed"
+                                 Style="{StaticResource ModernRadioButton}" />
+
+                    <Grid x:Name="PnlManualNames" Visibility="Collapsed" Margin="0,8,0,0">
+                      <TextBox x:Name="TxtRuleNames" Style="{StaticResource ModernTextBox}" Height="58" AcceptsReturn="True" VerticalContentAlignment="Top" Padding="8,6" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" />
+                      <TextBlock Text="상담원 이름 입력 (줄바꿈/쉼표 구분 · 공란은 Employee ID 적용)" FontSize="11" Foreground="{DynamicResource MutedBrush}" Opacity="0.65" VerticalAlignment="Top" Margin="9,7,8,4" IsHitTestVisible="False" TextWrapping="Wrap">
+                        <TextBlock.Style>
+                          <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                              <DataTrigger Binding="{Binding Text, ElementName=TxtRuleNames}" Value="">
+                                <Setter Property="Visibility" Value="Visible" />
+                              </DataTrigger>
+                            </Style.Triggers>
+                          </Style>
+                        </TextBlock.Style>
+                      </TextBlock>
+                    </Grid>
+                  </StackPanel>
+                </Border>
+
+                <DockPanel LastChildFill="False" Margin="0,0,0,10">
+                  <CheckBox x:Name="ChkRuleIsAgent" Content="Is Agent 체크 (상담원 계정)" IsChecked="True" Style="{StaticResource ModernCheckBox}" DockPanel.Dock="Left" />
+                  <TextBlock Text="First Name = User Name 동기화" FontSize="11" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" DockPanel.Dock="Right" />
+                </DockPanel>
+
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="*" />
+                  </Grid.ColumnDefinitions>
+                  <Button x:Name="BtnRuleAppend" Grid.Column="0" Content="목록에 추가 →" Click="BtnRuleAppend_Click" Style="{StaticResource BaseBtn}" />
+                  <Button x:Name="BtnRuleReplace" Grid.Column="2" Content="미리보기 채우기 →" Click="BtnRuleReplace_Click" Style="{StaticResource PrimaryBtn}" />
+                </Grid>
+              </StackPanel>
+
+              <!-- PANEL B: 명단 붙여넣기 -->
+              <StackPanel x:Name="PnlPasteMode" Visibility="Collapsed">
+                <Border Background="{DynamicResource SurfaceAltBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="6" Padding="9,7" Margin="0,0,0,8">
+                  <StackPanel>
+                    <TextBlock Text="엑셀(Ctrl+C) 또는 메모장 명단을 한 줄에 1명씩 붙여넣으세요 (Tab · 쉼표 구분)" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" Margin="0,0,0,3" />
+                    <TextBlock Text="• 3열: 사번(EmpID)  |  이름(UserName)  |  LoginID   (예: PTEST001  홍길동  70101)" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+                    <TextBlock Text="• 2열: 사번  |  LoginID(숫자) 또는 사번  |  이름  (이름 생략 시 EmpID 자동 적용)" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+                  </StackPanel>
+                </Border>
+
+                <Grid Margin="0,0,0,10">
+                  <TextBox x:Name="TxtPasteInput"
+                           Style="{StaticResource ModernTextBox}"
+                           Height="155"
+                           Padding="9,7"
+                           FontFamily="Consolas"
+                           AcceptsReturn="True"
+                           AcceptsTab="True"
+                           VerticalContentAlignment="Top"
+                           TextWrapping="NoWrap"
+                           HorizontalScrollBarVisibility="Auto"
+                           VerticalScrollBarVisibility="Auto" />
+                  <StackPanel IsHitTestVisible="False" Margin="10,8,10,6" VerticalAlignment="Top">
+                    <StackPanel.Style>
+                      <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                          <DataTrigger Binding="{Binding Text, ElementName=TxtPasteInput}" Value="">
+                            <Setter Property="Visibility" Value="Visible" />
+                          </DataTrigger>
+                        </Style.Triggers>
+                      </Style>
+                    </StackPanel.Style>
+                    <TextBlock Text="PTEST001&#x09;홍길동&#x09;70101" FontFamily="Consolas" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" Opacity="0.6" />
+                    <TextBlock Text="PTEST002&#x09;김철수&#x09;70102" FontFamily="Consolas" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" Opacity="0.6" />
+                    <TextBlock Text="PTEST003&#x09;&#x09;70103" FontFamily="Consolas" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" Opacity="0.6" />
+                  </StackPanel>
+                </Grid>
+
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="*" />
+                  </Grid.ColumnDefinitions>
+                  <Button x:Name="BtnPasteAppend" Grid.Column="0" Content="목록에 추가 →" Click="BtnPasteAppend_Click" Style="{StaticResource BaseBtn}" />
+                  <Button x:Name="BtnPasteReplace" Grid.Column="2" Content="미리보기 채우기 →" Click="BtnPasteReplace_Click" Style="{StaticResource PrimaryBtn}" />
+                </Grid>
+              </StackPanel>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </ScrollViewer>
+
+      <!-- RIGHT COLUMN: AGENT LOGIN SELECT/DISTRIBUTE/DIRECT + PERSON PREVIEW + LOG -->
+      <Grid Grid.Column="2">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- RIGHT BLOCK 1: Agent Login 선택 · 분배 (+ 직접 입력 통합) -->
+        <Border Grid.Row="0" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,10">
+          <StackPanel>
+            <DockPanel LastChildFill="False" Margin="0,0,0,8">
+              <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Left">
+                <Border Style="{StaticResource BlockTitleAccentStyle}" />
+                <TextBlock Text="Agent Login 선택 · 분배" Style="{StaticResource BlockTitleTextStyle}" />
+                <Border Background="{DynamicResource ChipBgBrush}" CornerRadius="10" Padding="8,2" Margin="8,0,8,0" VerticalAlignment="Center">
+                  <TextBlock x:Name="TxtLoginPoolCount" Text="미조회 (조회 버튼으로 불러오기)" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource ChipFgBrush}" />
+                </Border>
+                <Button x:Name="BtnFetchLoginPool" Content="사용 가능 Login 조회" Click="BtnFetchLoginPool_Click" Style="{StaticResource BaseBtn}" Height="25" Padding="9,0" FontSize="11.5" />
+              </StackPanel>
+
+              <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Right">
+                <CheckBox x:Name="ChkHideInUseLogins" Content="사용 가능만 보기" IsChecked="False" Checked="ChkHideInUseLogins_Changed" Unchecked="ChkHideInUseLogins_Changed" Style="{StaticResource ModernCheckBox}" FontSize="11.5" />
+              </StackPanel>
+            </DockPanel>
+
+            <!-- Unified Mode Bar: 자동 분배 / 수동 분배 / 직접 입력 -->
+            <DockPanel LastChildFill="False" Margin="0,0,0,7">
+              <Border Background="{DynamicResource SurfaceAltBrush}"
+                      BorderBrush="{DynamicResource BorderBrush}"
+                      BorderThickness="1"
+                      CornerRadius="6"
+                      Padding="2"
+                      DockPanel.Dock="Left">
+                <StackPanel Orientation="Horizontal">
+                  <Button x:Name="BtnDistModeAuto" Content="자동 분배 (다중 선택)" Click="BtnDistModeAuto_Click" Style="{StaticResource SegmentedBtnStyle}" FontSize="11" Padding="9,3" />
+                  <Button x:Name="BtnDistModeManual" Content="수동 분배 (1:1 지정)" Click="BtnDistModeManual_Click" Style="{StaticResource SegmentedBtnStyle}" FontSize="11" Padding="9,3" Margin="2,0,0,0" />
+                  <Button x:Name="BtnDistModeDirect" Content="직접 입력" Click="BtnDistModeDirect_Click" Style="{StaticResource SegmentedBtnStyle}" FontSize="11" Padding="9,3" Margin="2,0,0,0" />
+                </StackPanel>
+              </Border>
+
+              <!-- Auto Bar -->
+              <StackPanel x:Name="PnlAutoDistBar" Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Right">
+                <TextBlock x:Name="TxtGalleryPickedCount" Text="선택 0개" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                <Button x:Name="BtnSelectAllAvailLogins" Content="가능 전체 선택" Click="BtnSelectAllAvailLogins_Click" Style="{StaticResource BaseBtn}" Height="25" Padding="8,0" FontSize="11" Margin="0,0,5,0" />
+                <Button x:Name="BtnClearLoginPicks" Content="선택 해제" Click="BtnClearLoginPicks_Click" Style="{StaticResource BaseBtn}" Height="25" Padding="8,0" FontSize="11" Margin="0,0,6,0" />
+                <Button x:Name="BtnApplyAutoDist" Content="자동 1:1 분배 ↓" Click="BtnApplyAutoDist_Click" Style="{StaticResource PrimaryBtn}" Height="25" Padding="10,0" FontSize="11.5" ToolTip="선택된 Login(미선택 시 사용 가능 전체)을 아래 표에 순서대로 1:1 매칭합니다." />
+              </StackPanel>
+
+              <!-- Manual Bar -->
+              <StackPanel x:Name="PnlManualDistBar" Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Right" Visibility="Collapsed">
+                <Border Background="{DynamicResource ChipBgBrush}" CornerRadius="5" Height="25" Padding="9,0" Margin="0,0,6,0" VerticalAlignment="Center">
+                  <TextBlock x:Name="TxtManualTargetBadge" Text="대상 행 ▶ (표에서 Person을 선택하세요)" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource ChipFgBrush}" VerticalAlignment="Center" />
+                </Border>
+                <Button x:Name="BtnUnassignSelectedRow" Content="선택 행 배정 해제" Click="BtnUnassignSelectedRow_Click" Style="{StaticResource BaseBtn}" Height="25" Padding="8,0" FontSize="11" />
+              </StackPanel>
+
+              <!-- Direct Input Bar -->
+              <StackPanel x:Name="PnlDirectDistBar" Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Right" Visibility="Collapsed">
+                <Button x:Name="BtnImportCtiLogins" Content="내선·CTI 탭에서 가져오기" Click="BtnImportCtiLogins_Click" Style="{StaticResource BaseBtn}" Height="25" Padding="9,0" FontSize="11" />
+              </StackPanel>
+            </DockPanel>
+
+            <!-- Gallery Area (Auto / Manual Modes) -->
+            <StackPanel x:Name="PnlGalleryHost" Visibility="Visible">
+              <Border Background="{DynamicResource InputBgBrush}"
+                      BorderBrush="{DynamicResource BorderBrush}"
+                      BorderThickness="1"
+                      CornerRadius="6"
+                      Padding="5">
+                <Grid MinHeight="104">
+                  <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="104">
+                    <ItemsControl x:Name="IcLoginPool">
+                      <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                          <WrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                      </ItemsControl.ItemsPanel>
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                          <Border Padding="3"
+                                  Background="Transparent"
+                                  Cursor="Hand"
+                                  MouseLeftButtonDown="LoginTile_MouseLeftButtonDown"
+                                  MouseEnter="LoginTile_MouseEnter">
+                            <Border x:Name="TileCard"
+                                    Width="104"
+                                    Height="46"
+                                    CornerRadius="6"
+                                    Padding="8,4"
+                                    BorderThickness="1"
+                                    Background="{DynamicResource SurfaceBrush}"
+                                    BorderBrush="{DynamicResource BorderBrush}">
+                              <Grid>
+                                <StackPanel VerticalAlignment="Center">
+                                  <TextBlock Text="{Binding LoginId}"
+                                             FontFamily="Consolas"
+                                             FontSize="12.5"
+                                             FontWeight="Bold"
+                                             Foreground="{DynamicResource TextBrush}" />
+                                  <TextBlock x:Name="TxtTileStatus"
+                                             Text="{Binding StatusCaption}"
+                                             FontSize="10"
+                                             TextTrimming="CharacterEllipsis"
+                                             Foreground="{DynamicResource MutedBrush}"
+                                             Margin="0,1,0,0" />
+                                </StackPanel>
+
+                                <Border x:Name="PickOrderBadge"
+                                        Visibility="{Binding PickBadgeVisibility}"
+                                        Width="18" Height="18"
+                                        CornerRadius="9"
+                                        Background="{DynamicResource PrimaryBrush}"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Top"
+                                        Margin="0,-1,-2,0">
+                                  <TextBlock Text="{Binding PickOrderText}"
+                                             FontSize="10"
+                                             FontWeight="Bold"
+                                             Foreground="{DynamicResource PrimaryFgBrush}"
+                                             HorizontalAlignment="Center"
+                                             VerticalAlignment="Center" />
+                                </Border>
+                              </Grid>
+                            </Border>
+                          </Border>
+                          <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding IsAssignedToTable}" Value="True">
+                              <Setter TargetName="TileCard" Property="Background" Value="{DynamicResource OkBgBrush}" />
+                              <Setter TargetName="TileCard" Property="BorderBrush" Value="{DynamicResource OkBorderBrush}" />
+                              <Setter TargetName="TxtTileStatus" Property="Foreground" Value="{DynamicResource OkFgBrush}" />
+                              <Setter TargetName="TxtTileStatus" Property="FontWeight" Value="SemiBold" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsPicked}" Value="True">
+                              <Setter TargetName="TileCard" Property="Background" Value="{DynamicResource ChipBgBrush}" />
+                              <Setter TargetName="TileCard" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
+                              <Setter TargetName="TileCard" Property="BorderThickness" Value="2" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsInUseInCm}" Value="True">
+                              <Setter TargetName="TileCard" Property="Background" Value="{DynamicResource SurfaceAltBrush}" />
+                              <Setter TargetName="TileCard" Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+                              <Setter TargetName="TileCard" Property="Opacity" Value="0.44" />
+                            </DataTrigger>
+                          </DataTemplate.Triggers>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </ScrollViewer>
+
+                  <StackPanel x:Name="PnlEmptyGalleryHint" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False">
+                    <TextBlock Text="상단 [사용 가능 Login 조회]를 누르면 CM에서 미사용 Agent Login 목록을 불러와 클릭·드래그로 선택하고 분배할 수 있습니다." FontSize="11.5" Foreground="{DynamicResource MutedBrush}" TextAlignment="Center" TextWrapping="Wrap" Margin="12,0" />
+                  </StackPanel>
+                </Grid>
+              </Border>
+
+              <TextBlock x:Name="TxtGalleryTip"
+                         Text="💡 [자동 분배] Ctrl 키 없이 클릭·드래그로 다중 선택한 뒤 [자동 1:1 분배 ↓]를 누르세요. (미선택 시 사용 가능 전체 순차 분배)"
+                         FontSize="11"
+                         Foreground="{DynamicResource MutedBrush}"
+                         Margin="2,5,0,0" />
+            </StackPanel>
+
+            <!-- Direct Input Area (Integrated in Block 1) -->
+            <Border x:Name="PnlDirectInputHost"
+                    Visibility="Collapsed"
+                    Background="{DynamicResource SurfaceAltBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="10,9">
+              <StackPanel>
+                <TextBlock Text="Agent Login ID 직접 입력 (쉼표, 공백, 줄바꿈 또는 ~ 범위로 순서대로 1:1 매핑)" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource MutedBrush}" Margin="0,0,0,6" />
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="6" />
+                    <ColumnDefinition Width="Auto" />
+                  </Grid.ColumnDefinitions>
+
+                  <Grid Grid.Column="0">
+                    <TextBox x:Name="TxtRuleLogins" Style="{StaticResource ModernTextBox}" Height="34" FontFamily="Consolas" />
+                    <TextBlock Text="예: 70101~70105 또는 70101, 70104, 70109" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" Opacity="0.6" VerticalAlignment="Center" Margin="10,0,8,0" IsHitTestVisible="False">
+                      <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                          <Setter Property="Visibility" Value="Collapsed" />
+                          <Style.Triggers>
+                            <DataTrigger Binding="{Binding Text, ElementName=TxtRuleLogins}" Value="">
+                              <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                          </Style.Triggers>
+                        </Style>
+                      </TextBlock.Style>
+                    </TextBlock>
+                  </Grid>
+
+                  <Button x:Name="BtnApplyDirectLogins" Grid.Column="2" Content="표에 적용 ↓" Click="BtnApplyDirectLogins_Click" Style="{StaticResource PrimaryBtn}" Height="34" Padding="12,0" />
+                  <Button x:Name="BtnClearTableLogins" Grid.Column="4" Content="매핑 초기화" Click="BtnClearTableLogins_Click" Style="{StaticResource BaseBtn}" Height="34" Padding="10,0" />
+                </Grid>
+                <TextBlock x:Name="TxtDirectLoginStatus" Text="※ [사용 가능 Login 조회] 후 적용하면 사용 중 여부도 함께 확인할 수 있습니다." FontSize="11" Foreground="{DynamicResource MutedBrush}" Margin="2,6,0,0" />
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </Border>
+
+        <!-- RIGHT BLOCK 2: Person 생성 미리보기 + Bottom Execution Controls & Checkboxes -->
+        <Border Grid.Row="1" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,10">
+          <Grid>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="*" />
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <DockPanel Grid.Row="0" LastChildFill="False" Margin="0,0,0,8">
+              <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Left">
+                <Border Style="{StaticResource BlockTitleAccentStyle}" />
+                <TextBlock Text="Person 생성 미리보기" Style="{StaticResource BlockTitleTextStyle}" />
+                <Border Background="{DynamicResource ChipBgBrush}" CornerRadius="10" Padding="9,2" Margin="8,0,0,0" VerticalAlignment="Center">
+                  <TextBlock x:Name="TxtPersonCountBadge" Text="총 0명 · Login 연결 0건" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource ChipFgBrush}" />
+                </Border>
+              </StackPanel>
+
+              <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Right">
+                <Button x:Name="BtnAddEmptyRow" Content="+ 빈 행" Click="BtnAddEmptyRow_Click" Style="{StaticResource BaseBtn}" Height="25" Padding="8,0" FontSize="11.5" Margin="0,0,5,0" />
+                <Button x:Name="BtnDeleteSelectedRows" Content="행 삭제" Click="BtnDeleteSelectedRows_Click" Style="{StaticResource BaseBtn}" Height="25" Padding="8,0" FontSize="11.5" Margin="0,0,5,0" />
+                <Button x:Name="BtnClearRows" Content="비우기" Click="BtnClearRows_Click" Style="{StaticResource BaseBtn}" Height="25" Padding="8,0" FontSize="11.5" />
+              </StackPanel>
+            </DockPanel>
+
+            <Grid Grid.Row="1" MinHeight="145">
+              <DataGrid x:Name="DgPersons"
+                        Style="{StaticResource ModernDataGrid}"
+                        AutoGenerateColumns="False"
+                        ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                        SelectionChanged="DgPersons_SelectionChanged"
+                        CellEditEnding="DgPersons_CellEditEnding">
+                <DataGrid.Columns>
+                  <DataGridTemplateColumn Width="44" MinWidth="44" CanUserResize="False">
+                    <DataGridTemplateColumn.HeaderStyle>
+                      <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource ModernDataGridColumnHeader}">
+                        <Setter Property="Padding" Value="0" />
+                        <Setter Property="HorizontalContentAlignment" Value="Center" />
+                      </Style>
+                    </DataGridTemplateColumn.HeaderStyle>
+                    <DataGridTemplateColumn.Header>
+                      <CheckBox x:Name="ChkSelectAllRows"
+                                IsChecked="True"
+                                Click="ChkSelectAllRows_Click"
+                                Style="{StaticResource CompactCheckBox}"
+                                ToolTip="전체 선택/해제" />
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate>
+                        <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  Style="{StaticResource CompactCheckBox}"
+                                  Click="RowSelectionCheckBox_Click" />
+                      </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                  </DataGridTemplateColumn>
+
+                  <DataGridTextColumn Header="Employee ID"
+                                      Binding="{Binding EmployeeId, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                      EditingElementStyle="{StaticResource GridEditTextBoxStyle}"
+                                      MinWidth="105"
+                                      Width="1.25*">
+                    <DataGridTextColumn.ElementStyle>
+                      <Style TargetType="TextBlock">
+                        <Setter Property="FontFamily" Value="Consolas" />
+                        <Setter Property="FontWeight" Value="SemiBold" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                      </Style>
+                    </DataGridTextColumn.ElementStyle>
+                  </DataGridTextColumn>
+
+                  <DataGridTextColumn Header="User Name"
+                                      Binding="{Binding UserName, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                      EditingElementStyle="{StaticResource GridEditTextBoxStyle}"
+                                      MinWidth="95"
+                                      Width="1.15*" />
+
+                  <DataGridTextColumn Header="First Name"
+                                      Binding="{Binding FirstName, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                      EditingElementStyle="{StaticResource GridEditTextBoxStyle}"
+                                      MinWidth="95"
+                                      Width="1.1*" />
+
+                  <DataGridTextColumn Header="Last Name"
+                                      Binding="{Binding LastName, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                      EditingElementStyle="{StaticResource GridEditTextBoxStyle}"
+                                      MinWidth="90"
+                                      Width="1.05*" />
+
+                  <DataGridTextColumn Header="Agent Login ID"
+                                      Binding="{Binding AgentLoginId, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                      EditingElementStyle="{StaticResource GridEditTextBoxStyle}"
+                                      MinWidth="105"
+                                      Width="1.05*">
+                    <DataGridTextColumn.ElementStyle>
+                      <Style TargetType="TextBlock">
+                        <Setter Property="FontFamily" Value="Consolas" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                      </Style>
+                    </DataGridTextColumn.ElementStyle>
+                  </DataGridTextColumn>
+
+                  <DataGridTemplateColumn Header="Agent" Width="56" MinWidth="56" CanUserResize="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate>
+                        <CheckBox IsChecked="{Binding IsAgent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  Style="{StaticResource CompactCheckBox}"
+                                  Click="RowAgentCheckBox_Click" />
+                      </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                  </DataGridTemplateColumn>
+
+                  <DataGridTextColumn Header="상태"
+                                      Binding="{Binding StatusText}"
+                                      IsReadOnly="True"
+                                      MinWidth="64"
+                                      Width="0.68*">
+                    <DataGridTextColumn.ElementStyle>
+                      <Style TargetType="TextBlock">
+                        <Setter Property="Foreground" Value="{DynamicResource MutedBrush}" />
+                        <Setter Property="FontSize" Value="11.5" />
+                        <Setter Property="FontWeight" Value="SemiBold" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                      </Style>
+                    </DataGridTextColumn.ElementStyle>
+                  </DataGridTextColumn>
+                </DataGrid.Columns>
+              </DataGrid>
+
+              <StackPanel x:Name="PnlEmptyGridOverlay"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          IsHitTestVisible="False">
+                <TextBlock Text="생성할 Person 목록이 비어 있습니다" FontSize="12.5" FontWeight="SemiBold" Foreground="{DynamicResource MutedBrush}" HorizontalAlignment="Center" Margin="0,0,0,3" />
+                <TextBlock Text="좌측 [Person 프리셋 설정] 또는 [예시 채우기 (PTEST)]로 목록을 만드세요." FontSize="11" Foreground="{DynamicResource MutedBrush}" Opacity="0.78" HorizontalAlignment="Center" />
+              </StackPanel>
+            </Grid>
+
+            <!-- Selected Row CM Field Strip -->
+            <Border Grid.Row="2"
+                    Background="{DynamicResource SurfaceAltBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="9,6"
+                    Margin="0,8,0,0">
+              <TextBlock x:Name="TxtSelectedCmPreview"
+                         Text="[CM 입력 미리보기] 행을 선택하면 General / Agent Login 매핑 값이 표시됩니다."
+                         FontFamily="Consolas"
+                         FontSize="11.5"
+                         Foreground="{DynamicResource MutedBrush}"
+                         TextWrapping="Wrap" />
+            </Border>
+
+            <!-- Moved Checkboxes + Execution Buttons (Bottom of Right Block 2) -->
+            <DockPanel Grid.Row="3" LastChildFill="False" Margin="0,9,0,0">
+              <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Left">
+                <CheckBox x:Name="ChkPersonGeneral" Content="General" IsChecked="True" Style="{StaticResource ModernCheckBox}" Margin="0,0,12,0" />
+                <CheckBox x:Name="ChkPersonAddLogin" Content="Agent Login 적용하기" IsChecked="True" Style="{StaticResource ModernCheckBox}" />
+              </StackPanel>
+
+              <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Right">
+                <Button x:Name="BtnPersonCheck"
+                        Content="Employee ID 중복체크"
+                        Click="BtnPersonCheck_Click"
+                        Style="{StaticResource BaseBtn}"
+                        Margin="0,0,6,0" />
+                <Button x:Name="BtnPersonCreate"
+                        Content="적용하기"
+                        Click="BtnPersonCreate_Click"
+                        Style="{StaticResource PrimaryBtn}"
+                        ToolTip="미리보기 목록에서 체크된 Person만 일괄 생성·적용합니다" />
+              </StackPanel>
+            </DockPanel>
+          </Grid>
+        </Border>
+
+        <!-- RIGHT BLOCK 3: Log Console (Identical Style & Function to 내선·CTI Tab) -->
+        <Border Grid.Row="2" Style="{StaticResource CardBorderStyle}">
+          <StackPanel>
+            <DockPanel LastChildFill="False" Margin="0,0,0,9">
+              <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Left">
+                <Border Style="{StaticResource BlockTitleAccentStyle}" />
+                <TextBlock Text="Log" Style="{StaticResource BlockTitleTextStyle}" />
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                <Button x:Name="BtnSavePersonLog" Content="Save" Click="BtnSavePersonLog_Click" Style="{StaticResource BaseBtn}" Height="26" Padding="9,0" FontSize="11.5" Margin="0,0,6,0" />
+                <Button x:Name="BtnClearPersonLog" Content="Clear" Click="BtnClearPersonLog_Click" Style="{StaticResource BaseBtn}" Height="26" Padding="9,0" FontSize="11.5" />
+              </StackPanel>
+            </DockPanel>
+
+            <Border Background="{DynamicResource ConsoleBgBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="6">
+              <TextBox x:Name="TxtPersonLog"
+                       Height="110"
+                       IsReadOnly="True"
+                       AcceptsReturn="True"
+                       TextWrapping="Wrap"
+                       VerticalScrollBarVisibility="Auto"
+                       Background="Transparent"
+                       Foreground="{DynamicResource ConsoleFgBrush}"
+                       BorderThickness="0"
+                       FontFamily="Consolas"
+                       FontSize="12"
+                       Padding="10" />
+            </Border>
+          </StackPanel>
+        </Border>
+      </Grid>
+    </Grid>
+
+    <!-- ==================== VIEW 2: 조회 · 수정 / 삭제 ==================== -->
+    <Grid x:Name="PnlManageView" Grid.Row="1" Margin="14" Visibility="Collapsed">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="*" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+
+      <Border Grid.Row="0" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,10">
+        <DockPanel LastChildFill="False">
+          <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Left">
+            <Border Style="{StaticResource BlockTitleAccentStyle}" />
+            <TextBlock Text="기존 CM Person 조회" Style="{StaticResource BlockTitleTextStyle}" Margin="0,0,12,0" />
+
+            <Grid Width="240" Margin="0,0,8,0">
+              <ComboBox x:Name="CmbManageCustomer" Style="{StaticResource ModernComboBox}" Height="32" SelectionChanged="CmbManageCustomer_SelectionChanged" />
+              <TextBlock Text="센터를 선택하세요..."
+                         FontSize="12"
+                         Foreground="{DynamicResource MutedBrush}"
+                         Opacity="0.65"
+                         VerticalAlignment="Center"
+                         HorizontalAlignment="Left"
+                         Margin="11,0,28,0"
+                         IsHitTestVisible="False">
+                <TextBlock.Style>
+                  <Style TargetType="TextBlock">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                      <DataTrigger Binding="{Binding SelectedItem, ElementName=CmbManageCustomer}" Value="{x:Null}">
+                        <Setter Property="Visibility" Value="Visible" />
+                      </DataTrigger>
+                    </Style.Triggers>
+                  </Style>
+                </TextBlock.Style>
+              </TextBlock>
+            </Grid>
+
+            <Button x:Name="BtnFetchExistingPersons" Content="CM Person 목록 조회" Click="BtnFetchExistingPersons_Click" Style="{StaticResource PrimaryBtn}" Height="32" Padding="12,0" Margin="0,0,10,0" />
+            <Border x:Name="BdManageFolderChip" Visibility="Collapsed" Background="{DynamicResource SurfaceAltBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="5" Height="28" Padding="9,0" VerticalAlignment="Center">
+              <TextBlock x:Name="TxtManageLoadedFolder" Text="" FontFamily="Consolas" FontSize="11" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" />
+            </Border>
+          </StackPanel>
+
+          <Border Style="{StaticResource SearchBoxFrameStyle}" Height="32" Width="250" DockPanel.Dock="Right">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+              </Grid.ColumnDefinitions>
+              <Viewbox Grid.Column="0" Width="13" Height="13" Margin="10,0,6,0" VerticalAlignment="Center">
+                <Canvas Width="16" Height="16">
+                  <Ellipse Canvas.Left="2" Canvas.Top="2" Width="9" Height="9" Stroke="{DynamicResource MutedBrush}" StrokeThickness="1.7" />
+                  <Line X1="9.8" Y1="9.8" X2="14" Y2="14" Stroke="{DynamicResource MutedBrush}" StrokeThickness="1.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
+                </Canvas>
+              </Viewbox>
+              <Grid Grid.Column="1">
+                <TextBlock Text="사번 · 이름 · Login 필터..." FontSize="11.5" Foreground="{DynamicResource MutedBrush}" Opacity="0.65" VerticalAlignment="Center" Margin="2,0,8,0" IsHitTestVisible="False">
+                  <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                      <Setter Property="Visibility" Value="Collapsed" />
+                      <Style.Triggers>
+                        <DataTrigger Binding="{Binding Text, ElementName=TxtManageFilter}" Value="">
+                          <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                      </Style.Triggers>
+                    </Style>
+                  </TextBlock.Style>
+                </TextBlock>
+                <TextBox x:Name="TxtManageFilter"
+                         Background="Transparent"
+                         Foreground="{DynamicResource TextBrush}"
+                         CaretBrush="{DynamicResource TextBrush}"
+                         BorderThickness="0"
+                         FontSize="12"
+                         Padding="0,2,8,2"
+                         VerticalContentAlignment="Center"
+                         TextChanged="TxtManageFilter_TextChanged" />
+              </Grid>
+            </Grid>
+          </Border>
+        </DockPanel>
+      </Border>
+
+      <!-- LIST BLOCK + MOVED ACTION BUTTONS (EDIT / DELETE) -->
+      <Border Grid.Row="1" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,10">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+
+          <DockPanel Grid.Row="0" LastChildFill="False" Margin="0,0,0,9">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Left">
+              <Border Style="{StaticResource BlockTitleAccentStyle}" />
+              <TextBlock Text="CM 등록 Person 목록" Style="{StaticResource BlockTitleTextStyle}" />
+              <Border Background="{DynamicResource ChipBgBrush}" CornerRadius="10" Padding="9,2" Margin="8,0,0,0" VerticalAlignment="Center">
+                <TextBlock x:Name="TxtManageCountBadge" Text="조회 0명 · 선택 0명 · 변경 0건" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource ChipFgBrush}" />
+              </Border>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Right">
+              <Button x:Name="BtnManageRevertChanges"
+                      Content="변경 되돌리기"
+                      Click="BtnManageRevertChanges_Click"
+                      Style="{StaticResource BaseBtn}"
+                      Height="26"
+                      Padding="10,0"
+                      FontSize="11.5"
+                      ToolTip="선택(또는 수정된) 행의 편집 내용을 조회 당시 원본 값으로 복원합니다." />
+            </StackPanel>
+          </DockPanel>
+
+          <Grid Grid.Row="1">
+            <DataGrid x:Name="DgManagePersons"
+                      Style="{StaticResource ModernDataGrid}"
+                      AutoGenerateColumns="False"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                      CellEditEnding="DgManagePersons_CellEditEnding">
+              <DataGrid.Columns>
+                <DataGridTemplateColumn Width="44" MinWidth="44" CanUserResize="False">
+                  <DataGridTemplateColumn.HeaderStyle>
+                    <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource ModernDataGridColumnHeader}">
+                      <Setter Property="Padding" Value="0" />
+                      <Setter Property="HorizontalContentAlignment" Value="Center" />
+                    </Style>
+                  </DataGridTemplateColumn.HeaderStyle>
+                  <DataGridTemplateColumn.Header>
+                    <CheckBox x:Name="ChkManageSelectAll"
+                              IsChecked="False"
+                              Click="ChkManageSelectAll_Click"
+                              Style="{StaticResource CompactCheckBox}"
+                              ToolTip="전체 선택/해제" />
+                  </DataGridTemplateColumn.Header>
+                  <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                      <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                Style="{StaticResource CompactCheckBox}"
+                                Click="ManageRowSelection_Click" />
+                    </DataTemplate>
+                  </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTextColumn Header="Employee ID"
+                                    Binding="{Binding EmployeeId, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                    EditingElementStyle="{StaticResource GridEditTextBoxStyle}"
+                                    MinWidth="120"
+                                    Width="1.15*">
+                  <DataGridTextColumn.ElementStyle>
+                    <Style TargetType="TextBlock">
+                      <Setter Property="FontFamily" Value="Consolas" />
+                      <Setter Property="FontWeight" Value="SemiBold" />
+                      <Setter Property="VerticalAlignment" Value="Center" />
+                    </Style>
+                  </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="User Name"
+                                    Binding="{Binding UserName, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                    EditingElementStyle="{StaticResource GridEditTextBoxStyle}"
+                                    MinWidth="110"
+                                    Width="1.15*" />
+
+                <DataGridTextColumn Header="First Name"
+                                    Binding="{Binding FirstName, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                    EditingElementStyle="{StaticResource GridEditTextBoxStyle}"
+                                    MinWidth="110"
+                                    Width="1.1*" />
+
+                <DataGridTextColumn Header="Last Name"
+                                    Binding="{Binding LastName, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                    EditingElementStyle="{StaticResource GridEditTextBoxStyle}"
+                                    MinWidth="105"
+                                    Width="1.05*" />
+
+                <DataGridTemplateColumn Header="Agent Login ID" MinWidth="155" Width="1.25*">
+                  <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                      <DockPanel LastChildFill="True">
+                        <Button Content="선택 · 변경"
+                                Click="BtnRowChangeAgentLogin_Click"
+                                Style="{StaticResource BaseBtn}"
+                                Height="22"
+                                Padding="8,0"
+                                FontSize="10.5"
+                                DockPanel.Dock="Right"
+                                Margin="6,0,0,0"
+                                ToolTip="Agent Login 선택·분배 팝업 열기" />
+                        <TextBlock Text="{Binding AgentLoginDisplay}"
+                                   FontFamily="Consolas"
+                                   VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis" />
+                      </DockPanel>
+                    </DataTemplate>
+                  </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="Agent" Width="56" MinWidth="56" CanUserResize="False">
+                  <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                      <CheckBox IsChecked="{Binding IsAgent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                Style="{StaticResource CompactCheckBox}"
+                                Click="ManageRowAgentCheck_Click" />
+                    </DataTemplate>
+                  </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTextColumn Header="상태"
+                                    Binding="{Binding StatusText}"
+                                    IsReadOnly="True"
+                                    MinWidth="75"
+                                    Width="0.72*">
+                  <DataGridTextColumn.ElementStyle>
+                    <Style TargetType="TextBlock">
+                      <Setter Property="Foreground" Value="{DynamicResource MutedBrush}" />
+                      <Setter Property="FontSize" Value="11.5" />
+                      <Setter Property="FontWeight" Value="SemiBold" />
+                      <Setter Property="VerticalAlignment" Value="Center" />
+                    </Style>
+                  </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+              </DataGrid.Columns>
+            </DataGrid>
+
+            <StackPanel x:Name="PnlEmptyManageOverlay" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False">
+              <TextBlock Text="조회된 기존 Person 목록이 없습니다" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource MutedBrush}" HorizontalAlignment="Center" Margin="0,0,0,4" />
+              <TextBlock Text="상단에서 센터를 선택한 뒤 [CM Person 목록 조회]를 눌러 조회하세요." FontSize="11.5" Foreground="{DynamicResource MutedBrush}" Opacity="0.78" HorizontalAlignment="Center" />
+            </StackPanel>
+          </Grid>
+
+          <!-- Moved Bottom Execution Controls -->
+          <DockPanel Grid.Row="2" LastChildFill="False" Margin="0,9,0,0">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Left">
+              <Button x:Name="BtnManageOpenLoginPopup"
+                      Content="Agent Login 선택 · 분배..."
+                      Click="BtnManageOpenLoginPopup_Click"
+                      Style="{StaticResource BaseBtn}"
+                      Margin="0,0,10,0"
+                      ToolTip="체크된 대상들의 Agent Login을 선택·분배·직접입력 또는 해제합니다." />
+              <Border Background="{DynamicResource OkBgBrush}" BorderBrush="{DynamicResource OkBorderBrush}" BorderThickness="1" CornerRadius="5" Padding="9,5">
+                <TextBlock Text="Person 삭제 시 Agent Info의 Agent Login Delete ID 적용(연결 해제) 후 Person이 삭제됩니다."
+                           FontSize="11.5" Foreground="{DynamicResource OkFgBrush}" />
+              </Border>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Right">
+              <Button x:Name="BtnManageApplyEdit"
+                      Content="수정 반영"
+                      Click="BtnManageApplyEdit_Click"
+                      Style="{StaticResource PrimaryBtn}"
+                      Margin="0,0,6,0"
+                      ToolTip="체크된 행 중 수정된 Person 정보만 CM에 반영합니다 (Password 제외)" />
+              <Button x:Name="BtnManageDeletePersons"
+                      Content="선택 삭제"
+                      Click="BtnManageDeletePersons_Click"
+                      Style="{StaticResource DangerBtn}"
+                      ToolTip="체크된 Person을 Agent Login 연결 해제 후 CM에서 삭제합니다." />
+            </StackPanel>
+          </DockPanel>
+        </Grid>
+      </Border>
+
+      <!-- LOG BLOCK: Identical Style & Function to 내선·CTI / 신규 생성 -->
+      <Border Grid.Row="2" Style="{StaticResource CardBorderStyle}">
+        <StackPanel>
+          <DockPanel LastChildFill="False" Margin="0,0,0,9">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Left">
+              <Border Style="{StaticResource BlockTitleAccentStyle}" />
+              <TextBlock Text="Log" Style="{StaticResource BlockTitleTextStyle}" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+              <Button x:Name="BtnSaveManageLog" Content="Save" Click="BtnSaveManageLog_Click" Style="{StaticResource BaseBtn}" Height="26" Padding="9,0" FontSize="11.5" Margin="0,0,6,0" />
+              <Button x:Name="BtnClearManageLog" Content="Clear" Click="BtnClearManageLog_Click" Style="{StaticResource BaseBtn}" Height="26" Padding="9,0" FontSize="11.5" />
+            </StackPanel>
+          </DockPanel>
+
+          <Border Background="{DynamicResource ConsoleBgBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="6">
+            <TextBox x:Name="TxtManageLog"
+                     Height="110"
+                     IsReadOnly="True"
+                     AcceptsReturn="True"
+                     TextWrapping="Wrap"
+                     VerticalScrollBarVisibility="Auto"
+                     Background="Transparent"
+                     Foreground="{DynamicResource ConsoleFgBrush}"
+                     BorderThickness="0"
+                     FontFamily="Consolas"
+                     FontSize="12"
+                     Padding="10" />
+          </Border>
+        </StackPanel>
+      </Border>
+    </Grid>
+  </Grid>
+</UserControl>

@@ -1,0 +1,25 @@
+# Visual Studio / MSBuild 산출물 및 캐시
+.vs/
+src/bin/
+src/obj/
+*.user
+*.suo
+*.cache
+*.pdb
+
+# 빌드된 실행 파일 (소스 변경 시 MSBuild로 재빌드; 배포용 추적 시 아래 줄 제거)
+/ExtBatch.exe
+/ExtBatch.pdb
+
+# 런타임 일일 로그 및 임시 파일
+logs/
+*.log
+*.tmp
+*.bak
+Thumbs.db
+.DS_Store
+
+# 참조용 런타임 DLL은 유지
+!Microsoft.Web.WebView2.Core.dll
+!Microsoft.Web.WebView2.Wpf.dll
+!WebView2Loader.dll
