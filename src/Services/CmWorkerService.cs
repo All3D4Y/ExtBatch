@@ -216,6 +216,82 @@ namespace CmOxeProvisioner.Services
         public List<PersonManageFailureDto> failed { get; set; }
     }
 
+    public class CmCenterWorkerRequest
+    {
+        public string Action { get; set; }
+        public string CenterName { get; set; }
+        public string Location { get; set; }
+        public bool UseVQueue { get; set; }
+        public bool UseIvr { get; set; }
+        public bool ApplyVQueue { get; set; }
+        public bool WantVQueue { get; set; }
+        public bool ApplyIvr { get; set; }
+        public bool WantIvr { get; set; }
+        public bool DeleteLocationIfSpecified { get; set; }
+        public string CmExePath { get; set; }
+        public string CmUserId { get; set; }
+        public string CmPasswordPlain { get; set; }
+    }
+
+    public class CmCenterItemResultDto
+    {
+        public string key { get; set; }
+        public string label { get; set; }
+        public string kind { get; set; }
+        public string path { get; set; }
+        public string status { get; set; }
+        public string action { get; set; }
+        public bool existsNow { get; set; }
+        public string detail { get; set; }
+    }
+
+    public class CmCenterCheckResponse
+    {
+        public string centerName { get; set; }
+        public string location { get; set; }
+        public bool useVQueue { get; set; }
+        public bool useIvr { get; set; }
+        public List<CmCenterItemResultDto> items { get; set; }
+    }
+
+    public class CmCenterCreateResponse
+    {
+        public string centerName { get; set; }
+        public string location { get; set; }
+        public bool useVQueue { get; set; }
+        public bool useIvr { get; set; }
+        public int createdCount { get; set; }
+        public int skippedCount { get; set; }
+        public int failedCount { get; set; }
+        public double elapsedSeconds { get; set; }
+        public List<CmCenterItemResultDto> items { get; set; }
+    }
+
+    public class CmCenterStatusResponse
+    {
+        public string centerName { get; set; }
+        public bool vqueueExists { get; set; }
+        public bool ivrExists { get; set; }
+        public string vqueuePath { get; set; }
+        public string ivrPath { get; set; }
+    }
+
+    public class CmCenterApplyResponse
+    {
+        public string centerName { get; set; }
+        public bool vqueueExists { get; set; }
+        public bool ivrExists { get; set; }
+        public int failedCount { get; set; }
+        public List<CmCenterItemResultDto> items { get; set; }
+    }
+
+    public class CmCenterDeleteResponse
+    {
+        public string centerName { get; set; }
+        public int deletedCount { get; set; }
+        public int failedCount { get; set; }
+    }
+
     public class CmWorkerService
     {
         private static readonly Regex ClixmlMsgRegex = new Regex(
@@ -228,12 +304,14 @@ namespace CmOxeProvisioner.Services
 
         private readonly string _enginePath;
         private readonly string _personEnginePath;
+        private readonly string _centerEnginePath;
 
         public CmWorkerService(string enginePath)
         {
             _enginePath = enginePath;
             string dir = string.IsNullOrEmpty(enginePath) ? "" : Path.GetDirectoryName(enginePath);
             _personEnginePath = string.IsNullOrEmpty(dir) ? "" : Path.Combine(dir, "cm_person_engine.ps1");
+            _centerEnginePath = string.IsNullOrEmpty(dir) ? "" : Path.Combine(dir, "cm_center_engine.ps1");
         }
 
         private static string EscapePsSingle(string val)
@@ -308,7 +386,7 @@ namespace CmOxeProvisioner.Services
                 req.DoPlace ? "true" : "false"
             );
 
-            return ExecutePsScriptAsync(psLine, req.CmPasswordPlain, null, onLogLine);
+            return ExecutePsScriptAsync(psLine, req.CmPasswordPlain, null, null, onLogLine);
         }
 
         public Task<int> RunPersonAsync(CmPersonWorkerRequest req, Action<string> onLogLine)
@@ -346,10 +424,35 @@ namespace CmOxeProvisioner.Services
                 req.DoAgentLogin ? "true" : "false"
             );
 
-            return ExecutePsScriptAsync(psLine, req.CmPasswordPlain, tempPayloadPath, onLogLine);
+            return ExecutePsScriptAsync(psLine, req.CmPasswordPlain, tempPayloadPath, "CM_PERSON_PAYLOAD_PATH", onLogLine);
         }
 
-        private Task<int> ExecutePsScriptAsync(string commandLine, string passwordPlain, string payloadJsonPath, Action<string> onLogLine)
+        public Task<int> RunCenterAsync(CmCenterWorkerRequest req, Action<string> onLogLine)
+        {
+            if (string.IsNullOrEmpty(_centerEnginePath) || !File.Exists(_centerEnginePath))
+            {
+                if (onLogLine != null) onLogLine("[ERR] cm_center_engine.ps1 파일을 찾을 수 없습니다: " + (_centerEnginePath ?? ""));
+                return Task.FromResult(1);
+            }
+
+            string tempPayloadPath = Path.Combine(Path.GetTempPath(), "extbatch_center_" + Guid.NewGuid().ToString("N") + ".json");
+            JavaScriptSerializer jss = new JavaScriptSerializer();
+            jss.MaxJsonLength = 4 * 1024 * 1024;
+            File.WriteAllText(tempPayloadPath, jss.Serialize(req), new UTF8Encoding(false));
+
+            string psLine = string.Format(
+                "& '{0}' -Action '{1}' -Customer '{2}' -CmExePath '{3}' -CmUser '{4}'",
+                EscapePsSingle(_centerEnginePath),
+                EscapePsSingle(req.Action),
+                EscapePsSingle(req.CenterName),
+                EscapePsSingle(req.CmExePath),
+                EscapePsSingle(req.CmUserId)
+            );
+
+            return ExecutePsScriptAsync(psLine, req.CmPasswordPlain, tempPayloadPath, "CM_CENTER_PAYLOAD_PATH", onLogLine);
+        }
+
+        private Task<int> ExecutePsScriptAsync(string commandLine, string passwordPlain, string payloadJsonPath, string payloadEnvVarName, Action<string> onLogLine)
         {
             return Task.Run(delegate()
             {
@@ -373,9 +476,9 @@ namespace CmOxeProvisioner.Services
                     psi.StandardOutputEncoding = Encoding.UTF8;
                     psi.StandardErrorEncoding = Encoding.UTF8;
                     psi.EnvironmentVariables["CM_PASS_TEMP"] = passwordPlain ?? "";
-                    if (!string.IsNullOrEmpty(payloadJsonPath))
+                    if (!string.IsNullOrEmpty(payloadJsonPath) && !string.IsNullOrEmpty(payloadEnvVarName))
                     {
-                        psi.EnvironmentVariables["CM_PERSON_PAYLOAD_PATH"] = payloadJsonPath;
+                        psi.EnvironmentVariables[payloadEnvVarName] = payloadJsonPath;
                     }
 
                     object errLock = new object();

@@ -64,6 +64,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\CenterAddTabView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\AgentLoginPickerWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -89,6 +93,9 @@
     <Compile Include="Views\PopupDialogs.cs" />
     <Compile Include="Views\PersonTabView.xaml.cs">
       <DependentUpon>PersonTabView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\CenterAddTabView.xaml.cs">
+      <DependentUpon>CenterAddTabView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\AgentLoginPickerWindow.xaml.cs">
       <DependentUpon>AgentLoginPickerWindow.xaml</DependentUpon>

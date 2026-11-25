@@ -11,6 +11,9 @@ namespace CmOxeProvisioner.Models
         public string sampleExt { get; set; }
         public string sampleLoginId { get; set; }
         public string source { get; set; }
+        public string dnRange { get; set; }
+        public string ctiRange { get; set; }
+        public string note { get; set; }
     }
 
     public class CustomerInfo
@@ -21,6 +24,9 @@ namespace CmOxeProvisioner.Models
         public string[] acdPosition { get; set; }
         public string[] agentDn { get; set; }
         public string[] place { get; set; }
+        public string[] rsi { get; set; }
+        public bool? useVQueue { get; set; }
+        public bool? useIvr { get; set; }
         public string note { get; set; }
         public List<OxePreset> oxePresets { get; set; }
 
@@ -28,7 +34,7 @@ namespace CmOxeProvisioner.Models
         {
             get
             {
-                if (string.IsNullOrEmpty(floor)) return name ?? "";
+                if (string.IsNullOrEmpty(floor) || floor == "(위치 없음)") return name ?? "";
                 return string.Format("{0}  [{1}]", name, floor);
             }
         }

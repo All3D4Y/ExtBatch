@@ -1,0 +1,229 @@
+<UserControl x:Class="CmOxeProvisioner.Views.CenterAddTabView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="Transparent"
+             Foreground="{DynamicResource TextBrush}">
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <!-- SUB-HEADER BAR -->
+    <Border Grid.Row="0"
+            Background="{DynamicResource SurfaceBrush}"
+            BorderBrush="{DynamicResource BorderBrush}"
+            BorderThickness="0,0,0,1"
+            Padding="14,8">
+      <DockPanel LastChildFill="False">
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Left">
+          <Border Style="{StaticResource BlockTitleAccentStyle}" />
+          <TextBlock Text="신규 센터 추가" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" />
+          <TextBlock Text="CM 폴더 · Place Group 생성 및 선번장 · 프리셋 등록" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" Margin="10,0,0,0" />
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Right">
+          <Button x:Name="BtnFillCenterSample" Content="예시 채우기 (FTEST)" Click="BtnFillCenterSample_Click" Style="{StaticResource BaseBtn}" Height="28" Padding="11,0" FontSize="11.5" Margin="0,0,6,0" />
+          <Button x:Name="BtnResetCenterTab" Content="초기화" Click="BtnResetCenterTab_Click" Style="{StaticResource BaseBtn}" Height="28" Padding="11,0" FontSize="11.5" />
+        </StackPanel>
+      </DockPanel>
+    </Border>
+
+    <!-- MAIN BODY -->
+    <Grid Grid.Row="1" Margin="14">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="485" MinWidth="410" />
+        <ColumnDefinition Width="12" />
+        <ColumnDefinition Width="*" MinWidth="460" />
+      </Grid.ColumnDefinitions>
+
+      <!-- LEFT COLUMN: CENTER INPUT + PRESET/선번장 -->
+      <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
+        <StackPanel>
+
+          <!-- CARD 1: 센터 기본 정보 & CM 옵션 -->
+          <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,10">
+            <StackPanel>
+              <DockPanel LastChildFill="False" Margin="0,0,0,10">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Left">
+                  <Border Style="{StaticResource BlockTitleAccentStyle}" />
+                  <TextBlock Text="센터 기본 정보" Style="{StaticResource BlockTitleTextStyle}" />
+                </StackPanel>
+                <Border Background="{DynamicResource ChipBgBrush}" CornerRadius="5" Height="24" Padding="9,0" VerticalAlignment="Center" DockPanel.Dock="Right">
+                  <TextBlock x:Name="TxtCenterExistChip" Text="신규" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource ChipFgBrush}" VerticalAlignment="Center" />
+                </Border>
+              </DockPanel>
+
+              <Grid Margin="0,0,0,9">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="1*" />
+                  <ColumnDefinition Width="10" />
+                  <ColumnDefinition Width="1.45*" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                  <TextBlock Text="위치 (층수/지역)" Style="{StaticResource FieldLabelStyle}" />
+                  <ComboBox x:Name="CmbLocation" Style="{StaticResource ModernComboBox}" Height="34" SelectionChanged="InputField_Changed" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="2">
+                  <TextBlock Text="센터명 *" Style="{StaticResource FieldLabelStyle}" />
+                  <TextBox x:Name="TxtCenterName" Style="{StaticResource ModernTextBox}" Height="34" TextChanged="InputField_Changed" />
+                </StackPanel>
+              </Grid>
+
+              <StackPanel Margin="0,0,0,9">
+                <TextBlock Text="비고 (선택)" Style="{StaticResource FieldLabelStyle}" />
+                <TextBox x:Name="TxtCenterNote" Style="{StaticResource ModernTextBox}" Height="32" />
+              </StackPanel>
+
+              <Border Background="{DynamicResource SurfaceAltBrush}"
+                      BorderBrush="{DynamicResource BorderBrush}"
+                      BorderThickness="1"
+                      CornerRadius="6"
+                      Padding="10,8"
+                      Margin="0,0,0,10">
+                <StackPanel>
+                  <TextBlock Text="선택 CM 구성 옵션" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" Margin="0,0,0,6" />
+                  <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <CheckBox x:Name="ChkUseVQueue" Content="VQueue 사용 (DNs\VQueue 폴더)" Checked="InputField_Changed" Unchecked="InputField_Changed" Style="{StaticResource ModernCheckBox}" Margin="0,2,16,2" />
+                    <CheckBox x:Name="ChkUseIvr" Content="IVR 사용 (Place Groups 오브젝트)" Checked="InputField_Changed" Unchecked="InputField_Changed" Style="{StaticResource ModernCheckBox}" Margin="0,2,0,2" />
+                  </WrapPanel>
+                </StackPanel>
+              </Border>
+
+              <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <Button x:Name="BtnCenterPrecheck" Content="CM 사전 점검" Click="BtnCenterPrecheck_Click" Style="{StaticResource BaseBtn}" Margin="0,2,8,2" />
+                <Button x:Name="BtnCenterCreate" Content="CM 생성 + 센터 저장" Click="BtnCenterCreate_Click" Style="{StaticResource PrimaryBtn}" Margin="0,2,0,2" />
+              </WrapPanel>
+            </StackPanel>
+          </Border>
+
+          <!-- CARD 2: OXE 프리셋 · 선번장 (선택 입력 / 다건) -->
+          <Border Style="{StaticResource CardBorderStyle}">
+            <StackPanel>
+              <DockPanel LastChildFill="False" Margin="0,0,0,8">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Left">
+                  <Border Style="{StaticResource BlockTitleAccentStyle}" Background="{DynamicResource OxeBrush}" />
+                  <TextBlock Text="OXE 프리셋 · 선번장" Style="{StaticResource BlockTitleTextStyle}" />
+                  <TextBlock Text="(선택 · 다건)" Style="{StaticResource BlockSubtitleTextStyle}" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                  <Button x:Name="BtnAddPresetRow" Content="+ 추가" Click="BtnAddPresetRow_Click" Style="{StaticResource BaseBtn}" Height="26" Padding="9,0" FontSize="11.5" Margin="0,0,6,0" />
+                  <Button x:Name="BtnRemovePresetRow" Content="행 삭제" Click="BtnRemovePresetRow_Click" Style="{StaticResource BaseBtn}" Height="26" Padding="9,0" FontSize="11.5" />
+                </StackPanel>
+              </DockPanel>
+
+              <TextBlock Text="※ 모두 선택 입력입니다. 공란이 있어도 센터 생성이 가능하며, 입력한 행은 '내선 · CTI' 프리셋 및 선번장과 연동됩니다."
+                         FontSize="11"
+                         Foreground="{DynamicResource MutedBrush}"
+                         TextWrapping="Wrap"
+                         Margin="0,0,0,8" />
+
+              <DataGrid x:Name="DgCenterPresets"
+                        Style="{StaticResource ModernDataGrid}"
+                        MinHeight="175"
+                        MaxHeight="270"
+                        AutoGenerateColumns="False"
+                        CanUserSortColumns="False"
+                        HeadersVisibility="Column"
+                        ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                <DataGrid.Columns>
+                  <DataGridTextColumn Header="라벨 (미입력 시 자동)" Binding="{Binding Label, UpdateSourceTrigger=PropertyChanged}" Width="140" />
+                  <DataGridTextColumn Header="Entity No" Binding="{Binding EntityNo, UpdateSourceTrigger=PropertyChanged}" Width="72" />
+                  <DataGridTextColumn Header="Entity Name" Binding="{Binding EntityName, UpdateSourceTrigger=PropertyChanged}" Width="96" />
+                  <DataGridTextColumn Header="Agent PG" Binding="{Binding AgentPg, UpdateSourceTrigger=PropertyChanged}" Width="74" />
+                  <DataGridTextColumn Header="기준 내선" Binding="{Binding SampleExt, UpdateSourceTrigger=PropertyChanged}" Width="72" />
+                  <DataGridTextColumn Header="기준 CTI" Binding="{Binding SampleLoginId, UpdateSourceTrigger=PropertyChanged}" Width="72" />
+                  <DataGridTextColumn Header="내선 대역" Binding="{Binding DnRange, UpdateSourceTrigger=PropertyChanged}" Width="105" />
+                  <DataGridTextColumn Header="CTI 대역" Binding="{Binding CtiRange, UpdateSourceTrigger=PropertyChanged}" Width="105" />
+                  <DataGridTextColumn Header="비고" Binding="{Binding Note, UpdateSourceTrigger=PropertyChanged}" Width="120" />
+                </DataGrid.Columns>
+              </DataGrid>
+            </StackPanel>
+          </Border>
+
+        </StackPanel>
+      </ScrollViewer>
+
+      <!-- RIGHT COLUMN: CM PATH PREVIEW + LOG -->
+      <Grid Grid.Column="2">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="*" />
+          <RowDefinition Height="10" />
+          <RowDefinition Height="210" />
+        </Grid.RowDefinitions>
+
+        <!-- TOP RIGHT: TARGET PATHS PREVIEW -->
+        <Border Grid.Row="0" Style="{StaticResource CardBorderStyle}">
+          <Grid>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <DockPanel Grid.Row="0" LastChildFill="False" Margin="0,0,0,9">
+              <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Left">
+                <Border Style="{StaticResource BlockTitleAccentStyle}" />
+                <TextBlock Text="생성 대상 CM 경로 미리보기" Style="{StaticResource BlockTitleTextStyle}" />
+              </StackPanel>
+              <Border Background="{DynamicResource ChipBgBrush}" CornerRadius="10" Padding="10,3" VerticalAlignment="Center" DockPanel.Dock="Right">
+                <TextBlock x:Name="TxtTargetSummary" Text="총 0건" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource ChipFgBrush}" />
+              </Border>
+            </DockPanel>
+
+            <DataGrid x:Name="DgCmTargets"
+                      Grid.Row="1"
+                      Style="{StaticResource ModernDataGrid}"
+                      IsReadOnly="True"
+                      AutoGenerateColumns="False"
+                      CanUserSortColumns="False">
+              <DataGrid.Columns>
+                <DataGridTextColumn Header="항목" Binding="{Binding Label}" Width="165" />
+                <DataGridTextColumn Header="유형" Binding="{Binding TypeDisplay}" Width="88" />
+                <DataGridTextColumn Header="예정 CM 경로" Binding="{Binding PathDisplay}" Width="*" />
+                <DataGridTextColumn Header="상태" Binding="{Binding StatusText}" Width="128" />
+              </DataGrid.Columns>
+            </DataGrid>
+          </Grid>
+        </Border>
+
+        <!-- BOTTOM RIGHT: LOG -->
+        <Border Grid.Row="2" Style="{StaticResource CardBorderStyle}">
+          <Grid>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <DockPanel Grid.Row="0" LastChildFill="False" Margin="0,0,0,8">
+              <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Left">
+                <Border Style="{StaticResource BlockTitleAccentStyle}" />
+                <TextBlock Text="센터 작업 Log" Style="{StaticResource BlockTitleTextStyle}" />
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                <Button x:Name="BtnSaveCenterLog" Content="Save" Click="BtnSaveCenterLog_Click" Style="{StaticResource BaseBtn}" Height="26" Padding="9,0" FontSize="11.5" Margin="0,0,6,0" />
+                <Button x:Name="BtnClearCenterLog" Content="Clear" Click="BtnClearCenterLog_Click" Style="{StaticResource BaseBtn}" Height="26" Padding="9,0" FontSize="11.5" />
+              </StackPanel>
+            </DockPanel>
+
+            <Border Grid.Row="1" Background="{DynamicResource ConsoleBgBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="6">
+              <TextBox x:Name="TxtCenterLog"
+                       IsReadOnly="True"
+                       AcceptsReturn="True"
+                       TextWrapping="Wrap"
+                       VerticalScrollBarVisibility="Auto"
+                       Background="Transparent"
+                       Foreground="{DynamicResource ConsoleFgBrush}"
+                       BorderThickness="0"
+                       FontFamily="Consolas"
+                       FontSize="12"
+                       Padding="10" />
+            </Border>
+          </Grid>
+        </Border>
+      </Grid>
+    </Grid>
+  </Grid>
+</UserControl>

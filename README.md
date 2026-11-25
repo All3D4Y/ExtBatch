@@ -12,8 +12,8 @@ Alcatel OXE(LightGate 터미널) 및 Genesys Configuration Manager(`sce.exe`)의
 | 파일명 | 설명 |
 | --- | --- |
 | `ExtBatch.exe` | 메인 GUI 실행 파일 |
-| `cm_customers.json` | 센터별 CM 폴더 경로 및 OXE Preset(`Entity NO`, `Agent PG`, `기준 Profile`) 매핑 DB |
-| `cm_batch_engine.ps1` / `cm_win32_lib.ps1` | CM Win32 제어 및 전역 검색·생성·삭제 엔진 |
+| `cm_customers.json` | 센터별 CM 폴더 경로 및 OXE Preset·선번장(`Entity NO`, `Agent PG`, `기준 Profile`, 대역) 매핑 DB |
+| `cm_batch_engine.ps1` / `cm_person_engine.ps1` / `cm_center_engine.ps1` / `cm_win32_lib.ps1` | CM Win32 제어 및 내선·CTI / Person / 센터 폴더·Place Group 자동화 엔진 |
 
 ---
 
@@ -39,7 +39,7 @@ Alcatel OXE(LightGate 터미널) 및 Genesys Configuration Manager(`sce.exe`)의
 
 ### 1) 센터
 - 드롭다운에서 센터를 선택하거나 우측 검색창(센터명/층)으로 필터링합니다. (초기 기본값은 공란)
-- `CM 경로 ▾` 버튼으로 해당 센터의 CM 4종 폴더 경로(`Agent Login`, `ACD Position`, `Agent DN`, `Place`)를 확인할 수 있습니다.
+- `CM 경로 ▾` 버튼으로 해당 센터의 CM 폴더 경로 확인 및 **선택 CM 구성(`VQueue 사용`, `IVR 사용 (Place Group)`)**을 `상태 조회` / `적용하기`로 안전하게 생성·변경할 수 있습니다.
 > [!NOTE]
 > CM 및 PBX **내선/CTI ID 검색**과 CM 일괄 삭제는 센터를 선택하지 않아도 실행할 수 있습니다.
 
@@ -81,6 +81,12 @@ Alcatel OXE(LightGate 터미널) 및 Genesys Configuration Manager(`sce.exe`)의
   - `↻` (새로고침 아이콘) : LightGate 웹페이지 자체 새로고침
   - `터미널 창만 보기` : LightGate 좌측 메뉴 숨김 토글
   - `터미널 재실행` : 열려 있는 터미널만 종료 후 서버 재연결
+
+### 6) 사이드바 `'센터 추가'` 탭 (`v1.1.0`)
+- 좌측 사이드바 **`센터 추가`** 메뉴에서 신규 센터 CM 일괄 생성과 `cm_customers.json` 선번장/프리셋 등록을 한 번에 처리할 수 있습니다.
+- **필수 생성 폴더**: 위치 포함 6곳(`Persons`, `Places\AGENT`, `Agent Logins`, `DNs\ACDPosition`, `DNs\AGENT_DN`, `DNs\RSI`) + 위치 미포함 3곳(`Agent Groups`, `DN Groups`, `Scripts\유세스파트너스`)
+- **조건부 생성**: `VQueue 사용`(`Switches\TServerAlcatel\DNs\VQueue\<센터명>` 폴더), `IVR 사용`(`Place Groups\<센터명>` `Place Group` 오브젝트)
+- **프리셋 · 선번장**: `+ 추가`로 여러 행(Entity No, Agent PG, 대역 등) 등록 가능하며, 센터명만 입력하고 공란으로 두어도 생성 가능합니다.
 
 ---
 

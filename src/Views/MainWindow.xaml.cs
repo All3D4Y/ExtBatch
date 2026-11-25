@@ -44,6 +44,11 @@ namespace CmOxeProvisioner.Views
         private bool _isPbxCheckBusy = false;
         private bool _isCmConnected = false;
         private bool _startupAutoConnectDone = false;
+        private bool? _cmOptRealVq = null;
+        private bool? _cmOptRealIvr = null;
+        private bool _cmOptUserTouchedVq = false;
+        private bool _cmOptUserTouchedIvr = false;
+        private bool _isSyncingCenterOptChecks = false;
 
         private bool _webViewReady = false;
         private bool _webViewInitStarted = false;
@@ -97,6 +102,12 @@ namespace CmOxeProvisioner.Views
             PersonTabControl.FetchManagePersonsAsyncHandler = HandlePersonFetchManageAsync;
             PersonTabControl.UpdateManagePersonsAsyncHandler = HandlePersonUpdateManageAsync;
             PersonTabControl.DeleteManagePersonsAsyncHandler = HandlePersonDeleteManageAsync;
+
+            CenterAddTabControl.SetCustomers(_allCustomers);
+            CenterAddTabControl.PrecheckCenterAsyncHandler = HandleCenterPrecheckAsync;
+            CenterAddTabControl.CreateCenterAsyncHandler = HandleCenterCreateAsync;
+            CenterAddTabControl.SaveLogHandler = SaveLogTextToFile;
+
             ChkEmsTerminalOnly.IsChecked = _settings.EmsTerminalOnly;
             SetActiveViewMode("Split");
             OpenOrActivateTab("extcti");
@@ -260,6 +271,11 @@ namespace CmOxeProvisioner.Views
         private void UpdateCustomerDetails()
         {
             CustomerInfo c = _selectedCustomer;
+            _cmOptRealVq = null;
+            _cmOptRealIvr = null;
+            _cmOptUserTouchedVq = false;
+            _cmOptUserTouchedIvr = false;
+
             if (c == null)
             {
                 TxtFloorBadge.Text = "-";
@@ -269,6 +285,15 @@ namespace CmOxeProvisioner.Views
                 TxtPathDn.Text = "3) Agent DN    : (없음)";
                 TxtPathPlace.Text = "4) Place       : (없음)";
                 TxtPathNote.Visibility = Visibility.Collapsed;
+                _isSyncingCenterOptChecks = true;
+                ChkCenterVQueue.IsChecked = false;
+                ChkCenterIvr.IsChecked = false;
+                ChkCenterVQueue.IsEnabled = false;
+                ChkCenterIvr.IsEnabled = false;
+                BtnCheckCenterOpts.IsEnabled = false;
+                BtnApplyCenterOpts.IsEnabled = false;
+                TxtCmOptionSyncState.Text = "센터 미선택";
+                _isSyncingCenterOptChecks = false;
                 CmbOxePreset.ItemsSource = null;
                 CmbOxePreset.SelectedIndex = -1;
                 TxtEntityNo.Text = "";
@@ -287,6 +312,27 @@ namespace CmOxeProvisioner.Views
             TxtPathAcd.Text = FormatCmPath("2) ACD Position", c.acdPosition);
             TxtPathDn.Text = FormatCmPath("3) Agent DN    ", c.agentDn);
             TxtPathPlace.Text = FormatCmPath("4) Place       ", c.place);
+
+            _isSyncingCenterOptChecks = true;
+            ChkCenterVQueue.IsEnabled = !_isCmBusy;
+            ChkCenterIvr.IsEnabled = !_isCmBusy;
+            BtnCheckCenterOpts.IsEnabled = !_isCmBusy;
+            BtnApplyCenterOpts.IsEnabled = !_isCmBusy;
+            ChkCenterVQueue.IsChecked = c.useVQueue ?? false;
+            ChkCenterIvr.IsChecked = c.useIvr ?? false;
+            if (c.useVQueue.HasValue || c.useIvr.HasValue)
+            {
+                _cmOptRealVq = c.useVQueue;
+                _cmOptRealIvr = c.useIvr;
+                TxtCmOptionSyncState.Text = string.Format("저장값 (VQ:{0} / IVR:{1})",
+                    c.useVQueue == true ? "ON" : "OFF",
+                    c.useIvr == true ? "ON" : "OFF");
+            }
+            else
+            {
+                TxtCmOptionSyncState.Text = "미확인 ('상태 조회' 또는 '적용하기')";
+            }
+            _isSyncingCenterOptChecks = false;
 
             if (!string.IsNullOrEmpty(c.note))
             {
@@ -638,16 +684,21 @@ namespace CmOxeProvisioner.Views
             }
         }
 
-        private void BtnSaveLog_Click(object sender, RoutedEventArgs e)
+        private void SaveLogTextToFile(string logText, string filePrefix)
         {
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.Filter = "Log File (*.log)|*.log|Text File (*.txt)|*.txt";
-            sfd.FileName = "ExtBatch_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".log";
+            sfd.FileName = (string.IsNullOrWhiteSpace(filePrefix) ? "ExtBatch" : filePrefix) + "_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".log";
             if (sfd.ShowDialog(this) == true)
             {
-                File.WriteAllText(sfd.FileName, TxtLog.Text, new UTF8Encoding(true));
+                File.WriteAllText(sfd.FileName, logText ?? "", new UTF8Encoding(true));
                 AppendLog("OK", "Log 저장 완료: " + sfd.FileName);
             }
+        }
+
+        private void BtnSaveLog_Click(object sender, RoutedEventArgs e)
+        {
+            SaveLogTextToFile(TxtLog.Text, "ExtBatch");
         }
 
         private void BtnClearLog_Click(object sender, RoutedEventArgs e)
@@ -1456,9 +1507,18 @@ namespace CmOxeProvisioner.Views
             BtnCmCheck.IsEnabled = enabled;
             BtnCmCreate.IsEnabled = enabled;
             BtnCmDelete.IsEnabled = enabled;
+            bool hasCustomer = (_selectedCustomer != null);
+            if (ChkCenterVQueue != null) ChkCenterVQueue.IsEnabled = enabled && hasCustomer;
+            if (ChkCenterIvr != null) ChkCenterIvr.IsEnabled = enabled && hasCustomer;
+            if (BtnCheckCenterOpts != null) BtnCheckCenterOpts.IsEnabled = enabled && hasCustomer;
+            if (BtnApplyCenterOpts != null) BtnApplyCenterOpts.IsEnabled = enabled && hasCustomer;
             if (PersonTabControl != null)
             {
                 PersonTabControl.SetBusyState(!enabled);
+            }
+            if (CenterAddTabControl != null)
+            {
+                CenterAddTabControl.SetBusyState(!enabled);
             }
         }
 
@@ -1943,6 +2003,499 @@ namespace CmOxeProvisioner.Views
             return isSuccess && delCnt > 0;
         }
 
+        // ==================== CENTER ADD & VQUEUE / IVR OPTION HANDLERS ====================
+        private void EnsureCmReadyForCenter()
+        {
+            if (_isCmBusy)
+            {
+                throw new InvalidOperationException("다른 CM 작업이 진행 중입니다. 완료 후 다시 시도하세요.");
+            }
+            if (string.IsNullOrWhiteSpace(_settings.CmExePath) || !File.Exists(_settings.CmExePath))
+            {
+                AuditLogService.AppendError(_auditLogDir, "CM", "Center", "Settings에서 유효한 sce.exe 경로를 먼저 설정하세요.");
+                throw new InvalidOperationException("Settings에서 유효한 sce.exe 경로를 먼저 설정하세요.");
+            }
+        }
+
+        private CmCenterWorkerRequest BuildCenterWorkerRequest(string action, string centerName, string location)
+        {
+            CmCenterWorkerRequest req = new CmCenterWorkerRequest();
+            req.Action = action;
+            req.CenterName = centerName ?? "";
+            req.Location = location ?? "";
+            req.CmExePath = _settings.CmExePath;
+            req.CmUserId = _settings.CmUserId;
+            req.CmPasswordPlain = SettingsService.UnprotectString(_settings.CmPasswordEnc);
+            return req;
+        }
+
+        private async Task<int> ExecuteCenterWorkerAsync(
+            CmCenterWorkerRequest req,
+            string busyMsg,
+            bool logToCenterTab,
+            Action<string> onControlLine)
+        {
+            SetCmButtonsEnabled(false);
+            BtnConnectCm.Content = busyMsg;
+            bool psErrorAudited = false;
+            string lastPsErr = null;
+            string opLabel = "Center:" + ((req != null && !string.IsNullOrWhiteSpace(req.Action)) ? req.Action : "Worker");
+
+            try
+            {
+                int exit = await _cmWorker.RunCenterAsync(req, delegate(string line)
+                {
+                    bool isAuditErr;
+                    if (AuditLogService.TryWriteFromWorkerLine(_auditLogDir, line, out isAuditErr))
+                    {
+                        if (isAuditErr) psErrorAudited = true;
+                        return;
+                    }
+                    if (line != null && (line.StartsWith("##CENTER_CHECK_JSON##", StringComparison.Ordinal)
+                        || line.StartsWith("##CENTER_CREATE_JSON##", StringComparison.Ordinal)
+                        || line.StartsWith("##CENTER_STATUS_JSON##", StringComparison.Ordinal)
+                        || line.StartsWith("##CENTER_APPLY_JSON##", StringComparison.Ordinal)
+                        || line.StartsWith("##CENTER_DELETE_JSON##", StringComparison.Ordinal)))
+                    {
+                        if (onControlLine != null) onControlLine(line);
+                        return;
+                    }
+                    if (line != null && line.StartsWith("[PS-ERR]", StringComparison.Ordinal))
+                    {
+                        lastPsErr = line;
+                    }
+
+                    if (logToCenterTab)
+                    {
+                        if (CenterAddTabControl != null) CenterAddTabControl.AppendExternalLog(line);
+                    }
+                    else
+                    {
+                        Dispatcher.BeginInvoke(new Action(delegate()
+                        {
+                            if (TxtLog.Text.Length > 0) TxtLog.AppendText(Environment.NewLine);
+                            TxtLog.AppendText(line);
+                            TxtLog.ScrollToEnd();
+                        }));
+                    }
+                });
+
+                if (exit != 0 && !psErrorAudited)
+                {
+                    AuditLogService.AppendError(
+                        _auditLogDir,
+                        "CM",
+                        opLabel,
+                        !string.IsNullOrWhiteSpace(lastPsErr) ? lastPsErr : string.Format("센터 CM 작업 비정상 종료 (exit={0})", exit),
+                        req != null ? req.CenterName : null);
+                }
+                return exit;
+            }
+            catch (Exception ex)
+            {
+                if (!psErrorAudited)
+                {
+                    AuditLogService.AppendError(_auditLogDir, "CM", opLabel, ex.Message, req != null ? req.CenterName : null);
+                }
+                throw;
+            }
+            finally
+            {
+                SetCmButtonsEnabled(true);
+                SetCmConnState(_isCmConnected);
+            }
+        }
+
+        private void SaveCustomersToDiskAndRefreshAll(string preferSelectName = null)
+        {
+            string jsonPath = Path.Combine(_baseDir, "cm_customers.json");
+            CustomerRepository repo = new CustomerRepository();
+            repo.SaveAll(jsonPath, _allCustomers);
+
+            if (!string.IsNullOrEmpty(preferSelectName))
+            {
+                for (int i = 0; i < _allCustomers.Count; i++)
+                {
+                    if (string.Equals(_allCustomers[i].name, preferSelectName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        _selectedCustomer = _allCustomers[i];
+                        break;
+                    }
+                }
+            }
+
+            FilterCustomers(TxtSearch.Text);
+            if (PersonTabControl != null) PersonTabControl.SetCustomers(_allCustomers);
+            if (CenterAddTabControl != null) CenterAddTabControl.SetCustomers(_allCustomers);
+        }
+
+        private async Task<CmCenterCheckResponse> HandleCenterPrecheckAsync(CenterCreateInput input)
+        {
+            EnsureCmReadyForCenter();
+            CmCenterWorkerRequest req = BuildCenterWorkerRequest("CheckCenter", input.CenterName, input.Location);
+            req.UseVQueue = input.UseVQueue;
+            req.UseIvr = input.UseIvr;
+
+            CenterAddTabControl.AppendExternalLog(string.Format("[CM 사전 점검] '{0}' 시작...", input.CenterName));
+            string jsonRaw = null;
+            int exit = await ExecuteCenterWorkerAsync(req, "센터 사전 점검 중...", true, delegate(string line)
+            {
+                if (line.StartsWith("##CENTER_CHECK_JSON##", StringComparison.Ordinal))
+                {
+                    jsonRaw = line.Substring("##CENTER_CHECK_JSON##".Length);
+                }
+            });
+
+            if (exit != 0)
+            {
+                SetCmConnState(false);
+                throw new InvalidOperationException("CM 사전 점검 중 오류가 발생했습니다. 작업 Log를 확인하세요.");
+            }
+            SetCmConnState(true);
+
+            CmCenterCheckResponse res = DeserializeJsonPayload<CmCenterCheckResponse>(jsonRaw);
+            if (res == null)
+            {
+                throw new InvalidOperationException("CM 사전 점검 응답을 파싱할 수 없습니다.");
+            }
+            return res;
+        }
+
+        private async Task<CenterSaveOutcome> HandleCenterCreateAsync(CenterCreateInput input)
+        {
+            EnsureCmReadyForCenter();
+            CmCenterWorkerRequest req = BuildCenterWorkerRequest("CreateCenter", input.CenterName, input.Location);
+            req.UseVQueue = input.UseVQueue;
+            req.UseIvr = input.UseIvr;
+
+            CenterAddTabControl.AppendExternalLog(string.Format("[CM 센터 생성] '{0}' 실행 시작...", input.CenterName));
+            string jsonRaw = null;
+            int exit = await ExecuteCenterWorkerAsync(req, "센터 CM 생성 중...", true, delegate(string line)
+            {
+                if (line.StartsWith("##CENTER_CREATE_JSON##", StringComparison.Ordinal))
+                {
+                    jsonRaw = line.Substring("##CENTER_CREATE_JSON##".Length);
+                }
+            });
+
+            CmCenterCreateResponse cmRes = DeserializeJsonPayload<CmCenterCreateResponse>(jsonRaw);
+            if (exit != 0 && cmRes == null)
+            {
+                SetCmConnState(false);
+                throw new InvalidOperationException("센터 CM 생성 중 오류가 발생했습니다. 작업 Log를 확인하세요.");
+            }
+            SetCmConnState(exit == 0);
+
+            CenterSaveOutcome outcome = new CenterSaveOutcome();
+            outcome.CmResponse = cmRes;
+
+            if (cmRes != null && (cmRes.createdCount > 0 || cmRes.skippedCount > 0))
+            {
+                bool hasLoc = !string.IsNullOrWhiteSpace(input.Location) && input.Location != "(위치 없음)" && input.Location != "-";
+                string[] locArr = hasLoc ? new string[] { input.Location.Trim(), input.CenterName.Trim() } : new string[] { input.CenterName.Trim() };
+
+                CustomerInfo existing = null;
+                for (int i = 0; i < _allCustomers.Count; i++)
+                {
+                    if (string.Equals(_allCustomers[i].name, input.CenterName.Trim(), StringComparison.OrdinalIgnoreCase))
+                    {
+                        existing = _allCustomers[i];
+                        break;
+                    }
+                }
+
+                if (existing != null)
+                {
+                    outcome.UpdatedExistingJson = true;
+                    if (string.IsNullOrWhiteSpace(existing.floor) && hasLoc) existing.floor = input.Location.Trim();
+                    if (existing.agentLogin == null || existing.agentLogin.Length == 0) existing.agentLogin = locArr;
+                    if (existing.acdPosition == null || existing.acdPosition.Length == 0) existing.acdPosition = locArr;
+                    if (existing.agentDn == null || existing.agentDn.Length == 0) existing.agentDn = locArr;
+                    if (existing.place == null || existing.place.Length == 0) existing.place = locArr;
+                    if (existing.rsi == null || existing.rsi.Length == 0) existing.rsi = locArr;
+                    existing.useVQueue = input.UseVQueue || (existing.useVQueue == true);
+                    existing.useIvr = input.UseIvr || (existing.useIvr == true);
+                    if (!string.IsNullOrWhiteSpace(input.Note)) existing.note = input.Note;
+                    if (existing.oxePresets == null) existing.oxePresets = new List<OxePreset>();
+                    if (input.Presets != null && input.Presets.Count > 0)
+                    {
+                        for (int pi = 0; pi < input.Presets.Count; pi++)
+                        {
+                            OxePreset np = input.Presets[pi];
+                            bool dup = false;
+                            for (int ei = 0; ei < existing.oxePresets.Count; ei++)
+                            {
+                                OxePreset ep = existing.oxePresets[ei];
+                                if (string.Equals(ep.label ?? "", np.label ?? "", StringComparison.OrdinalIgnoreCase)
+                                    && string.Equals(ep.entityNo ?? "", np.entityNo ?? "", StringComparison.OrdinalIgnoreCase)
+                                    && string.Equals(ep.agentPg ?? "", np.agentPg ?? "", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    existing.oxePresets[ei] = np;
+                                    dup = true;
+                                    break;
+                                }
+                            }
+                            if (!dup) existing.oxePresets.Add(np);
+                        }
+                    }
+                }
+                else
+                {
+                    outcome.UpdatedExistingJson = false;
+                    CustomerInfo createdCust = new CustomerInfo();
+                    createdCust.name = input.CenterName.Trim();
+                    createdCust.floor = hasLoc ? input.Location.Trim() : "";
+                    createdCust.agentLogin = locArr;
+                    createdCust.acdPosition = locArr;
+                    createdCust.agentDn = locArr;
+                    createdCust.place = locArr;
+                    createdCust.rsi = locArr;
+                    createdCust.useVQueue = input.UseVQueue;
+                    createdCust.useIvr = input.UseIvr;
+                    createdCust.note = input.Note ?? "";
+                    createdCust.oxePresets = input.Presets ?? new List<OxePreset>();
+                    _allCustomers.Add(createdCust);
+                }
+
+                SaveCustomersToDiskAndRefreshAll(_selectedCustomer != null ? _selectedCustomer.name : input.CenterName.Trim());
+                outcome.SavedToJson = true;
+                CenterAddTabControl.AppendExternalLog(string.Format("[저장 완료] cm_customers.json {0} ('{1}')",
+                    outcome.UpdatedExistingJson ? "업데이트" : "신규 등록", input.CenterName));
+                AppendLog("OK", string.Format("[센터 추가] '{0}' {1} 완료 (JSON 반영)",
+                    input.CenterName, outcome.UpdatedExistingJson ? "보완" : "등록"));
+            }
+
+            return outcome;
+        }
+
+        private void ChkCenterOption_Changed(object sender, RoutedEventArgs e)
+        {
+            if (_isInitializingUi || _isSyncingCenterOptChecks) return;
+            if (sender == ChkCenterVQueue) _cmOptUserTouchedVq = true;
+            if (sender == ChkCenterIvr) _cmOptUserTouchedIvr = true;
+            if (TxtCmOptionSyncState != null && _selectedCustomer != null)
+            {
+                TxtCmOptionSyncState.Text = "변경 대기 ('적용하기' 클릭 시 반영)";
+            }
+        }
+
+        private async Task<CmCenterStatusResponse> QueryLiveCenterOptionsAsync(CustomerInfo cust)
+        {
+            CmCenterWorkerRequest req = BuildCenterWorkerRequest("CheckCenterOptions", cust.name, cust.floor);
+            string jsonRaw = null;
+            int exit = await ExecuteCenterWorkerAsync(req, "CM 옵션 조회 중...", false, delegate(string line)
+            {
+                if (line.StartsWith("##CENTER_STATUS_JSON##", StringComparison.Ordinal))
+                {
+                    jsonRaw = line.Substring("##CENTER_STATUS_JSON##".Length);
+                }
+            });
+
+            if (exit != 0)
+            {
+                SetCmConnState(false);
+                throw new InvalidOperationException("CM VQueue / IVR 상태 조회 중 오류가 발생했습니다.");
+            }
+            SetCmConnState(true);
+            CmCenterStatusResponse st = DeserializeJsonPayload<CmCenterStatusResponse>(jsonRaw);
+            if (st == null)
+            {
+                throw new InvalidOperationException("CM VQueue / IVR 상태 응답을 파싱할 수 없습니다.");
+            }
+            return st;
+        }
+
+        private async void BtnCheckCenterOpts_Click(object sender, RoutedEventArgs e)
+        {
+            if (_isCmBusy || _selectedCustomer == null) return;
+            CustomerInfo cust = _selectedCustomer;
+            try
+            {
+                EnsureCmReadyForCenter();
+                CmCenterStatusResponse st = await QueryLiveCenterOptionsAsync(cust);
+                _cmOptRealVq = st.vqueueExists;
+                _cmOptRealIvr = st.ivrExists;
+                _cmOptUserTouchedVq = false;
+                _cmOptUserTouchedIvr = false;
+                cust.useVQueue = st.vqueueExists;
+                cust.useIvr = st.ivrExists;
+
+                _isSyncingCenterOptChecks = true;
+                ChkCenterVQueue.IsChecked = st.vqueueExists;
+                ChkCenterIvr.IsChecked = st.ivrExists;
+                _isSyncingCenterOptChecks = false;
+
+                TxtCmOptionSyncState.Text = string.Format("CM 실물 확인 (VQ:{0} / IVR:{1})",
+                    st.vqueueExists ? "존재" : "없음",
+                    st.ivrExists ? "존재" : "없음");
+                AppendLog("INFO", string.Format("[CM 상태 조회] '{0}' -> VQueue={1}, IVR(Place Group)={2}",
+                    cust.name, st.vqueueExists ? "존재" : "미생성", st.ivrExists ? "존재" : "미생성"));
+            }
+            catch (Exception ex)
+            {
+                AppendLog("ERR", "[CM 옵션 조회 실패] " + ex.Message);
+                PopupDialogs.ShowSyntaxToast(this, false, "CM 상태 조회 오류", ex.Message);
+            }
+        }
+
+        private async void BtnApplyCenterOpts_Click(object sender, RoutedEventArgs e)
+        {
+            if (_isCmBusy || _selectedCustomer == null) return;
+            CustomerInfo cust = _selectedCustomer;
+            bool wantVq = (ChkCenterVQueue.IsChecked == true);
+            bool wantIvr = (ChkCenterIvr.IsChecked == true);
+
+            try
+            {
+                EnsureCmReadyForCenter();
+                CmCenterStatusResponse live = await QueryLiveCenterOptionsAsync(cust);
+                bool realVq = live.vqueueExists;
+                bool realIvr = live.ivrExists;
+
+                bool applyVq = false;
+                bool applyIvr = false;
+                bool preserveNoticeVq = false;
+                bool preserveNoticeIvr = false;
+
+                if (wantVq && !realVq)
+                {
+                    applyVq = true;
+                }
+                else if (!wantVq && realVq)
+                {
+                    if (_cmOptRealVq == true || _cmOptUserTouchedVq)
+                        applyVq = true;
+                    else
+                        preserveNoticeVq = true;
+                }
+
+                if (wantIvr && !realIvr)
+                {
+                    applyIvr = true;
+                }
+                else if (!wantIvr && realIvr)
+                {
+                    if (_cmOptRealIvr == true || _cmOptUserTouchedIvr)
+                        applyIvr = true;
+                    else
+                        preserveNoticeIvr = true;
+                }
+
+                if (preserveNoticeVq || preserveNoticeIvr)
+                {
+                    _isSyncingCenterOptChecks = true;
+                    if (preserveNoticeVq) ChkCenterVQueue.IsChecked = true;
+                    if (preserveNoticeIvr) ChkCenterIvr.IsChecked = true;
+                    _isSyncingCenterOptChecks = false;
+                }
+
+                _cmOptRealVq = realVq;
+                _cmOptRealIvr = realIvr;
+                cust.useVQueue = realVq;
+                cust.useIvr = realIvr;
+
+                if (!applyVq && !applyIvr)
+                {
+                    _cmOptUserTouchedVq = false;
+                    _cmOptUserTouchedIvr = false;
+                    TxtCmOptionSyncState.Text = string.Format("CM 일치 (VQ:{0} / IVR:{1})",
+                        realVq ? "존재" : "없음", realIvr ? "존재" : "없음");
+                    string note = (preserveNoticeVq || preserveNoticeIvr)
+                        ? "기존 CM에 존재하는 항목을 안전을 위해 유지 체크로 동기화했습니다.\n삭제하려면 체크 해제 후 다시 '적용하기'를 누르세요."
+                        : "현재 체크 상태와 실제 CM 구성이 이미 동일합니다.";
+                    PopupDialogs.ShowSyntaxToast(this, true, "변경 사항 없음", note);
+                    return;
+                }
+
+                bool hasDelete = (applyVq && !wantVq) || (applyIvr && !wantIvr);
+                StringBuilder plan = new StringBuilder();
+                plan.AppendLine(string.Format("• 대상 센터: {0}", cust.DisplayName));
+                if (applyVq)
+                {
+                    plan.AppendLine(string.Format("• VQueue 폴더: {0} ({1})",
+                        wantVq ? "신규 생성" : "CM에서 삭제", live.vqueuePath));
+                }
+                if (applyIvr)
+                {
+                    plan.AppendLine(string.Format("• IVR Place Group: {0} ({1})",
+                        wantIvr ? "신규 생성" : "CM에서 삭제", live.ivrPath));
+                }
+                if (preserveNoticeVq || preserveNoticeIvr)
+                {
+                    plan.AppendLine("※ 기존 CM에 이미 있던 미선택 항목은 안전상 유지됩니다.");
+                }
+
+                bool confirmed = hasDelete
+                    ? PopupDialogs.ConfirmDelete(this, "CM 선택 구성 삭제 포함 적용", "CM VQueue / Place Group 변경 적용", plan.ToString().TrimEnd(),
+                        "체크 해제된 항목을 CM에서 삭제합니다. 내부에 하위 오브젝트(Virtual Queue 등)가 남아 있으면 삭제가 거부될 수 있습니다.\n\n진행하려면 '삭제한다' 를 입력하세요.")
+                    : PopupDialogs.ConfirmAction(this, "CM 선택 구성 적용 확인", "CM VQueue / Place Group 생성 적용", plan.ToString().TrimEnd(), "적용하기");
+
+                if (!confirmed)
+                {
+                    AppendLog("WARN", "[CM 옵션 적용] 사용자에 의해 취소되었습니다.");
+                    return;
+                }
+
+                CmCenterWorkerRequest applyReq = BuildCenterWorkerRequest("ApplyCenterOptions", cust.name, cust.floor);
+                applyReq.ApplyVQueue = applyVq;
+                applyReq.WantVQueue = wantVq;
+                applyReq.ApplyIvr = applyIvr;
+                applyReq.WantIvr = wantIvr;
+
+                string applyJsonRaw = null;
+                int exit = await ExecuteCenterWorkerAsync(applyReq, "CM 옵션 적용 중...", false, delegate(string line)
+                {
+                    if (line.StartsWith("##CENTER_APPLY_JSON##", StringComparison.Ordinal))
+                    {
+                        applyJsonRaw = line.Substring("##CENTER_APPLY_JSON##".Length);
+                    }
+                });
+
+                CmCenterApplyResponse applyRes = DeserializeJsonPayload<CmCenterApplyResponse>(applyJsonRaw);
+                if (exit != 0 && applyRes == null)
+                {
+                    SetCmConnState(false);
+                    PopupDialogs.ShowSyntaxToast(this, false, "CM 옵션 적용 오류", "Log의 오류 내용을 확인하세요.");
+                    return;
+                }
+                SetCmConnState(true);
+
+                if (applyRes != null)
+                {
+                    _cmOptRealVq = applyRes.vqueueExists;
+                    _cmOptRealIvr = applyRes.ivrExists;
+                    _cmOptUserTouchedVq = false;
+                    _cmOptUserTouchedIvr = false;
+                    cust.useVQueue = applyRes.vqueueExists;
+                    cust.useIvr = applyRes.ivrExists;
+
+                    _isSyncingCenterOptChecks = true;
+                    ChkCenterVQueue.IsChecked = applyRes.vqueueExists;
+                    ChkCenterIvr.IsChecked = applyRes.ivrExists;
+                    _isSyncingCenterOptChecks = false;
+
+                    TxtCmOptionSyncState.Text = string.Format("적용 완료 (VQ:{0} / IVR:{1})",
+                        applyRes.vqueueExists ? "존재" : "없음",
+                        applyRes.ivrExists ? "존재" : "없음");
+
+                    SaveCustomersToDiskAndRefreshAll(cust.name);
+
+                    string toastMsg = string.Format("VQueue: {0}  |  IVR(Place Group): {1}{2}",
+                        applyRes.vqueueExists ? "사용중(CM 존재)" : "미사용",
+                        applyRes.ivrExists ? "사용중(CM 존재)" : "미사용",
+                        applyRes.failedCount > 0 ? string.Format("\n실패 {0}건 (Log 확인)", applyRes.failedCount) : "");
+                    PopupDialogs.ShowSyntaxToast(this, applyRes.failedCount == 0,
+                        applyRes.failedCount == 0 ? "CM 구성 적용 완료" : "CM 구성 일부 실패",
+                        toastMsg);
+                }
+            }
+            catch (Exception ex)
+            {
+                AppendLog("ERR", "[CM 옵션 적용 실패] " + ex.Message);
+                PopupDialogs.ShowSyntaxToast(this, false, "CM 옵션 적용 오류", ex.Message);
+            }
+        }
+
         // ==================== SIDEBAR & BROWSER-STYLE TAB SHELL ====================
         private void BtnToggleSidebar_Click(object sender, RoutedEventArgs e)
         {
@@ -1959,8 +2512,10 @@ namespace CmOxeProvisioner.Views
                 SidebarFooter.Visibility = Visibility.Collapsed;
                 TxtNavExtCtiLabel.Visibility = Visibility.Collapsed;
                 TxtNavPersonLabel.Visibility = Visibility.Collapsed;
+                TxtNavCenterAddLabel.Visibility = Visibility.Collapsed;
                 DotNavExtCti.Visibility = Visibility.Collapsed;
                 DotNavPerson.Visibility = Visibility.Collapsed;
+                DotNavCenterAdd.Visibility = Visibility.Collapsed;
                 TxtSidebarToggleGlyph.Text = "»";
             }
             else
@@ -1970,6 +2525,7 @@ namespace CmOxeProvisioner.Views
                 SidebarFooter.Visibility = Visibility.Visible;
                 TxtNavExtCtiLabel.Visibility = Visibility.Visible;
                 TxtNavPersonLabel.Visibility = Visibility.Visible;
+                TxtNavCenterAddLabel.Visibility = Visibility.Visible;
                 TxtSidebarToggleGlyph.Text = "«";
                 SyncSidebarDots();
             }
@@ -1981,10 +2537,12 @@ namespace CmOxeProvisioner.Views
             {
                 DotNavExtCti.Visibility = Visibility.Collapsed;
                 DotNavPerson.Visibility = Visibility.Collapsed;
+                DotNavCenterAdd.Visibility = Visibility.Collapsed;
                 return;
             }
             DotNavExtCti.Visibility = _openTabs.Contains("extcti") ? Visibility.Visible : Visibility.Collapsed;
             DotNavPerson.Visibility = _openTabs.Contains("person") ? Visibility.Visible : Visibility.Collapsed;
+            DotNavCenterAdd.Visibility = _openTabs.Contains("centeradd") ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void BtnNavExtCti_Click(object sender, RoutedEventArgs e)
@@ -1995,6 +2553,11 @@ namespace CmOxeProvisioner.Views
         private void BtnNavPerson_Click(object sender, RoutedEventArgs e)
         {
             OpenOrActivateTab("person");
+        }
+
+        private void BtnNavCenterAdd_Click(object sender, RoutedEventArgs e)
+        {
+            OpenOrActivateTab("centeradd");
         }
 
         private void OpenOrActivateTab(string tabKey)
@@ -2034,9 +2597,11 @@ namespace CmOxeProvisioner.Views
             bool hasTabs = _openTabs.Count > 0;
             bool showExtCti = hasTabs && _activeTabKey == "extcti";
             bool showPerson = hasTabs && _activeTabKey == "person";
+            bool showCenterAdd = hasTabs && _activeTabKey == "centeradd";
 
             ExtCtiTabRoot.Visibility = showExtCti ? Visibility.Visible : Visibility.Collapsed;
             PersonTabRoot.Visibility = showPerson ? Visibility.Visible : Visibility.Collapsed;
+            CenterAddTabRoot.Visibility = showCenterAdd ? Visibility.Visible : Visibility.Collapsed;
             EmptyTabsRoot.Visibility = hasTabs ? Visibility.Collapsed : Visibility.Visible;
 
             if (showExtCti)
@@ -2050,6 +2615,7 @@ namespace CmOxeProvisioner.Views
 
             UpdateSidebarItemStyle(BtnNavExtCti, showExtCti, _openTabs.Contains("extcti"));
             UpdateSidebarItemStyle(BtnNavPerson, showPerson, _openTabs.Contains("person"));
+            UpdateSidebarItemStyle(BtnNavCenterAdd, showCenterAdd, _openTabs.Contains("centeradd"));
             SyncSidebarDots();
             RenderBrowserTabs();
         }
@@ -2094,8 +2660,10 @@ namespace CmOxeProvisioner.Views
 
         private UIElement BuildBrowserTabElement(string tabKey, bool isActive)
         {
-            string title = (tabKey == "person") ? "Person 관리" : "내선 · CTI";
-            string dotBrushKey = (tabKey == "person") ? "OxeBrush" : "PrimaryBrush";
+            string title = (tabKey == "person") ? "Person 관리"
+                : ((tabKey == "centeradd") ? "센터 추가" : "내선 · CTI");
+            string dotBrushKey = (tabKey == "person") ? "OxeBrush"
+                : ((tabKey == "centeradd") ? "OkFgBrush" : "PrimaryBrush");
 
             Border tabBd = new Border();
             tabBd.CornerRadius = new CornerRadius(7, 7, 0, 0);

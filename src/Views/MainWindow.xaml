@@ -220,6 +220,49 @@
                   <Ellipse x:Name="DotNavPerson" Grid.Column="2" Width="6" Height="6" Fill="{DynamicResource PrimaryBrush}" VerticalAlignment="Center" Visibility="Collapsed" />
                 </Grid>
               </Button>
+
+              <Button x:Name="BtnNavCenterAdd"
+                      Click="BtnNavCenterAdd_Click"
+                      Height="38"
+                      Padding="10,0"
+                      Margin="0,0,0,5"
+                      Cursor="Hand"
+                      HorizontalContentAlignment="Stretch"
+                      BorderThickness="1"
+                      ToolTip="신규 센터 CM 폴더 · Place Group 생성 및 선번장 등록">
+                <Button.Template>
+                  <ControlTemplate TargetType="Button">
+                    <Border x:Name="NavBd"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="7"
+                            Padding="{TemplateBinding Padding}">
+                      <ContentPresenter VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                      <Trigger Property="IsMouseOver" Value="True">
+                        <Setter TargetName="NavBd" Property="Opacity" Value="0.88" />
+                      </Trigger>
+                    </ControlTemplate.Triggers>
+                  </ControlTemplate>
+                </Button.Template>
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                  </Grid.ColumnDefinitions>
+                  <Viewbox Grid.Column="0" Width="15" Height="15" VerticalAlignment="Center">
+                    <Canvas Width="24" Height="24">
+                      <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                            Data="M 10,4 L 12,6 H 20 C 21.1,6 22,6.9 22,8 V 18 C 22,19.1 21.1,20 20,20 H 4 C 2.9,20 2,19.1 2,18 V 6 C 2,4.9 2.9,4 4,4 H 10 Z M 15,10 V 13 H 12 V 15 H 15 V 18 H 17 V 15 H 20 V 13 H 17 V 10 H 15 Z" />
+                    </Canvas>
+                  </Viewbox>
+                  <TextBlock x:Name="TxtNavCenterAddLabel" Grid.Column="1" Text="센터 추가" FontSize="12.5" FontWeight="SemiBold" VerticalAlignment="Center" Margin="9,0,4,0" />
+                  <Ellipse x:Name="DotNavCenterAdd" Grid.Column="2" Width="6" Height="6" Fill="{DynamicResource PrimaryBrush}" VerticalAlignment="Center" Visibility="Collapsed" />
+                </Grid>
+              </Button>
             </StackPanel>
           </DockPanel>
         </Border>
@@ -386,7 +429,7 @@
                   </Border>
                 </Grid>
 
-                <!-- Collapsible CM 4 Paths -->
+                <!-- Collapsible CM 4 Paths + VQueue / IVR On-Demand Apply -->
                 <Border x:Name="BdCmPaths" Visibility="Collapsed"
                         Background="{DynamicResource SurfaceAltBrush}"
                         BorderBrush="{DynamicResource BorderBrush}"
@@ -400,6 +443,21 @@
                     <TextBlock x:Name="TxtPathDn" FontFamily="Consolas" FontSize="12" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" Margin="0,0,0,2" />
                     <TextBlock x:Name="TxtPathPlace" FontFamily="Consolas" FontSize="12" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
                     <TextBlock x:Name="TxtPathNote" FontSize="12" Foreground="{DynamicResource WarnFgBrush}" TextWrapping="Wrap" Margin="0,4,0,0" Visibility="Collapsed" />
+
+                    <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0" Margin="0,8,0,0" Padding="0,8,0,0">
+                      <StackPanel>
+                        <DockPanel LastChildFill="False" Margin="0,0,0,6">
+                          <TextBlock Text="선택 CM 구성 (VQueue · IVR)" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" DockPanel.Dock="Left" />
+                          <TextBlock x:Name="TxtCmOptionSyncState" Text="센터 미선택" FontSize="11" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" DockPanel.Dock="Right" />
+                        </DockPanel>
+                        <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+                          <CheckBox x:Name="ChkCenterVQueue" Content="VQueue 사용" Checked="ChkCenterOption_Changed" Unchecked="ChkCenterOption_Changed" Style="{StaticResource ModernCheckBox}" Margin="0,2,14,2" />
+                          <CheckBox x:Name="ChkCenterIvr" Content="IVR 사용 (Place Group)" Checked="ChkCenterOption_Changed" Unchecked="ChkCenterOption_Changed" Style="{StaticResource ModernCheckBox}" Margin="0,2,12,2" />
+                          <Button x:Name="BtnCheckCenterOpts" Content="상태 조회" Click="BtnCheckCenterOpts_Click" Style="{StaticResource BaseBtn}" Height="26" Padding="9,0" FontSize="11.5" Margin="0,2,6,2" />
+                          <Button x:Name="BtnApplyCenterOpts" Content="적용하기" Click="BtnApplyCenterOpts_Click" Style="{StaticResource PrimaryBtn}" Height="26" Padding="11,0" FontSize="11.5" Margin="0,2,0,2" />
+                        </WrapPanel>
+                      </StackPanel>
+                    </Border>
                   </StackPanel>
                 </Border>
               </StackPanel>
@@ -685,11 +743,16 @@
               <views:PersonTabView x:Name="PersonTabControl" />
             </Grid>
 
+            <!-- TAB 3 ROOT: 신규 센터 추가 -->
+            <Grid x:Name="CenterAddTabRoot" Visibility="Collapsed">
+              <views:CenterAddTabView x:Name="CenterAddTabControl" />
+            </Grid>
+
             <!-- EMPTY STATE WHEN ALL TABS CLOSED -->
             <Grid x:Name="EmptyTabsRoot" Visibility="Collapsed">
               <Border HorizontalAlignment="Center"
                       VerticalAlignment="Center"
-                      MaxWidth="460"
+                      MaxWidth="520"
                       Style="{StaticResource CardBorderStyle}"
                       Padding="28,24">
                 <StackPanel HorizontalAlignment="Center">
@@ -697,7 +760,8 @@
                   <TextBlock Text="좌측 사이드바 메뉴 또는 아래 버튼을 눌러 원하는 기능을 탭으로 열 수 있습니다." FontSize="12" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" TextAlignment="Center" Margin="0,0,0,18" />
                   <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <Button Content="내선 · CTI 관리 열기" Click="BtnNavExtCti_Click" Style="{StaticResource PrimaryBtn}" Margin="0,0,8,0" />
-                    <Button Content="Person 관리 열기" Click="BtnNavPerson_Click" Style="{StaticResource BaseBtn}" />
+                    <Button Content="Person 관리 열기" Click="BtnNavPerson_Click" Style="{StaticResource BaseBtn}" Margin="0,0,8,0" />
+                    <Button Content="센터 추가 열기" Click="BtnNavCenterAdd_Click" Style="{StaticResource BaseBtn}" />
                   </StackPanel>
                 </StackPanel>
               </Border>
