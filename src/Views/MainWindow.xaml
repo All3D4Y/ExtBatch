@@ -221,15 +221,15 @@
                 </Grid>
               </Button>
 
-              <Button x:Name="BtnNavCenterAdd"
-                      Click="BtnNavCenterAdd_Click"
+              <Button x:Name="BtnNavDialPlan"
+                      Click="BtnNavDialPlan_Click"
                       Height="38"
                       Padding="10,0"
                       Margin="0,0,0,5"
                       Cursor="Hand"
                       HorizontalContentAlignment="Stretch"
                       BorderThickness="1"
-                      ToolTip="신규 센터 CM 폴더 · Place Group 생성 및 선번장 등록">
+                      ToolTip="선번장(Dial-Plan / PRI / IVR / 멘트 / MDF) 및 센터 추가·수정·삭제">
                 <Button.Template>
                   <ControlTemplate TargetType="Button">
                     <Border x:Name="NavBd"
@@ -256,11 +256,11 @@
                   <Viewbox Grid.Column="0" Width="15" Height="15" VerticalAlignment="Center">
                     <Canvas Width="24" Height="24">
                       <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
-                            Data="M 10,4 L 12,6 H 20 C 21.1,6 22,6.9 22,8 V 18 C 22,19.1 21.1,20 20,20 H 4 C 2.9,20 2,19.1 2,18 V 6 C 2,4.9 2.9,4 4,4 H 10 Z M 15,10 V 13 H 12 V 15 H 15 V 18 H 17 V 15 H 20 V 13 H 17 V 10 H 15 Z" />
+                            Data="M 3,4 H 21 V 8 H 3 V 4 Z M 3,10 H 10 V 20 H 3 V 10 Z M 12,10 H 21 V 14 H 12 V 10 Z M 12,16 H 21 V 20 H 12 V 16 Z" />
                     </Canvas>
                   </Viewbox>
-                  <TextBlock x:Name="TxtNavCenterAddLabel" Grid.Column="1" Text="센터 추가" FontSize="12.5" FontWeight="SemiBold" VerticalAlignment="Center" Margin="9,0,4,0" />
-                  <Ellipse x:Name="DotNavCenterAdd" Grid.Column="2" Width="6" Height="6" Fill="{DynamicResource PrimaryBrush}" VerticalAlignment="Center" Visibility="Collapsed" />
+                  <TextBlock x:Name="TxtNavDialPlanLabel" Grid.Column="1" Text="선번장 · 센터" FontSize="12.5" FontWeight="SemiBold" VerticalAlignment="Center" Margin="9,0,4,0" />
+                  <Ellipse x:Name="DotNavDialPlan" Grid.Column="2" Width="6" Height="6" Fill="{DynamicResource PrimaryBrush}" VerticalAlignment="Center" Visibility="Collapsed" />
                 </Grid>
               </Button>
             </StackPanel>
@@ -743,9 +743,9 @@
               <views:PersonTabView x:Name="PersonTabControl" />
             </Grid>
 
-            <!-- TAB 3 ROOT: 신규 센터 추가 -->
-            <Grid x:Name="CenterAddTabRoot" Visibility="Collapsed">
-              <views:CenterAddTabView x:Name="CenterAddTabControl" />
+            <!-- TAB 3 ROOT: 선번장 · 센터 관리 -->
+            <Grid x:Name="DialPlanTabRoot" Visibility="Collapsed">
+              <views:DialPlanTabView x:Name="DialPlanTabControl" />
             </Grid>
 
             <!-- EMPTY STATE WHEN ALL TABS CLOSED -->
@@ -761,7 +761,7 @@
                   <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <Button Content="내선 · CTI 관리 열기" Click="BtnNavExtCti_Click" Style="{StaticResource PrimaryBtn}" Margin="0,0,8,0" />
                     <Button Content="Person 관리 열기" Click="BtnNavPerson_Click" Style="{StaticResource BaseBtn}" Margin="0,0,8,0" />
-                    <Button Content="센터 추가 열기" Click="BtnNavCenterAdd_Click" Style="{StaticResource BaseBtn}" />
+                    <Button Content="선번장 · 센터 열기" Click="BtnNavDialPlan_Click" Style="{StaticResource BaseBtn}" />
                   </StackPanel>
                 </StackPanel>
               </Border>

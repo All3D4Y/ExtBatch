@@ -27,6 +27,7 @@ namespace CmOxeProvisioner.Views
 
         private AppSettings _settings;
         private List<CustomerInfo> _allCustomers = new List<CustomerInfo>();
+        private CenterAddTabView _activeCenterAddPopupView = null;
         private List<CustomerInfo> _filteredCustomers = new List<CustomerInfo>();
         private CustomerInfo _selectedCustomer;
 
@@ -103,10 +104,22 @@ namespace CmOxeProvisioner.Views
             PersonTabControl.UpdateManagePersonsAsyncHandler = HandlePersonUpdateManageAsync;
             PersonTabControl.DeleteManagePersonsAsyncHandler = HandlePersonDeleteManageAsync;
 
-            CenterAddTabControl.SetCustomers(_allCustomers);
-            CenterAddTabControl.PrecheckCenterAsyncHandler = HandleCenterPrecheckAsync;
-            CenterAddTabControl.CreateCenterAsyncHandler = HandleCenterCreateAsync;
-            CenterAddTabControl.SaveLogHandler = SaveLogTextToFile;
+            DialPlanTabControl.Initialize(
+                Path.Combine(_baseDir, "dialplan_db.json"),
+                Path.Combine(_baseDir, "cm_customers.json"),
+                () => _allCustomers,
+                HandleCenterPrecheckAsync,
+                HandleCenterCreateAsync,
+                SaveLogTextToFile,
+                delegate(CenterAddTabView popupView) { _activeCenterAddPopupView = popupView; },
+                HandleCenterFullDeleteAsync,
+                NavigateToExtCtiFromDialPlan,
+                delegate(string msg)
+                {
+                    AuditLogService.AppendLine(_auditLogDir, msg);
+                    AppendLog("INFO", msg);
+                },
+                RefreshCustomersFromDialPlan);
 
             ChkEmsTerminalOnly.IsChecked = _settings.EmsTerminalOnly;
             SetActiveViewMode("Split");
@@ -1516,10 +1529,8 @@ namespace CmOxeProvisioner.Views
             {
                 PersonTabControl.SetBusyState(!enabled);
             }
-            if (CenterAddTabControl != null)
-            {
-                CenterAddTabControl.SetBusyState(!enabled);
-            }
+            if (DialPlanTabControl != null)
+                DialPlanTabControl.IsEnabled = enabled;
         }
 
         // ==================== PERSON TAB CM HANDLERS ====================
@@ -2067,7 +2078,8 @@ namespace CmOxeProvisioner.Views
 
                     if (logToCenterTab)
                     {
-                        if (CenterAddTabControl != null) CenterAddTabControl.AppendExternalLog(line);
+                        // Log output routed directly via active modal log view if open
+                    if (_activeCenterAddPopupView != null) _activeCenterAddPopupView.AppendExternalLog(line);
                     }
                     else
                     {
@@ -2126,7 +2138,7 @@ namespace CmOxeProvisioner.Views
 
             FilterCustomers(TxtSearch.Text);
             if (PersonTabControl != null) PersonTabControl.SetCustomers(_allCustomers);
-            if (CenterAddTabControl != null) CenterAddTabControl.SetCustomers(_allCustomers);
+            if (_activeCenterAddPopupView != null) _activeCenterAddPopupView.SetCustomers(_allCustomers);
         }
 
         private async Task<CmCenterCheckResponse> HandleCenterPrecheckAsync(CenterCreateInput input)
@@ -2136,7 +2148,8 @@ namespace CmOxeProvisioner.Views
             req.UseVQueue = input.UseVQueue;
             req.UseIvr = input.UseIvr;
 
-            CenterAddTabControl.AppendExternalLog(string.Format("[CM 사전 점검] '{0}' 시작...", input.CenterName));
+            if (_activeCenterAddPopupView != null)
+                _activeCenterAddPopupView.AppendExternalLog(string.Format("[CM 사전 점검] '{0}' 시작...", input.CenterName));
             string jsonRaw = null;
             int exit = await ExecuteCenterWorkerAsync(req, "센터 사전 점검 중...", true, delegate(string line)
             {
@@ -2168,7 +2181,8 @@ namespace CmOxeProvisioner.Views
             req.UseVQueue = input.UseVQueue;
             req.UseIvr = input.UseIvr;
 
-            CenterAddTabControl.AppendExternalLog(string.Format("[CM 센터 생성] '{0}' 실행 시작...", input.CenterName));
+            if (_activeCenterAddPopupView != null)
+                _activeCenterAddPopupView.AppendExternalLog(string.Format("[CM 센터 생성] '{0}' 실행 시작...", input.CenterName));
             string jsonRaw = null;
             int exit = await ExecuteCenterWorkerAsync(req, "센터 CM 생성 중...", true, delegate(string line)
             {
@@ -2204,9 +2218,11 @@ namespace CmOxeProvisioner.Views
                     }
                 }
 
+                CustomerInfo targetCustomer = null;
                 if (existing != null)
                 {
                     outcome.UpdatedExistingJson = true;
+                    targetCustomer = existing;
                     if (string.IsNullOrWhiteSpace(existing.floor) && hasLoc) existing.floor = input.Location.Trim();
                     if (existing.agentLogin == null || existing.agentLogin.Length == 0) existing.agentLogin = locArr;
                     if (existing.acdPosition == null || existing.acdPosition.Length == 0) existing.acdPosition = locArr;
@@ -2255,17 +2271,151 @@ namespace CmOxeProvisioner.Views
                     createdCust.note = input.Note ?? "";
                     createdCust.oxePresets = input.Presets ?? new List<OxePreset>();
                     _allCustomers.Add(createdCust);
+                    targetCustomer = createdCust;
                 }
 
                 SaveCustomersToDiskAndRefreshAll(_selectedCustomer != null ? _selectedCustomer.name : input.CenterName.Trim());
+                try
+                {
+                    string dpPath = Path.Combine(_baseDir, "dialplan_db.json");
+                    DialPlanDatabase dpDb = DialPlanRepository.Load(dpPath);
+                    DialPlanRepository.UpsertCenterFromCreatePopup(dpDb, targetCustomer, true);
+                    DialPlanRepository.Save(dpPath, dpDb);
+                    if (DialPlanTabControl != null) DialPlanTabControl.ReloadFromDisk(targetCustomer.name);
+                }
+                catch (Exception dpEx)
+                {
+                    AppendLog("WARN", "[선번장 연동] dialplan_db.json 갱신 경고: " + dpEx.Message);
+                }
+
                 outcome.SavedToJson = true;
-                CenterAddTabControl.AppendExternalLog(string.Format("[저장 완료] cm_customers.json {0} ('{1}')",
-                    outcome.UpdatedExistingJson ? "업데이트" : "신규 등록", input.CenterName));
-                AppendLog("OK", string.Format("[센터 추가] '{0}' {1} 완료 (JSON 반영)",
+                if (_activeCenterAddPopupView != null)
+                {
+                    _activeCenterAddPopupView.AppendExternalLog(string.Format("[저장 완료] cm_customers.json & dialplan_db.json {0} ('{1}')",
+                        outcome.UpdatedExistingJson ? "업데이트" : "신규 등록", input.CenterName));
+                }
+                AppendLog("OK", string.Format("[센터 추가] '{0}' {1} 완료 (CM/JSON/선번장 반영)",
                     input.CenterName, outcome.UpdatedExistingJson ? "보완" : "등록"));
             }
 
             return outcome;
+        }
+
+        private void RefreshCustomersFromDialPlan()
+        {
+            FilterCustomers(TxtSearch.Text);
+            if (PersonTabControl != null) PersonTabControl.SetCustomers(_allCustomers);
+            if (_activeCenterAddPopupView != null) _activeCenterAddPopupView.SetCustomers(_allCustomers);
+        }
+
+        private void NavigateToExtCtiFromDialPlan(DialPlanCenter center)
+        {
+            if (center == null) return;
+            OpenOrActivateTab("extcti");
+
+            if (TxtSearch != null && !string.IsNullOrEmpty(TxtSearch.Text))
+                TxtSearch.Text = string.Empty;
+
+            CustomerInfo match = null;
+            string linkName = !string.IsNullOrWhiteSpace(center.cmCustomerName) ? center.cmCustomerName.Trim() : (center.project ?? "").Trim();
+            for (int i = 0; i < _allCustomers.Count; i++)
+            {
+                if (string.Equals(_allCustomers[i].name, linkName, StringComparison.OrdinalIgnoreCase))
+                {
+                    match = _allCustomers[i];
+                    break;
+                }
+            }
+            if (match == null && !string.IsNullOrWhiteSpace(center.project))
+            {
+                string projTrim = center.project.Trim();
+                for (int i = 0; i < _allCustomers.Count; i++)
+                {
+                    if (string.Equals(_allCustomers[i].name, projTrim, StringComparison.OrdinalIgnoreCase))
+                    {
+                        match = _allCustomers[i];
+                        break;
+                    }
+                }
+            }
+
+            if (match != null)
+            {
+                CmbCustomer.SelectedItem = match;
+                if (center.lines != null && center.lines.Count > 0 && CmbOxePreset != null && CmbOxePreset.Items.Count > 0)
+                {
+                    string wantEnt = DialPlanWorkbookMapper.ExtractLeadingIntToken(center.lines[0].entityNo);
+                    string wantPg = DialPlanWorkbookMapper.ExtractLeadingIntToken(center.lines[0].agentPg);
+                    for (int pi = 0; pi < CmbOxePreset.Items.Count; pi++)
+                    {
+                        OxePreset p = CmbOxePreset.Items[pi] as OxePreset;
+                        if (p == null) continue;
+                        if ((!string.IsNullOrEmpty(wantEnt) && string.Equals(p.entityNo, wantEnt, StringComparison.OrdinalIgnoreCase)) ||
+                            (!string.IsNullOrEmpty(wantPg) && string.Equals(p.agentPg, wantPg, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            CmbOxePreset.SelectedIndex = pi;
+                            break;
+                        }
+                    }
+                }
+                AppendLog("INFO", string.Format("[선번장 → 개통 전환] '{0}' (CM '{1}') 선택됨", center.project, match.name));
+                PopupDialogs.ShowSyntaxToast(this, true, "개통 탭 전환", "'" + match.name + "' 센터가 내선·CTI 탭에 선택되었습니다.");
+            }
+            else
+            {
+                AppendLog("WARN", string.Format("[선번장 → 개통 전환] '{0}'에 연결된 CM 고객사 없음", center.project));
+                PopupDialogs.ShowSyntaxToast(this, false, "CM 연동 없음", "연결된 CM 고객사가 없습니다. '+ 센터 추가' 또는 CM연동명을 먼저 확인하세요.");
+            }
+        }
+
+        private async Task<CenterFullDeleteOutcome> HandleCenterFullDeleteAsync(DialPlanCenter center)
+        {
+            var result = new CenterFullDeleteOutcome { Success = true, CmExecuted = false };
+            if (center == null || !center.HasCmLink)
+                return result;
+
+            string targetName = center.cmCustomerName.Trim();
+            EnsureCmReadyForCenter();
+            CmCenterWorkerRequest req = BuildCenterWorkerRequest("DeleteCenterArtifacts", targetName, center.location ?? "");
+            req.DeleteLocationIfSpecified = false;
+
+            string jsonRaw = null;
+            int exit = await ExecuteCenterWorkerAsync(req, string.Format("CM '{0}' 센터 폴더 삭제 중...", targetName), false, delegate(string line)
+            {
+                if (line.StartsWith("##CENTER_DELETE_JSON##", StringComparison.Ordinal))
+                {
+                    jsonRaw = line.Substring("##CENTER_DELETE_JSON##".Length);
+                }
+            });
+
+            CmCenterDeleteResponse delRes = DeserializeJsonPayload<CmCenterDeleteResponse>(jsonRaw);
+            if (exit != 0 && delRes == null)
+            {
+                SetCmConnState(false);
+                result.Success = false;
+                result.CmExecuted = true;
+                result.Message = "CM 센터 아티팩트 삭제 중 오류가 발생했습니다. 로그를 확인하세요.";
+                AppendLog("ERR", string.Format("[완전 삭제 실패] '{0}' CM Worker 종료코드 {1}", targetName, exit));
+                return result;
+            }
+
+            SetCmConnState(true);
+            result.CmExecuted = true;
+            if (delRes != null)
+            {
+                result.CmDeletedCount = delRes.deletedCount;
+                result.CmFailedCount = delRes.failedCount;
+                if (delRes.failedCount > 0)
+                {
+                    result.Success = false;
+                    result.Message = string.Format("CM 일부 항목 삭제 실패 (삭제 {0}건 / 실패 {1}건). JSON 유지됨.", delRes.deletedCount, delRes.failedCount);
+                    AppendLog("ERR", "[완전 삭제 중단] " + result.Message);
+                    return result;
+                }
+            }
+
+            AppendLog("OK", string.Format("[완전 삭제] '{0}' CM 삭제 완료 (삭제 {1}건)", targetName, result.CmDeletedCount));
+            return result;
         }
 
         private void ChkCenterOption_Changed(object sender, RoutedEventArgs e)
@@ -2512,10 +2662,10 @@ namespace CmOxeProvisioner.Views
                 SidebarFooter.Visibility = Visibility.Collapsed;
                 TxtNavExtCtiLabel.Visibility = Visibility.Collapsed;
                 TxtNavPersonLabel.Visibility = Visibility.Collapsed;
-                TxtNavCenterAddLabel.Visibility = Visibility.Collapsed;
+                TxtNavDialPlanLabel.Visibility = Visibility.Collapsed;
                 DotNavExtCti.Visibility = Visibility.Collapsed;
                 DotNavPerson.Visibility = Visibility.Collapsed;
-                DotNavCenterAdd.Visibility = Visibility.Collapsed;
+                DotNavDialPlan.Visibility = Visibility.Collapsed;
                 TxtSidebarToggleGlyph.Text = "»";
             }
             else
@@ -2525,7 +2675,7 @@ namespace CmOxeProvisioner.Views
                 SidebarFooter.Visibility = Visibility.Visible;
                 TxtNavExtCtiLabel.Visibility = Visibility.Visible;
                 TxtNavPersonLabel.Visibility = Visibility.Visible;
-                TxtNavCenterAddLabel.Visibility = Visibility.Visible;
+                TxtNavDialPlanLabel.Visibility = Visibility.Visible;
                 TxtSidebarToggleGlyph.Text = "«";
                 SyncSidebarDots();
             }
@@ -2537,12 +2687,12 @@ namespace CmOxeProvisioner.Views
             {
                 DotNavExtCti.Visibility = Visibility.Collapsed;
                 DotNavPerson.Visibility = Visibility.Collapsed;
-                DotNavCenterAdd.Visibility = Visibility.Collapsed;
+                DotNavDialPlan.Visibility = Visibility.Collapsed;
                 return;
             }
             DotNavExtCti.Visibility = _openTabs.Contains("extcti") ? Visibility.Visible : Visibility.Collapsed;
             DotNavPerson.Visibility = _openTabs.Contains("person") ? Visibility.Visible : Visibility.Collapsed;
-            DotNavCenterAdd.Visibility = _openTabs.Contains("centeradd") ? Visibility.Visible : Visibility.Collapsed;
+            DotNavDialPlan.Visibility = _openTabs.Contains("dialplan") ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void BtnNavExtCti_Click(object sender, RoutedEventArgs e)
@@ -2555,9 +2705,9 @@ namespace CmOxeProvisioner.Views
             OpenOrActivateTab("person");
         }
 
-        private void BtnNavCenterAdd_Click(object sender, RoutedEventArgs e)
+        private void BtnNavDialPlan_Click(object sender, RoutedEventArgs e)
         {
-            OpenOrActivateTab("centeradd");
+            OpenOrActivateTab("dialplan");
         }
 
         private void OpenOrActivateTab(string tabKey)
@@ -2597,11 +2747,11 @@ namespace CmOxeProvisioner.Views
             bool hasTabs = _openTabs.Count > 0;
             bool showExtCti = hasTabs && _activeTabKey == "extcti";
             bool showPerson = hasTabs && _activeTabKey == "person";
-            bool showCenterAdd = hasTabs && _activeTabKey == "centeradd";
+            bool showDialPlan = hasTabs && _activeTabKey == "dialplan";
 
             ExtCtiTabRoot.Visibility = showExtCti ? Visibility.Visible : Visibility.Collapsed;
             PersonTabRoot.Visibility = showPerson ? Visibility.Visible : Visibility.Collapsed;
-            CenterAddTabRoot.Visibility = showCenterAdd ? Visibility.Visible : Visibility.Collapsed;
+            DialPlanTabRoot.Visibility = showDialPlan ? Visibility.Visible : Visibility.Collapsed;
             EmptyTabsRoot.Visibility = hasTabs ? Visibility.Collapsed : Visibility.Visible;
 
             if (showExtCti)
@@ -2615,7 +2765,7 @@ namespace CmOxeProvisioner.Views
 
             UpdateSidebarItemStyle(BtnNavExtCti, showExtCti, _openTabs.Contains("extcti"));
             UpdateSidebarItemStyle(BtnNavPerson, showPerson, _openTabs.Contains("person"));
-            UpdateSidebarItemStyle(BtnNavCenterAdd, showCenterAdd, _openTabs.Contains("centeradd"));
+            UpdateSidebarItemStyle(BtnNavDialPlan, showDialPlan, _openTabs.Contains("dialplan"));
             SyncSidebarDots();
             RenderBrowserTabs();
         }
@@ -2661,9 +2811,9 @@ namespace CmOxeProvisioner.Views
         private UIElement BuildBrowserTabElement(string tabKey, bool isActive)
         {
             string title = (tabKey == "person") ? "Person 관리"
-                : ((tabKey == "centeradd") ? "센터 추가" : "내선 · CTI");
+                : ((tabKey == "dialplan") ? "선번장 · 센터" : "내선 · CTI");
             string dotBrushKey = (tabKey == "person") ? "OxeBrush"
-                : ((tabKey == "centeradd") ? "OkFgBrush" : "PrimaryBrush");
+                : ((tabKey == "dialplan") ? "OkFgBrush" : "PrimaryBrush");
 
             Border tabBd = new Border();
             tabBd.CornerRadius = new CornerRadius(7, 7, 0, 0);

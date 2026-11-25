@@ -13,6 +13,7 @@ Alcatel OXE(LightGate 터미널) 및 Genesys Configuration Manager(`sce.exe`)의
 | --- | --- |
 | `ExtBatch.exe` | 메인 GUI 실행 파일 |
 | `cm_customers.json` | 센터별 CM 폴더 경로 및 OXE Preset·선번장(`Entity NO`, `Agent PG`, `기준 Profile`, 대역) 매핑 DB |
+| `dialplan_db.json` | 전체 선번장 통합 DB (`Dial-Plan`, `PRI현황`, `Entity`, `IP IVR`, `GPA`, `D.V.G 멘트`, `PBX IP`, `MDF`) |
 | `cm_batch_engine.ps1` / `cm_person_engine.ps1` / `cm_center_engine.ps1` / `cm_win32_lib.ps1` | CM Win32 제어 및 내선·CTI / Person / 센터 폴더·Place Group 자동화 엔진 |
 
 ---
@@ -82,11 +83,12 @@ Alcatel OXE(LightGate 터미널) 및 Genesys Configuration Manager(`sce.exe`)의
   - `터미널 창만 보기` : LightGate 좌측 메뉴 숨김 토글
   - `터미널 재실행` : 열려 있는 터미널만 종료 후 서버 재연결
 
-### 6) 사이드바 `'센터 추가'` 탭 (`v1.1.0`)
-- 좌측 사이드바 **`센터 추가`** 메뉴에서 신규 센터 CM 일괄 생성과 `cm_customers.json` 선번장/프리셋 등록을 한 번에 처리할 수 있습니다.
-- **필수 생성 폴더**: 위치 포함 6곳(`Persons`, `Places\AGENT`, `Agent Logins`, `DNs\ACDPosition`, `DNs\AGENT_DN`, `DNs\RSI`) + 위치 미포함 3곳(`Agent Groups`, `DN Groups`, `Scripts\유세스파트너스`)
-- **조건부 생성**: `VQueue 사용`(`Switches\TServerAlcatel\DNs\VQueue\<센터명>` 폴더), `IVR 사용`(`Place Groups\<센터명>` `Place Group` 오브젝트)
-- **프리셋 · 선번장**: `+ 추가`로 여러 행(Entity No, Agent PG, 대역 등) 등록 가능하며, 센터명만 입력하고 공란으로 두어도 생성 가능합니다.
+### 6) 사이드바 `'선번장 · 센터'` 탭 & `'+ 센터 추가'` 팝업 (`v1.2.0`)
+- 좌측 사이드바 **`선번장 · 센터`** 메뉴에서 엑셀 선번장 전체 시트(`Dial-Plan`, `PRI · Entity`, `IP IVR · D.V.G 멘트`, `PBX 보드 · 110 Block`)를 조회·편집할 수 있습니다.
+- **A안 마스터-디테일**: 상단 표에서 센터당 1행 요약을 빠르게 스캔하고, 행 더블클릭 또는 `▾ 상세 펼치기`로 21컬럼 세부 선번을 인라인 편집한 뒤 `변경 저장 (DB + CM 프리셋)`으로 즉시 반영합니다.
+- **센터 원클릭 연동**: **`이 센터로 개통 →`** 버튼으로 선택한 센터/프리셋을 `내선 · CTI` 탭에 바로 바인딩할 수 있으며, 우측 상단 **`+ 센터 추가`** 버튼이 모달 팝업으로 신규 센터 CM 폴더 생성과 선번장 등록을 동시에 처리합니다.
+- **안전 종료 vs 완전 삭제**: `업무 종료로 이동 ↔ 운영 중으로 복구`로 비파괴 보관하며, **`완전 삭제 (JSON+CM)`**는 `'삭제한다'` 입력 확인 후 CM 센터 폴더·Place Group·Script(공용 위치 폴더 보존)와 JSON 데이터를 함께 삭제합니다.
+- **`빈 번호 찾기` & 가져오기/내보내기**: 미사용 `Entity NO`, `6XX` 대역, `IP IVR DN`, `D.V.G` 슬롯을 즉시 조회하고 `.xlsx`(9시트) / `.csv` / `.json` 가져오기·내보내기를 지원합니다.
 
 ---
 
@@ -94,7 +96,7 @@ Alcatel OXE(LightGate 터미널) 및 Genesys Configuration Manager(`sce.exe`)의
 
 - **버전 정의**: `src\Properties\AssemblyInfo.cs`의 `AssemblyVersion` / `AssemblyFileVersion` 값을 기준으로 앱 상단 헤더(`vX.Y.Z`)와 `ExtBatch.exe` 파일 버전이 자동 동기화됩니다.
 - **변경 이력**: 릴리스별 변경 내용은 `CHANGELOG.md`에 기록합니다.
-- **추적 대상 (`.gitignore`)**: `src/`, `.ps1` 엔진, `cm_customers.json`, `run_extbatch.cmd`, `ExtBatch.exe.config`, WebView2 참조 DLL은 Git에 포함하고, `src/bin/`, `src/obj/`, `logs/`, `/ExtBatch.exe`, `*.pdb`는 제외합니다.
+- **추적 대상 (`.gitignore`)**: `src/`, `.ps1` 엔진, `cm_customers.json`, `dialplan_db.json`, `run_extbatch.cmd`, `ExtBatch.exe.config`, WebView2 참조 DLL은 Git에 포함하고, `src/bin/`, `src/obj/`, `logs/`, `/ExtBatch.exe`, `*.pdb`는 제외합니다.
 - **로컬 Git 초기화 / 커밋 예시** *(Git for Windows 설치 후 `C:\GCTI\ExtBatch`에서 실행)*:
 
 ```powershell

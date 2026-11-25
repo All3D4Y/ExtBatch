@@ -1,0 +1,567 @@
+<UserControl x:Class="CmOxeProvisioner.Views.DialPlanTabView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="Transparent"
+             Foreground="{StaticResource TextBrush}"
+             FontFamily="Malgun Gothic, Segoe UI, sans-serif">
+    <Grid Margin="14,10,14,10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Row 0: Sub-Tabs + Global Actions -->
+        <Border Grid.Row="0" Style="{StaticResource CardBorderStyle}" Padding="10,8" Margin="0,0,0,8">
+            <DockPanel LastChildFill="True">
+                <!-- Right: Global Actions -->
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button x:Name="BtnFindEmpty"
+                            Style="{StaticResource BaseBtn}"
+                            Content="빈 번호 찾기"
+                            Height="30" Padding="11,0" Margin="0,0,6,0"
+                            Click="BtnFindEmpty_Click"/>
+                    <Button x:Name="BtnAddCenterPopup"
+                            Style="{StaticResource PrimaryBtn}"
+                            Content="+ 센터 추가"
+                            Height="30" Padding="12,0" Margin="0,0,6,0"
+                            Click="BtnAddCenterPopup_Click"/>
+                    <Button x:Name="BtnImport"
+                            Style="{StaticResource BaseBtn}"
+                            Content="가져오기 (.xlsx/.csv/.json)"
+                            Height="30" Padding="10,0" Margin="0,0,6,0"
+                            Click="BtnImport_Click"/>
+                    <Button x:Name="BtnExport"
+                            Style="{StaticResource OxeBtn}"
+                            Content="내보내기 (.xlsx/.json)"
+                            Height="30" Padding="10,0"
+                            Click="BtnExport_Click"/>
+                </StackPanel>
+
+                <!-- Left: 4 Sub-Tab Switchers -->
+                <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button x:Name="BtnSubDialPlan"
+                            Style="{StaticResource PrimaryBtn}"
+                            Content="Dial-Plan (센터별)"
+                            Height="30" Padding="12,0" Margin="0,0,6,0"
+                            Click="BtnSubTab_Click" Tag="dialplan"/>
+                    <Button x:Name="BtnSubPriEntity"
+                            Style="{StaticResource BaseBtn}"
+                            Content="PRI · Entity 마스터"
+                            Height="30" Padding="12,0" Margin="0,0,6,0"
+                            Click="BtnSubTab_Click" Tag="pri"/>
+                    <Button x:Name="BtnSubIvrDvg"
+                            Style="{StaticResource BaseBtn}"
+                            Content="IP IVR · D.V.G 멘트"
+                            Height="30" Padding="12,0" Margin="0,0,6,0"
+                            Click="BtnSubTab_Click" Tag="ivr"/>
+                    <Button x:Name="BtnSubHardware"
+                            Style="{StaticResource BaseBtn}"
+                            Content="PBX 보드 · 110 Block"
+                            Height="30" Padding="12,0"
+                            Click="BtnSubTab_Click" Tag="hw"/>
+                </WrapPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- Row 1: Filter & Search Bar -->
+        <Border Grid.Row="1" Style="{StaticResource CardBorderStyle}" Padding="10,7" Margin="0,0,0,8">
+            <DockPanel LastChildFill="True">
+                <TextBlock DockPanel.Dock="Right"
+                           x:Name="TxtResultSummary"
+                           VerticalAlignment="Center"
+                           FontSize="12"
+                           Foreground="{StaticResource MutedBrush}"
+                           Margin="10,0,0,0"/>
+
+                <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- Status Filter Pills (shown only in Dial-Plan sub-tab) -->
+                    <StackPanel x:Name="PanelStatusFilter" Orientation="Horizontal" Margin="0,0,12,0">
+                        <Button x:Name="BtnStatusActive" Style="{StaticResource PrimaryBtn}" Content="운영 중 (0)" Height="28" Padding="10,0" Margin="0,0,4,0" Click="BtnStatusFilter_Click" Tag="active"/>
+                        <Button x:Name="BtnStatusTest" Style="{StaticResource BaseBtn}" Content="테스트용 (0)" Height="28" Padding="10,0" Margin="0,0,4,0" Click="BtnStatusFilter_Click" Tag="test"/>
+                        <Button x:Name="BtnStatusClosed" Style="{StaticResource BaseBtn}" Content="업무 종료 (0)" Height="28" Padding="10,0" Margin="0,0,4,0" Click="BtnStatusFilter_Click" Tag="closed"/>
+                        <Button x:Name="BtnStatusAll" Style="{StaticResource BaseBtn}" Content="전체 (0)" Height="28" Padding="10,0" Click="BtnStatusFilter_Click" Tag="all"/>
+                    </StackPanel>
+
+                    <!-- D.V.G Band Filter Pills (shown only in IVR/DVG sub-tab) -->
+                    <StackPanel x:Name="PanelDvgBandFilter" Orientation="Horizontal" Visibility="Collapsed" Margin="0,0,12,0">
+                        <Button x:Name="BtnDvgAll" Style="{StaticResource PrimaryBtn}" Content="멘트 전체" Height="28" Padding="9,0" Margin="0,0,4,0" Click="BtnDvgBand_Click" Tag="all"/>
+                        <Button x:Name="BtnDvg700" Style="{StaticResource BaseBtn}" Content="700~799" Height="28" Padding="9,0" Margin="0,0,4,0" Click="BtnDvgBand_Click" Tag="700"/>
+                        <Button x:Name="BtnDvg800" Style="{StaticResource BaseBtn}" Content="800~899" Height="28" Padding="9,0" Margin="0,0,4,0" Click="BtnDvgBand_Click" Tag="800"/>
+                        <Button x:Name="BtnDvg900" Style="{StaticResource BaseBtn}" Content="900~999" Height="28" Padding="9,0" Margin="0,0,4,0" Click="BtnDvgBand_Click" Tag="900"/>
+                        <Button x:Name="BtnDvg1800" Style="{StaticResource BaseBtn}" Content="1800~" Height="28" Padding="9,0" Click="BtnDvgBand_Click" Tag="1800"/>
+                    </StackPanel>
+
+                    <!-- Location Filter -->
+                    <StackPanel x:Name="PanelLocationFilter" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,10,0">
+                        <TextBlock Text="위치" FontSize="12" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <ComboBox x:Name="CmbLocationFilter"
+                                  Style="{StaticResource ModernComboBox}"
+                                  Width="150" Height="28"
+                                  SelectionChanged="CmbLocationFilter_SelectionChanged"/>
+                    </StackPanel>
+
+                    <!-- Global Live Search -->
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="검색" FontSize="12" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <TextBox x:Name="TxtSearch"
+                                 Style="{StaticResource ModernTextBox}"
+                                 Width="260" Height="28"
+                                 ToolTip="센터명, 대표번호, 착신번호, RSI, PG, 내선, Entity, DID, 멘트 내용 검색"
+                                 TextChanged="TxtSearch_TextChanged"/>
+                        <Button x:Name="BtnClearSearch"
+                                Style="{StaticResource BaseBtn}"
+                                Content="초기화"
+                                Height="28" Padding="8,0" Margin="5,0,0,0"
+                                Click="BtnClearSearch_Click"/>
+                    </StackPanel>
+                </WrapPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- Row 2: 4 Sub-Tab Views -->
+        <Grid Grid.Row="2">
+
+            <!-- SUB-TAB 1: Dial-Plan (Master-Detail "A안") -->
+            <Grid x:Name="PanelDialPlan" Visibility="Visible">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" MinHeight="160"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition x:Name="RowDetailPanel" Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Master Grid (1 row per center) -->
+                <Border Grid.Row="0" Style="{StaticResource CardBorderStyle}" Padding="0" Margin="0,0,0,4">
+                    <DataGrid x:Name="GridCenters"
+                              Style="{StaticResource ModernDataGrid}"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              SelectionMode="Single"
+                              SelectionUnit="FullRow"
+                              GridLinesVisibility="Horizontal"
+                              SelectionChanged="GridCenters_SelectionChanged"
+                              MouseDoubleClick="GridCenters_MouseDoubleClick">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="상태" Binding="{Binding StatusBadgeText}" Width="74"/>
+                            <DataGridTextColumn Header="위치" Binding="{Binding LocationDisplay}" Width="115"/>
+                            <DataGridTextColumn Header="프로젝트 (센터명)" Binding="{Binding project}" Width="180"/>
+                            <DataGridTextColumn Header="세부업무" Binding="{Binding SubTaskSummary}" Width="150"/>
+                            <DataGridTextColumn Header="대표번호" Binding="{Binding MainNumberSummary}" Width="140"/>
+                            <DataGridTextColumn Header="Entity NO" Binding="{Binding EntitySummary}" Width="135"/>
+                            <DataGridTextColumn Header="Agent PG" Binding="{Binding PgSummary}" Width="110"/>
+                            <DataGridTextColumn Header="Phone 내선" Binding="{Binding ExtRangeSummary}" Width="135"/>
+                            <DataGridTextColumn Header="Login-ID" Binding="{Binding LoginRangeSummary}" Width="135"/>
+                            <DataGridTextColumn Header="라인" Binding="{Binding LineCount}" Width="52"/>
+                            <DataGridTextColumn Header="CM 연동" Binding="{Binding CmLinkedSummary}" Width="140"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
+
+                <!-- Resizable Splitter when expanded -->
+                <GridSplitter x:Name="DetailSplitter"
+                              Grid.Row="1"
+                              Height="5"
+                              HorizontalAlignment="Stretch"
+                              Background="Transparent"
+                              Visibility="Collapsed"/>
+
+                <!-- Collapsible Bottom Detail Panel -->
+                <Border x:Name="DetailContainer"
+                        Grid.Row="2"
+                        Style="{StaticResource CardBorderStyle}"
+                        Padding="10,8"
+                        Margin="0,2,0,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Detail Header Strip -->
+                        <DockPanel Grid.Row="0" LastChildFill="True">
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Button x:Name="BtnOpenInExtCti"
+                                        Style="{StaticResource OxeBtn}"
+                                        Content="이 센터로 개통 →"
+                                        Height="28" Padding="10,0" Margin="0,0,6,0"
+                                        IsEnabled="False"
+                                        Click="BtnOpenInExtCti_Click"/>
+                                <Button x:Name="BtnToggleStatus"
+                                        Style="{StaticResource BaseBtn}"
+                                        Content="업무 종료로 이동"
+                                        Height="28" Padding="10,0" Margin="0,0,6,0"
+                                        IsEnabled="False"
+                                        Click="BtnToggleStatus_Click"/>
+                                <Button x:Name="BtnFullDelete"
+                                        Style="{StaticResource DangerBtn}"
+                                        Content="완전 삭제 (JSON+CM)"
+                                        Height="28" Padding="10,0" Margin="0,0,8,0"
+                                        IsEnabled="False"
+                                        Click="BtnFullDelete_Click"/>
+                                <Button x:Name="BtnToggleDetail"
+                                        Style="{StaticResource PrimaryBtn}"
+                                        Content="▾ 상세 펼치기"
+                                        Height="28" Padding="11,0"
+                                        Click="BtnToggleDetail_Click"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock x:Name="TxtDetailHeaderTitle"
+                                           Text="센터를 선택하면 세부 선번(RSI · IVR · 내선 · Entity)을 펼쳐서 편집할 수 있습니다."
+                                           FontSize="13" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextBrush}"/>
+                                <TextBlock x:Name="TxtDetailHeaderMeta"
+                                           Text=""
+                                           FontSize="12"
+                                           Foreground="{StaticResource MutedBrush}"
+                                           Margin="10,1,0,0"/>
+                            </StackPanel>
+                        </DockPanel>
+
+                        <!-- Expandable Detail Body -->
+                        <Grid x:Name="DetailBodyGrid" Grid.Row="1" Visibility="Collapsed" Margin="0,8,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Center Metadata & Line Toolbar -->
+                            <Border Grid.Row="0" Background="{StaticResource SurfaceAltBrush}" CornerRadius="5" Padding="8,6" Margin="0,0,0,6">
+                                <DockPanel LastChildFill="True">
+                                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Button x:Name="BtnAddLine" Style="{StaticResource BaseBtn}" Content="+ 라인 추가" Height="27" Padding="9,0" Margin="0,0,5,0" Click="BtnAddLine_Click"/>
+                                        <Button x:Name="BtnRemoveLine" Style="{StaticResource BaseBtn}" Content="선택 라인 삭제" Height="27" Padding="9,0" Margin="0,0,6,0" Click="BtnRemoveLine_Click"/>
+                                        <Button x:Name="BtnSaveCenter" Style="{StaticResource PrimaryBtn}" Content="변경 저장 (DB + CM 프리셋)" Height="27" Padding="12,0" Click="BtnSaveCenter_Click"/>
+                                    </StackPanel>
+
+                                    <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="위치" FontSize="11" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                        <TextBox x:Name="TxtDetailLocation" Style="{StaticResource ModernTextBox}" Width="96" Height="26" Margin="0,0,8,0"/>
+
+                                        <TextBlock Text="센터명" FontSize="11" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                        <TextBox x:Name="TxtDetailProject" Style="{StaticResource ModernTextBox}" Width="145" Height="26" Margin="0,0,8,0"/>
+
+                                        <TextBlock Text="상태" FontSize="11" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                        <ComboBox x:Name="CmbDetailStatus" Style="{StaticResource ModernComboBox}" Width="96" Height="26" Margin="0,0,8,0"/>
+
+                                        <TextBlock Text="CM연동명" FontSize="11" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                        <TextBox x:Name="TxtDetailCmName" Style="{StaticResource ModernTextBox}" Width="130" Height="26" Margin="0,0,8,0"/>
+
+                                        <CheckBox x:Name="ChkDetailVQueue" Style="{StaticResource CompactCheckBox}" Content="VQueue" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <CheckBox x:Name="ChkDetailIvr" Style="{StaticResource CompactCheckBox}" Content="IVR(PG)" VerticalAlignment="Center" Margin="0,0,8,0"/>
+
+                                        <TextBlock Text="메모" FontSize="11" Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                        <TextBox x:Name="TxtDetailNotes" Style="{StaticResource ModernTextBox}" Width="160" Height="26"/>
+                                    </WrapPanel>
+                                </DockPanel>
+                            </Border>
+
+                            <!-- 21-Column Inline Editable Dial-Plan Lines Grid -->
+                            <DataGrid x:Name="GridLines"
+                                      Grid.Row="1"
+                                      Style="{StaticResource ModernDataGrid}"
+                                      AutoGenerateColumns="False"
+                                      IsReadOnly="False"
+                                      CanUserAddRows="False"
+                                      CanUserDeleteRows="False"
+                                      SelectionMode="Single"
+                                      GridLinesVisibility="All">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="(세부업무)" Binding="{Binding subTask, UpdateSourceTrigger=PropertyChanged}" Width="130"/>
+                                    <DataGridTextColumn Header="대표번호" Binding="{Binding mainNumber, UpdateSourceTrigger=PropertyChanged}" Width="115"/>
+                                    <DataGridTextColumn Header="통신사" Binding="{Binding carrier, UpdateSourceTrigger=PropertyChanged}" Width="75"/>
+                                    <DataGridTextColumn Header="명의" Binding="{Binding ownerName, UpdateSourceTrigger=PropertyChanged}" Width="90"/>
+                                    <DataGridTextColumn Header="착신번호" Binding="{Binding incomingNumber, UpdateSourceTrigger=PropertyChanged}" Width="115"/>
+                                    <DataGridTextColumn Header="인입 RSI" Binding="{Binding inboundRsi, UpdateSourceTrigger=PropertyChanged}" Width="75"/>
+                                    <DataGridTextColumn Header="IVR (PDS) 채널" Binding="{Binding ivrPdsChannel, UpdateSourceTrigger=PropertyChanged}" Width="125"/>
+                                    <DataGridTextColumn Header="IVR-Fw Pilot" Binding="{Binding ivrFwPilot, UpdateSourceTrigger=PropertyChanged}" Width="90"/>
+                                    <DataGridTextColumn Header="상담연결 RSI" Binding="{Binding agentTransferRsi, UpdateSourceTrigger=PropertyChanged}" Width="110"/>
+                                    <DataGridTextColumn Header="Agent Pilot" Binding="{Binding agentPilot, UpdateSourceTrigger=PropertyChanged}" Width="85"/>
+                                    <DataGridTextColumn Header="Agent Queue" Binding="{Binding agentQueue, UpdateSourceTrigger=PropertyChanged}" Width="90"/>
+                                    <DataGridTextColumn Header="Agent PG" Binding="{Binding agentPg, UpdateSourceTrigger=PropertyChanged}" Width="80"/>
+                                    <DataGridTextColumn Header="Phone 내선" Binding="{Binding phoneExt, UpdateSourceTrigger=PropertyChanged}" Width="125"/>
+                                    <DataGridTextColumn Header="Login-ID" Binding="{Binding loginId, UpdateSourceTrigger=PropertyChanged}" Width="125"/>
+                                    <DataGridTextColumn Header="Call Type" Binding="{Binding callType, UpdateSourceTrigger=PropertyChanged}" Width="75"/>
+                                    <DataGridTextColumn Header="Entity NO" Binding="{Binding entityNo, UpdateSourceTrigger=PropertyChanged}" Width="120"/>
+                                    <DataGridTextColumn Header="Trunk 그룹 NO" Binding="{Binding trunkGroupNo, UpdateSourceTrigger=PropertyChanged}" Width="115"/>
+                                    <DataGridTextColumn Header="테스트 IVR DN" Binding="{Binding testIvrDn, UpdateSourceTrigger=PropertyChanged}" Width="105"/>
+                                    <DataGridTextColumn Header="비고" Binding="{Binding note, UpdateSourceTrigger=PropertyChanged}" Width="180"/>
+                                    <DataGridTextColumn Header="구 IVR RSI" Binding="{Binding legacyIvrRsi, UpdateSourceTrigger=PropertyChanged}" Width="85"/>
+                                    <DataGridTextColumn Header="구 IVR Pilot" Binding="{Binding legacyIvrPilot, UpdateSourceTrigger=PropertyChanged}" Width="95"/>
+                                    <DataGridTextColumn Header="구 RSI 특징" Binding="{Binding legacyRsiNote, UpdateSourceTrigger=PropertyChanged}" Width="100"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- SUB-TAB 2: PRI & Entity Master -->
+            <Grid x:Name="PanelPriEntity" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="56*"/>
+                    <RowDefinition Height="6"/>
+                    <RowDefinition Height="44*"/>
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0" Style="{StaticResource CardBorderStyle}" Padding="10,8">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <DockPanel Grid.Row="0" Margin="0,0,0,6">
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                <Button Style="{StaticResource BaseBtn}" Content="+ PRI 추가" Height="26" Padding="9,0" Margin="0,0,5,0" Click="BtnAddPri_Click"/>
+                                <Button Style="{StaticResource BaseBtn}" Content="선택 삭제" Height="26" Padding="9,0" Margin="0,0,5,0" Click="BtnRemovePri_Click"/>
+                                <Button Style="{StaticResource PrimaryBtn}" Content="저장" Height="26" Padding="11,0" Click="BtnSaveAllMaster_Click"/>
+                            </StackPanel>
+                            <TextBlock Text="PRI 회선 현황 (보드 / Logical / TG / DID 대역)" FontSize="13" FontWeight="Bold" VerticalAlignment="Center"/>
+                        </DockPanel>
+                        <DataGrid x:Name="GridPri"
+                                  Grid.Row="1"
+                                  Style="{StaticResource ModernDataGrid}"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="False"
+                                  CanUserAddRows="False"
+                                  SelectionMode="Single">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="실장보드" Binding="{Binding boardSlot, UpdateSourceTrigger=PropertyChanged}" Width="75"/>
+                                <DataGridTextColumn Header="Logical" Binding="{Binding logical, UpdateSourceTrigger=PropertyChanged}" Width="60"/>
+                                <DataGridTextColumn Header="TG신규" Binding="{Binding tgNew, UpdateSourceTrigger=PropertyChanged}" Width="65"/>
+                                <DataGridTextColumn Header="상태" Binding="{Binding status, UpdateSourceTrigger=PropertyChanged}" Width="70"/>
+                                <DataGridTextColumn Header="사용센터" Binding="{Binding centerName, UpdateSourceTrigger=PropertyChanged}" Width="145"/>
+                                <DataGridTextColumn Header="트렁크 그룹이름" Binding="{Binding trunkGroupName, UpdateSourceTrigger=PropertyChanged}" Width="135"/>
+                                <DataGridTextColumn Header="할당 DID 대역" Binding="{Binding didRange, UpdateSourceTrigger=PropertyChanged}" Width="175"/>
+                                <DataGridTextColumn Header="사업자" Binding="{Binding carrier, UpdateSourceTrigger=PropertyChanged}" Width="70"/>
+                                <DataGridTextColumn Header="DID/DOD" Binding="{Binding didDod, UpdateSourceTrigger=PropertyChanged}" Width="75"/>
+                                <DataGridTextColumn Header="가입자번호" Binding="{Binding subscriberNo, UpdateSourceTrigger=PropertyChanged}" Width="120"/>
+                                <DataGridTextColumn Header="중계번호" Binding="{Binding relayNo, UpdateSourceTrigger=PropertyChanged}" Width="110"/>
+                                <DataGridTextColumn Header="개통일" Binding="{Binding openedDate, UpdateSourceTrigger=PropertyChanged}" Width="95"/>
+                                <DataGridTextColumn Header="비고" Binding="{Binding note, UpdateSourceTrigger=PropertyChanged}" Width="160"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+
+                <GridSplitter Grid.Row="1" Height="6" HorizontalAlignment="Stretch" Background="Transparent"/>
+
+                <Border Grid.Row="2" Style="{StaticResource CardBorderStyle}" Padding="10,8">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <DockPanel Grid.Row="0" Margin="0,0,0,6">
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                <Button Style="{StaticResource BaseBtn}" Content="+ Entity 추가" Height="26" Padding="9,0" Margin="0,0,5,0" Click="BtnAddEntity_Click"/>
+                                <Button Style="{StaticResource BaseBtn}" Content="선택 삭제" Height="26" Padding="9,0" Margin="0,0,5,0" Click="BtnRemoveEntity_Click"/>
+                                <Button Style="{StaticResource PrimaryBtn}" Content="저장" Height="26" Padding="11,0" Click="BtnSaveAllMaster_Click"/>
+                            </StackPanel>
+                            <TextBlock Text="OXE Entity NO 마스터 (Sheet2)" FontSize="13" FontWeight="Bold" VerticalAlignment="Center"/>
+                        </DockPanel>
+                        <DataGrid x:Name="GridEntities"
+                                  Grid.Row="1"
+                                  Style="{StaticResource ModernDataGrid}"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="False"
+                                  CanUserAddRows="False"
+                                  SelectionMode="Single">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Entity NO" Binding="{Binding entityNo, UpdateSourceTrigger=PropertyChanged}" Width="110"/>
+                                <DataGridTextColumn Header="엔티티명" Binding="{Binding entityName, UpdateSourceTrigger=PropertyChanged}" Width="240"/>
+                                <DataGridTextColumn Header="Disc.Num" Binding="{Binding discNum, UpdateSourceTrigger=PropertyChanged}" Width="130"/>
+                                <DataGridTextColumn Header="비고" Binding="{Binding note, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- SUB-TAB 3: IP IVR & D.V.G Prompts -->
+            <Grid x:Name="PanelIvrDvg" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="38*"/>
+                    <RowDefinition Height="6"/>
+                    <RowDefinition Height="62*"/>
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0" Style="{StaticResource CardBorderStyle}" Padding="10,8">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <DockPanel Grid.Row="0" Margin="0,0,0,6">
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                <Button Style="{StaticResource BaseBtn}" Content="+ IVR 추가" Height="26" Padding="9,0" Margin="0,0,5,0" Click="BtnAddIpIvr_Click"/>
+                                <Button Style="{StaticResource BaseBtn}" Content="선택 삭제" Height="26" Padding="9,0" Margin="0,0,5,0" Click="BtnRemoveIpIvr_Click"/>
+                                <Button Style="{StaticResource PrimaryBtn}" Content="저장" Height="26" Padding="11,0" Click="BtnSaveAllMaster_Click"/>
+                            </StackPanel>
+                            <TextBlock Text="IP IVR 내선 및 채널 할당 현황 (이원화 · SIP)" FontSize="13" FontWeight="Bold" VerticalAlignment="Center"/>
+                        </DockPanel>
+                        <DataGrid x:Name="GridIpIvr"
+                                  Grid.Row="1"
+                                  Style="{StaticResource ModernDataGrid}"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="False"
+                                  CanUserAddRows="False"
+                                  SelectionMode="Single">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="장비명" Binding="{Binding deviceName, UpdateSourceTrigger=PropertyChanged}" Width="210"/>
+                                <DataGridTextColumn Header="신규 IVR DN" Binding="{Binding ivrDn, UpdateSourceTrigger=PropertyChanged}" Width="160"/>
+                                <DataGridTextColumn Header="채널 수" Binding="{Binding channelCount, UpdateSourceTrigger=PropertyChanged}" Width="80"/>
+                                <DataGridTextColumn Header="사용 센터" Binding="{Binding centerName, UpdateSourceTrigger=PropertyChanged}" Width="230"/>
+                                <DataGridTextColumn Header="비고 / SIP 정보" Binding="{Binding note, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+
+                <GridSplitter Grid.Row="1" Height="6" HorizontalAlignment="Stretch" Background="Transparent"/>
+
+                <Border Grid.Row="2" Style="{StaticResource CardBorderStyle}" Padding="10,8">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <DockPanel Grid.Row="0" Margin="0,0,0,6">
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                <Button Style="{StaticResource BaseBtn}" Content="+ 멘트 추가" Height="26" Padding="9,0" Margin="0,0,5,0" Click="BtnAddDvg_Click"/>
+                                <Button Style="{StaticResource BaseBtn}" Content="선택 삭제" Height="26" Padding="9,0" Margin="0,0,5,0" Click="BtnRemoveDvg_Click"/>
+                                <Button Style="{StaticResource PrimaryBtn}" Content="저장" Height="26" Padding="11,0" Click="BtnSaveAllMaster_Click"/>
+                            </StackPanel>
+                            <TextBlock Text="D.V.G 안내 멘트 목록 (700~799 / 800~899 / 900~999 / 1800~)" FontSize="13" FontWeight="Bold" VerticalAlignment="Center"/>
+                        </DockPanel>
+                        <DataGrid x:Name="GridDvg"
+                                  Grid.Row="1"
+                                  Style="{StaticResource ModernDataGrid}"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="False"
+                                  CanUserAddRows="False"
+                                  SelectionMode="Single">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="대역" Binding="{Binding band, UpdateSourceTrigger=PropertyChanged}" Width="90"/>
+                                <DataGridTextColumn Header="D.V.G" Binding="{Binding dvgNo, UpdateSourceTrigger=PropertyChanged}" Width="70"/>
+                                <DataGridTextColumn Header="구분" Binding="{Binding category, UpdateSourceTrigger=PropertyChanged}" Width="120"/>
+                                <DataGridTextColumn Header="세부" Binding="{Binding subCategory, UpdateSourceTrigger=PropertyChanged}" Width="140"/>
+                                <DataGridTextColumn Header="안내 멘트 내용" Binding="{Binding content, UpdateSourceTrigger=PropertyChanged}" Width="380"/>
+                                <DataGridTextColumn Header="시간(Sec)" Binding="{Binding durationSec, UpdateSourceTrigger=PropertyChanged}" Width="75"/>
+                                <DataGridTextColumn Header="보드" Binding="{Binding board, UpdateSourceTrigger=PropertyChanged}" Width="110"/>
+                                <DataGridTextColumn Header="비고" Binding="{Binding note, UpdateSourceTrigger=PropertyChanged}" Width="140"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- SUB-TAB 4: PBX Hardware (IP / GPA) & MDF 110 Block -->
+            <Grid x:Name="PanelHardware" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="46*"/>
+                    <RowDefinition Height="6"/>
+                    <RowDefinition Height="54*"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="58*"/>
+                        <ColumnDefinition Width="8"/>
+                        <ColumnDefinition Width="42*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Left: MAIN / SUB PBX IP & MAC -->
+                    <Border Grid.Column="0" Style="{StaticResource CardBorderStyle}" Padding="10,8">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <DockPanel Grid.Row="0" Margin="0,0,0,6">
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                    <Button Style="{StaticResource BaseBtn}" Content="+ 보드" Height="25" Padding="8,0" Margin="0,0,4,0" Click="BtnAddHw_Click"/>
+                                    <Button Style="{StaticResource BaseBtn}" Content="삭제" Height="25" Padding="8,0" Margin="0,0,4,0" Click="BtnRemoveHw_Click"/>
+                                    <Button Style="{StaticResource PrimaryBtn}" Content="저장" Height="25" Padding="10,0" Click="BtnSaveAllMaster_Click"/>
+                                </StackPanel>
+                                <TextBlock Text="MAIN / SUB PBX 보드 IP · MAC" FontSize="13" FontWeight="Bold" VerticalAlignment="Center"/>
+                            </DockPanel>
+                            <DataGrid x:Name="GridPbxHw"
+                                      Grid.Row="1"
+                                      Style="{StaticResource ModernDataGrid}"
+                                      AutoGenerateColumns="False"
+                                      IsReadOnly="False"
+                                      CanUserAddRows="False"
+                                      SelectionMode="Single">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="SET" Binding="{Binding pbxSet, UpdateSourceTrigger=PropertyChanged}" Width="65"/>
+                                    <DataGridTextColumn Header="실장보드" Binding="{Binding boardSlot, UpdateSourceTrigger=PropertyChanged}" Width="95"/>
+                                    <DataGridTextColumn Header="보드명" Binding="{Binding boardName, UpdateSourceTrigger=PropertyChanged}" Width="140"/>
+                                    <DataGridTextColumn Header="IP 정보" Binding="{Binding ipAddress, UpdateSourceTrigger=PropertyChanged}" Width="115"/>
+                                    <DataGridTextColumn Header="MAC 정보" Binding="{Binding macAddress, UpdateSourceTrigger=PropertyChanged}" Width="135"/>
+                                    <DataGridTextColumn Header="비고" Binding="{Binding note, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </Border>
+
+                    <!-- Right: GPA Board Remaining Time -->
+                    <Border Grid.Column="2" Style="{StaticResource CardBorderStyle}" Padding="10,8">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <DockPanel Grid.Row="0" Margin="0,0,0,6">
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                    <Button Style="{StaticResource BaseBtn}" Content="+ GPA" Height="25" Padding="8,0" Margin="0,0,4,0" Click="BtnAddGpa_Click"/>
+                                    <Button Style="{StaticResource BaseBtn}" Content="삭제" Height="25" Padding="8,0" Margin="0,0,4,0" Click="BtnRemoveGpa_Click"/>
+                                    <Button Style="{StaticResource PrimaryBtn}" Content="저장" Height="25" Padding="10,0" Click="BtnSaveAllMaster_Click"/>
+                                </StackPanel>
+                                <TextBlock Text="GPA 보드 잔여시간 (D.V.G 용량)" FontSize="13" FontWeight="Bold" VerticalAlignment="Center"/>
+                            </DockPanel>
+                            <DataGrid x:Name="GridGpa"
+                                      Grid.Row="1"
+                                      Style="{StaticResource ModernDataGrid}"
+                                      AutoGenerateColumns="False"
+                                      IsReadOnly="False"
+                                      CanUserAddRows="False"
+                                      SelectionMode="Single">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="보드 위치" Binding="{Binding boardLocation, UpdateSourceTrigger=PropertyChanged}" Width="80"/>
+                                    <DataGridTextColumn Header="잔여시간 정보" Binding="{Binding remainingTime, UpdateSourceTrigger=PropertyChanged}" Width="240"/>
+                                    <DataGridTextColumn Header="비고" Binding="{Binding note, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <GridSplitter Grid.Row="1" Height="6" HorizontalAlignment="Stretch" Background="Transparent"/>
+
+                <!-- Bottom: MDF / 110 Block Grid -->
+                <Border Grid.Row="2" Style="{StaticResource CardBorderStyle}" Padding="10,8">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <DockPanel Grid.Row="0" Margin="0,0,0,6">
+                            <Button DockPanel.Dock="Right" Style="{StaticResource PrimaryBtn}" Content="MDF 변경 저장" Height="25" Padding="10,0" Click="BtnSaveMdf_Click"/>
+                            <TextBlock Text="MDF / PRI 110 Block 배선 현황 (인라인 편집 가능)" FontSize="13" FontWeight="Bold" VerticalAlignment="Center"/>
+                        </DockPanel>
+                        <DataGrid x:Name="GridMdf"
+                                  Grid.Row="1"
+                                  Style="{StaticResource ModernDataGrid}"
+                                  AutoGenerateColumns="True"
+                                  IsReadOnly="False"
+                                  CanUserAddRows="False"
+                                  SelectionMode="Single"/>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

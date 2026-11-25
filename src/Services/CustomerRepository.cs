@@ -98,7 +98,7 @@ namespace CmOxeProvisioner.Services
             return dict;
         }
 
-        private static string FormatPrettyJson(string json)
+        public static string FormatPrettyJson(string json)
         {
             if (string.IsNullOrEmpty(json)) return "[]";
             StringBuilder sb = new StringBuilder(json.Length * 2);

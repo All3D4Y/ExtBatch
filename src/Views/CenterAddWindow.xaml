@@ -1,0 +1,72 @@
+<Window x:Class="CmOxeProvisioner.Views.CenterAddWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+        xmlns:views="clr-namespace:CmOxeProvisioner.Views"
+        Title="신규 센터 추가 · CM / 선번장 연동"
+        Width="1060" Height="760"
+        MinWidth="820" MinHeight="600"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResize"
+        Background="{StaticResource AppBgBrush}"
+        Foreground="{StaticResource TextBrush}"
+        FontFamily="Malgun Gothic, Segoe UI, sans-serif">
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome CaptionHeight="42"
+                            CornerRadius="8"
+                            GlassFrameThickness="0"
+                            ResizeBorderThickness="5" />
+    </shell:WindowChrome.WindowChrome>
+
+    <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="42"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="50"/>
+            </Grid.RowDefinitions>
+
+            <!-- Custom Title Bar -->
+            <Border Grid.Row="0" Background="{StaticResource HeaderBgBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1">
+                <DockPanel LastChildFill="True">
+                    <Button DockPanel.Dock="Right"
+                            Style="{StaticResource CaptionCloseBtn}"
+                            Width="46" Height="41"
+                            Content="✕"
+                            ToolTip="창 닫기 (Esc)"
+                            shell:WindowChrome.IsHitTestVisibleInChrome="True"
+                            Click="BtnClose_Click"/>
+
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
+                        <Border Background="{StaticResource ChipBgBrush}" CornerRadius="4" Padding="7,2" Margin="0,0,10,0">
+                            <TextBlock Text="CM · 선번장" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource ChipFgBrush}"/>
+                        </Border>
+                        <TextBlock Text="신규 센터 추가" FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
+                        <TextBlock Text="Configuration\Environment 폴더 · Place Group · 선번장 등록"
+                                   FontSize="12" Foreground="{StaticResource MutedBrush}" Margin="10,1,0,0" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+
+            <!-- Hosted CenterAddTabView -->
+            <views:CenterAddTabView x:Name="CenterAddControl" Grid.Row="1" Margin="8,6,8,6"/>
+
+            <!-- Footer Bar -->
+            <Border Grid.Row="2" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0" Padding="16,8">
+                <DockPanel LastChildFill="True">
+                    <Button DockPanel.Dock="Right"
+                            x:Name="BtnCloseFooter"
+                            Style="{StaticResource BaseBtn}"
+                            Content="닫기"
+                            Width="96" Height="32"
+                            Click="BtnClose_Click"/>
+                    <TextBlock x:Name="TxtFooterHint"
+                               VerticalAlignment="Center"
+                               FontSize="12"
+                               Foreground="{StaticResource MutedBrush}"
+                               Text="센터 생성 시 선번장(dialplan_db.json) 및 CM 고객사 프리셋(cm_customers.json)에 함께 반영됩니다."/>
+                </DockPanel>
+            </Border>
+        </Grid>
+    </Border>
+</Window>
