@@ -7,7 +7,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Threading;
 using CmOxeProvisioner.Models;
 using CmOxeProvisioner.Services;
 using Microsoft.Win32;
@@ -43,15 +46,23 @@ namespace CmOxeProvisioner.Views
         private string _statusFilter = DialPlanStatus.Active;
         private string _dvgBandFilter = "all";
         private string _selectedLocation = "전체 위치";
-        private bool _isDetailExpanded = false;
+        private int _blurIntensityPercent = 55;
         private bool _suppressSelectionEvents = false;
         private DialPlanCenter _selectedCenter = null;
+        private DialPlanCenter _expandedCenter = null;
+        private DataGrid _expandedLinesGrid = null;
         private DataTable _mdfDataTable = null;
 
         public DialPlanTabView()
         {
             InitializeComponent();
-            InitDetailStatusCombo();
+            PreviewKeyDown += DialPlanTabView_PreviewKeyDown;
+        }
+
+        public void SetBlurIntensityPercent(int percent)
+        {
+            _blurIntensityPercent = Math.Max(0, Math.Min(100, percent));
+            RefreshExpandFocusVisuals();
         }
 
         public void Initialize(
@@ -90,6 +101,8 @@ namespace CmOxeProvisioner.Views
 
         public void ReloadFromDisk(string selectCenterNameOrId)
         {
+            _expandedCenter = null;
+            _expandedLinesGrid = null;
             _db = DialPlanRepository.Load(_dbPath);
             PopulateLocationFilter();
             UpdateStatusCounts();
@@ -110,15 +123,6 @@ namespace CmOxeProvisioner.Views
                     GridCenters.ScrollIntoView(found);
                 }
             }
-        }
-
-        private void InitDetailStatusCombo()
-        {
-            CmbDetailStatus.Items.Clear();
-            CmbDetailStatus.Items.Add(new ComboBoxItem { Content = "운영 중", Tag = DialPlanStatus.Active });
-            CmbDetailStatus.Items.Add(new ComboBoxItem { Content = "테스트용", Tag = DialPlanStatus.Test });
-            CmbDetailStatus.Items.Add(new ComboBoxItem { Content = "업무 종료", Tag = DialPlanStatus.Closed });
-            CmbDetailStatus.SelectedIndex = 0;
         }
 
         private void PopulateLocationFilter()
@@ -277,7 +281,14 @@ namespace CmOxeProvisioner.Views
                 }).ToList();
 
                 var prevSelId = _selectedCenter != null ? _selectedCenter.id : null;
+                if (_expandedCenter != null && !filtered.Contains(_expandedCenter))
+                {
+                    _expandedCenter = null;
+                    _expandedLinesGrid = null;
+                }
+
                 GridCenters.ItemsSource = filtered;
+                RefreshExpandFocusVisuals();
 
                 int totalLines = filtered.Sum(c => c.LineCount);
                 TxtResultSummary.Text = "센터 " + filtered.Count + "개 · 선번 " + totalLines + "행";
@@ -359,170 +370,206 @@ namespace CmOxeProvisioner.Views
 
         private void GridCenters_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var sel = GridCenters.SelectedItem as DialPlanCenter;
-            BindSelectedCenter(sel);
+            _selectedCenter = GridCenters.SelectedItem as DialPlanCenter;
         }
 
         private void GridCenters_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            DependencyObject origin = e.OriginalSource as DependencyObject;
+            if (IsInsideDetailsOrInteractiveControl(origin))
+                return;
+
             var sel = GridCenters.SelectedItem as DialPlanCenter;
             if (sel == null) return;
-            if (!_isDetailExpanded)
-                SetDetailExpanded(true);
-            BindSelectedCenter(sel);
+
+            ToggleExpandedCenter(sel);
         }
 
-        private void BtnToggleDetail_Click(object sender, RoutedEventArgs e)
+        private void DialPlanTabView_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            SetDetailExpanded(!_isDetailExpanded);
-        }
-
-        private void SetDetailExpanded(bool expanded)
-        {
-            _isDetailExpanded = expanded;
-            DetailBodyGrid.Visibility = expanded ? Visibility.Visible : Visibility.Collapsed;
-            DetailSplitter.Visibility = expanded ? Visibility.Visible : Visibility.Collapsed;
-            RowDetailPanel.Height = expanded ? new GridLength(300, GridUnitType.Pixel) : GridLength.Auto;
-            BtnToggleDetail.Content = expanded ? "▴ 상세 접기" : "▾ 상세 펼치기";
-        }
-
-        private void BindSelectedCenter(DialPlanCenter center)
-        {
-            _selectedCenter = center;
-            bool has = center != null;
-
-            BtnOpenInExtCti.IsEnabled = has;
-            BtnToggleStatus.IsEnabled = has;
-            BtnFullDelete.IsEnabled = has;
-
-            if (!has)
+            if (e.Key == Key.Escape && _expandedCenter != null && _activeSubTab == "dialplan")
             {
-                TxtDetailHeaderTitle.Text = "센터를 선택하면 세부 선번(RSI · IVR · 내선 · Entity)을 펼쳐서 편집할 수 있습니다.";
-                TxtDetailHeaderMeta.Text = string.Empty;
-                TxtDetailLocation.Text = string.Empty;
-                TxtDetailProject.Text = string.Empty;
-                TxtDetailCmName.Text = string.Empty;
-                TxtDetailNotes.Text = string.Empty;
-                ChkDetailVQueue.IsChecked = false;
-                ChkDetailIvr.IsChecked = false;
-                GridLines.ItemsSource = null;
-                return;
+                if (IsInsideDetailsEditingTextBox(Keyboard.FocusedElement as DependencyObject))
+                    return;
+
+                SetExpandedCenter(null);
+                e.Handled = true;
+            }
+        }
+
+        private void InlineLinesGrid_Loaded(object sender, RoutedEventArgs e)
+        {
+            var grid = sender as DataGrid;
+            if (grid != null && grid.DataContext == _expandedCenter)
+            {
+                _expandedLinesGrid = grid;
+            }
+        }
+
+        private void BtnInlineToggle_Click(object sender, RoutedEventArgs e)
+        {
+            e.Handled = true;
+            DialPlanCenter center = ExtractCenterFromSender(sender);
+            if (center == null) return;
+            ToggleExpandedCenter(center);
+        }
+
+        private void ToggleExpandedCenter(DialPlanCenter center)
+        {
+            if (center == null) return;
+            if (_expandedCenter == center)
+            {
+                SetExpandedCenter(null);
+            }
+            else
+            {
+                SetExpandedCenter(center);
+            }
+        }
+
+        private void SetExpandedCenter(DialPlanCenter center)
+        {
+            if (center != null)
+            {
+                center.EnsureLists();
             }
 
-            center.EnsureLists();
-            TxtDetailHeaderTitle.Text = "[" + center.StatusBadgeText + "] " + center.project;
-            TxtDetailHeaderMeta.Text = "위치: " + center.LocationDisplay +
-                                       " · 라인 " + center.LineCount + "건" +
-                                       " · CM 연동: " + center.CmLinkedSummary;
-
-            BtnToggleStatus.Content = center.status == DialPlanStatus.Closed ? "운영 중으로 복구" : "업무 종료로 이동";
-
-            TxtDetailLocation.Text = center.location ?? string.Empty;
-            TxtDetailProject.Text = center.project ?? string.Empty;
-            TxtDetailCmName.Text = center.cmCustomerName ?? string.Empty;
-            TxtDetailNotes.Text = center.notes ?? string.Empty;
-            ChkDetailVQueue.IsChecked = center.useVQueue;
-            ChkDetailIvr.IsChecked = center.useIvr;
-
-            foreach (ComboBoxItem item in CmbDetailStatus.Items)
+            _expandedCenter = center;
+            if (center == null)
             {
-                if (string.Equals(item.Tag as string, center.status, StringComparison.OrdinalIgnoreCase))
+                _expandedLinesGrid = null;
+            }
+
+            RefreshExpandFocusVisuals();
+
+            if (center != null)
+            {
+                _selectedCenter = center;
+                GridCenters.SelectedItem = center;
+                Dispatcher.BeginInvoke(new Action(delegate()
                 {
-                    CmbDetailStatus.SelectedItem = item;
-                    break;
-                }
+                    if (_expandedCenter == center)
+                        GridCenters.ScrollIntoView(center);
+                }), DispatcherPriority.Loaded);
             }
-
-            GridLines.ItemsSource = null;
-            GridLines.ItemsSource = center.lines;
         }
 
-        private void BtnAddLine_Click(object sender, RoutedEventArgs e)
+        private void RefreshExpandFocusVisuals()
         {
-            if (_selectedCenter == null) return;
-            _selectedCenter.EnsureLists();
-            var line = new DialPlanLine { subTask = _selectedCenter.project };
-            _selectedCenter.lines.Add(line);
-            GridLines.ItemsSource = null;
-            GridLines.ItemsSource = _selectedCenter.lines;
-            GridLines.SelectedItem = line;
-            GridLines.ScrollIntoView(line);
+            if (_db == null || _db.centers == null) return;
+            bool anyExpanded = (_expandedCenter != null);
+            foreach (var c in _db.centers)
+            {
+                if (c != null)
+                    c.ApplyExpandFocusVisual(c == _expandedCenter, anyExpanded, _blurIntensityPercent);
+            }
         }
 
-        private void BtnRemoveLine_Click(object sender, RoutedEventArgs e)
+        private void BtnInlineAddLine_Click(object sender, RoutedEventArgs e)
         {
-            if (_selectedCenter == null) return;
-            var line = GridLines.SelectedItem as DialPlanLine;
+            DialPlanCenter center = ExtractCenterFromSender(sender) ?? _expandedCenter;
+            if (center == null) return;
+            center.EnsureLists();
+
+            var line = new DialPlanLine { subTask = center.project };
+            center.lines.Add(line);
+            center.NotifySummaryFields();
+
+            DataGrid linesGrid = FindLinesGridForSender(sender);
+            if (linesGrid != null)
+            {
+                linesGrid.ItemsSource = null;
+                linesGrid.ItemsSource = center.lines;
+                linesGrid.SelectedItem = line;
+                linesGrid.ScrollIntoView(line);
+            }
+        }
+
+        private void BtnInlineRemoveLine_Click(object sender, RoutedEventArgs e)
+        {
+            DialPlanCenter center = ExtractCenterFromSender(sender) ?? _expandedCenter;
+            if (center == null) return;
+
+            DataGrid linesGrid = FindLinesGridForSender(sender);
+            var line = linesGrid != null ? linesGrid.SelectedItem as DialPlanLine : null;
             if (line == null)
             {
                 Toast(false, "선택 필요", "삭제할 선번 라인을 먼저 선택하세요.");
                 return;
             }
-            _selectedCenter.lines.Remove(line);
-            GridLines.ItemsSource = null;
-            GridLines.ItemsSource = _selectedCenter.lines;
+
+            center.lines.Remove(line);
+            center.NotifySummaryFields();
+            if (linesGrid != null)
+            {
+                linesGrid.ItemsSource = null;
+                linesGrid.ItemsSource = center.lines;
+            }
         }
 
-        private void BtnSaveCenter_Click(object sender, RoutedEventArgs e)
+        private void BtnInlineSaveCenter_Click(object sender, RoutedEventArgs e)
         {
-            if (_selectedCenter == null) return;
-            CommitGridEdits(GridLines);
+            DialPlanCenter center = ExtractCenterFromSender(sender) ?? _expandedCenter;
+            if (center == null) return;
 
-            string newProject = (TxtDetailProject.Text ?? string.Empty).Trim();
+            DataGrid linesGrid = FindLinesGridForSender(sender);
+            CommitGridEdits(linesGrid);
+
+            string newProject = (center.project ?? string.Empty).Trim();
             if (string.IsNullOrWhiteSpace(newProject))
             {
                 Toast(false, "입력 확인", "센터명은 비워둘 수 없습니다.");
                 return;
             }
 
-            _selectedCenter.location = (TxtDetailLocation.Text ?? string.Empty).Trim();
-            _selectedCenter.project = newProject;
-            _selectedCenter.cmCustomerName = (TxtDetailCmName.Text ?? string.Empty).Trim();
-            _selectedCenter.notes = (TxtDetailNotes.Text ?? string.Empty).Trim();
-            _selectedCenter.useVQueue = ChkDetailVQueue.IsChecked == true;
-            _selectedCenter.useIvr = ChkDetailIvr.IsChecked == true;
+            center.location = (center.location ?? string.Empty).Trim();
+            center.project = newProject;
+            center.cmCustomerName = (center.cmCustomerName ?? string.Empty).Trim();
+            center.notes = (center.notes ?? string.Empty).Trim();
+            center.EnsureLists();
+            center.NotifySummaryFields();
 
-            var selStatusItem = CmbDetailStatus.SelectedItem as ComboBoxItem;
-            if (selStatusItem != null && selStatusItem.Tag is string)
-                _selectedCenter.status = selStatusItem.Tag as string;
-
-            SaveDbAndSyncCustomers(_selectedCenter);
-            WriteAudit("선번장 저장", "Center=" + _selectedCenter.project + " Status=" + _selectedCenter.status + " Lines=" + _selectedCenter.LineCount);
-            Toast(true, "저장 완료", "'" + _selectedCenter.project + "' 변경사항 저장 및 CM 프리셋 동기화 완료");
+            SaveDbAndSyncCustomers(center);
+            WriteAudit("선번장 저장", "Center=" + center.project + " Status=" + center.status + " Lines=" + center.LineCount);
+            Toast(true, "저장 완료", "'" + center.project + "' 변경사항 저장 및 CM 프리셋 동기화 완료");
         }
 
-        private void BtnToggleStatus_Click(object sender, RoutedEventArgs e)
+        private void BtnInlineToggleStatus_Click(object sender, RoutedEventArgs e)
         {
-            if (_selectedCenter == null) return;
-            CommitGridEdits(GridLines);
+            DialPlanCenter center = ExtractCenterFromSender(sender) ?? _expandedCenter;
+            if (center == null) return;
 
-            bool movingToClosed = _selectedCenter.status != DialPlanStatus.Closed;
+            CommitGridEdits(FindLinesGridForSender(sender));
+
+            bool movingToClosed = center.status != DialPlanStatus.Closed;
             string nextStatus = movingToClosed ? DialPlanStatus.Closed : DialPlanStatus.Active;
             string verb = movingToClosed ? "업무 종료(종료센터 보관)" : "운영 중 복구";
 
             if (!PopupDialogs.ConfirmAction(
                 Window.GetWindow(this),
                 verb + " 확인",
-                "'" + _selectedCenter.project + "' → " + DialPlanStatus.ToDisplay(nextStatus),
+                "'" + center.project + "' → " + DialPlanStatus.ToDisplay(nextStatus),
                 "이 작업은 선번 데이터와 CM 폴더를 삭제하지 않으며 언제든 상태를 되돌릴 수 있습니다.",
                 verb))
             {
                 return;
             }
 
-            _selectedCenter.status = nextStatus;
-            _selectedCenter.closedAt = movingToClosed ? DateTime.Now.ToString("yyyy-MM-dd") : string.Empty;
+            center.status = nextStatus;
+            center.closedAt = movingToClosed ? DateTime.Now.ToString("yyyy-MM-dd") : string.Empty;
+            center.NotifySummaryFields();
 
             SaveDbAndSyncCustomers(null);
-            WriteAudit("선번장 상태변경", "Center=" + _selectedCenter.project + " -> " + nextStatus);
-            Toast(true, "상태 변경 완료", "'" + _selectedCenter.project + "' 상태가 '" + DialPlanStatus.ToDisplay(nextStatus) + "'(으)로 변경되었습니다.");
+            WriteAudit("선번장 상태변경", "Center=" + center.project + " -> " + nextStatus);
+            Toast(true, "상태 변경 완료", "'" + center.project + "' 상태가 '" + DialPlanStatus.ToDisplay(nextStatus) + "'(으)로 변경되었습니다.");
         }
 
-        private async void BtnFullDelete_Click(object sender, RoutedEventArgs e)
+        private async void BtnInlineFullDelete_Click(object sender, RoutedEventArgs e)
         {
-            if (_selectedCenter == null) return;
-            var target = _selectedCenter;
+            DialPlanCenter target = ExtractCenterFromSender(sender) ?? _expandedCenter;
+            if (target == null) return;
 
+            var btn = sender as Button;
             string cmTargetDesc = target.HasCmLink
                 ? ("CM 고객사 연동 대상: '" + target.cmCustomerName + "' (위치 폴더 '" + target.LocationDisplay + "'는 보존되고 센터 폴더·Place Group·Script만 삭제)")
                 : "CM 연동 정보 없음 (선번장 JSON DB에서만 영구 삭제)";
@@ -543,7 +590,7 @@ namespace CmOxeProvisioner.Views
             CenterFullDeleteOutcome outcome = null;
             if (_fullDeleteCenterHandler != null)
             {
-                BtnFullDelete.IsEnabled = false;
+                if (btn != null) btn.IsEnabled = false;
                 try
                 {
                     outcome = await _fullDeleteCenterHandler(target);
@@ -551,12 +598,12 @@ namespace CmOxeProvisioner.Views
                 catch (Exception ex)
                 {
                     MessageBox.Show("CM 완전 삭제 실행 중 오류: " + ex.Message, "삭제 오류", MessageBoxButton.OK, MessageBoxImage.Error);
-                    BtnFullDelete.IsEnabled = true;
+                    if (btn != null) btn.IsEnabled = true;
                     return;
                 }
                 finally
                 {
-                    BtnFullDelete.IsEnabled = true;
+                    if (btn != null) btn.IsEnabled = true;
                 }
 
                 if (outcome != null && !outcome.Success)
@@ -581,9 +628,10 @@ namespace CmOxeProvisioner.Views
                 }
             }
 
-            _selectedCenter = null;
-            SetDetailExpanded(false);
-            BindSelectedCenter(null);
+            if (_expandedCenter == target) _expandedCenter = null;
+            if (_selectedCenter == target) _selectedCenter = null;
+            _expandedLinesGrid = null;
+
             PopulateLocationFilter();
             UpdateStatusCounts();
             ApplyFiltersAndBind();
@@ -596,10 +644,83 @@ namespace CmOxeProvisioner.Views
             Toast(true, "완전 삭제 완료", "'" + target.project + "' 완전 삭제 완료" + extra);
         }
 
-        private void BtnOpenInExtCti_Click(object sender, RoutedEventArgs e)
+        private void BtnInlineOpenExtCti_Click(object sender, RoutedEventArgs e)
         {
-            if (_selectedCenter == null || _navigateToExtCtiHandler == null) return;
-            _navigateToExtCtiHandler(_selectedCenter);
+            DialPlanCenter center = ExtractCenterFromSender(sender) ?? _expandedCenter;
+            if (center == null || _navigateToExtCtiHandler == null) return;
+            _navigateToExtCtiHandler(center);
+        }
+
+        private static DialPlanCenter ExtractCenterFromSender(object sender)
+        {
+            var fe = sender as FrameworkElement;
+            if (fe == null) return null;
+            return (fe.Tag as DialPlanCenter) ?? (fe.DataContext as DialPlanCenter);
+        }
+
+        private DataGrid FindLinesGridForSender(object sender)
+        {
+            DependencyObject cur = sender as DependencyObject;
+            while (cur != null)
+            {
+                var rootGrid = cur as Grid;
+                if (rootGrid != null && rootGrid.Name == "InlineDetailRoot")
+                {
+                    var found = FindNamedDescendant<DataGrid>(rootGrid, "InlineLinesGrid");
+                    if (found != null) return found;
+                }
+                cur = VisualTreeHelper.GetParent(cur);
+            }
+            return _expandedLinesGrid;
+        }
+
+        private static bool IsInsideDetailsOrInteractiveControl(DependencyObject origin)
+        {
+            DependencyObject cur = origin;
+            while (cur != null)
+            {
+                if (cur is DataGridDetailsPresenter ||
+                    cur is ButtonBase ||
+                    cur is TextBox ||
+                    cur is ComboBox)
+                {
+                    return true;
+                }
+                if (cur is DataGridRow)
+                    return false;
+                cur = VisualTreeHelper.GetParent(cur);
+            }
+            return false;
+        }
+
+        private static bool IsInsideDetailsEditingTextBox(DependencyObject focused)
+        {
+            DependencyObject cur = focused;
+            while (cur != null)
+            {
+                if (cur is TextBox)
+                {
+                    return true;
+                }
+                cur = VisualTreeHelper.GetParent(cur);
+            }
+            return false;
+        }
+
+        private static T FindNamedDescendant<T>(DependencyObject root, string name) where T : FrameworkElement
+        {
+            if (root == null) return null;
+            int count = VisualTreeHelper.GetChildrenCount(root);
+            for (int i = 0; i < count; i++)
+            {
+                DependencyObject child = VisualTreeHelper.GetChild(root, i);
+                var match = child as T;
+                if (match != null && (string.IsNullOrEmpty(name) || match.Name == name))
+                    return match;
+                var deep = FindNamedDescendant<T>(child, name);
+                if (deep != null) return deep;
+            }
+            return null;
         }
 
         private void BtnAddCenterPopup_Click(object sender, RoutedEventArgs e)
@@ -963,7 +1084,7 @@ namespace CmOxeProvisioner.Views
             PopulateLocationFilter();
             UpdateStatusCounts();
             ApplyFiltersAndBind();
-            BindSelectedCenter(syncTarget ?? _selectedCenter);
+            if (syncTarget != null) syncTarget.NotifySummaryFields();
             if (_onDatabaseOrCustomerChanged != null)
                 _onDatabaseOrCustomerChanged();
         }

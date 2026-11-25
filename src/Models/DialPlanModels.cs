@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Web.Script.Serialization;
 
@@ -84,8 +85,15 @@ namespace CmOxeProvisioner.Models
         }
     }
 
-    public class DialPlanCenter
+    public class DialPlanCenter : INotifyPropertyChanged
     {
+        private bool _isDetailExpanded = false;
+        private bool _isDimmedByOther = false;
+        private double _rowBlurRadius = 0.0;
+        private double _rowContentOpacity = 1.0;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public string id { get; set; }
         public string status { get; set; }
         public string location { get; set; }
@@ -117,6 +125,107 @@ namespace CmOxeProvisioner.Models
         {
             if (lines == null) lines = new List<DialPlanLine>();
             status = DialPlanStatus.Normalize(status);
+        }
+
+        [ScriptIgnore]
+        public bool IsDetailExpanded { get { return _isDetailExpanded; } }
+
+        [ScriptIgnore]
+        public bool IsBlurred { get { return _isDimmedByOther && _rowBlurRadius > 0.01; } }
+
+        [ScriptIgnore]
+        public double RowBlurRadius { get { return _rowBlurRadius; } }
+
+        [ScriptIgnore]
+        public double RowContentOpacity { get { return _rowContentOpacity; } }
+
+        [ScriptIgnore]
+        public string ExpandButtonText { get { return _isDetailExpanded ? "▴ 접기" : "▾ 상세"; } }
+
+        [ScriptIgnore]
+        public string StatusMoveButtonText
+        {
+            get { return status == DialPlanStatus.Closed ? "운영 중으로 복구" : "업무 종료로 이동"; }
+        }
+
+        [ScriptIgnore]
+        public string DetailHeaderTitleText
+        {
+            get { return "[" + StatusBadgeText + "] " + (project ?? string.Empty); }
+        }
+
+        [ScriptIgnore]
+        public string DetailHeaderMetaText
+        {
+            get
+            {
+                return "위치: " + LocationDisplay +
+                       " · 라인 " + LineCount + "건" +
+                       " · CM 연동: " + CmLinkedSummary;
+            }
+        }
+
+        public void ApplyExpandFocusVisual(bool isExpanded, bool anyOtherExpanded, int blurPercent)
+        {
+            int clamped = Math.Max(0, Math.Min(100, blurPercent));
+            _isDetailExpanded = isExpanded;
+            _isDimmedByOther = !isExpanded && anyOtherExpanded;
+
+            if (_isDimmedByOther && clamped > 0)
+            {
+                _rowBlurRadius = Math.Round((clamped / 100.0) * 10.0, 2);
+                _rowContentOpacity = Math.Round(1.0 - (clamped / 100.0) * 0.50, 3);
+            }
+            else
+            {
+                _rowBlurRadius = 0.0;
+                _rowContentOpacity = 1.0;
+            }
+
+            OnPropertyChanged("IsDetailExpanded");
+            OnPropertyChanged("IsBlurred");
+            OnPropertyChanged("RowBlurRadius");
+            OnPropertyChanged("RowContentOpacity");
+            OnPropertyChanged("ExpandButtonText");
+            OnPropertyChanged("StatusMoveButtonText");
+            OnPropertyChanged("DetailHeaderTitleText");
+            OnPropertyChanged("DetailHeaderMetaText");
+        }
+
+        public void NotifySummaryFields()
+        {
+            OnPropertyChanged("StatusBadgeText");
+            OnPropertyChanged("LocationDisplay");
+            OnPropertyChanged("LineCount");
+            OnPropertyChanged("HasCmLink");
+            OnPropertyChanged("CmLinkedSummary");
+            OnPropertyChanged("SubTaskSummary");
+            OnPropertyChanged("MainNumberSummary");
+            OnPropertyChanged("EntitySummary");
+            OnPropertyChanged("PgSummary");
+            OnPropertyChanged("ExtRangeSummary");
+            OnPropertyChanged("LoginRangeSummary");
+            OnPropertyChanged("RsiSummary");
+            OnPropertyChanged("TestIvrSummary");
+            OnPropertyChanged("StatusMoveButtonText");
+            OnPropertyChanged("DetailHeaderTitleText");
+            OnPropertyChanged("DetailHeaderMetaText");
+            OnPropertyChanged("project");
+            OnPropertyChanged("location");
+            OnPropertyChanged("status");
+            OnPropertyChanged("cmCustomerName");
+            OnPropertyChanged("useVQueue");
+            OnPropertyChanged("useIvr");
+            OnPropertyChanged("notes");
+        }
+
+        private void OnPropertyChanged(string propName)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(propName));
+            }
         }
 
         [ScriptIgnore]
