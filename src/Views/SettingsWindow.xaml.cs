@@ -57,7 +57,6 @@ namespace CmOxeProvisioner.Views
             c.DefaultProfileExt = src.DefaultProfileExt;
             c.DefaultProfileLogin = src.DefaultProfileLogin;
             c.DnWarnThreshold = src.DnWarnThreshold;
-            c.DialPlanBlurPercent = src.DialPlanBlurPercent ?? 55;
             return c;
         }
 
@@ -79,20 +78,6 @@ namespace CmOxeProvisioner.Views
             TxtDefProfLogin.Text = s.DefaultProfileLogin ?? "71090";
             TxtWarnThreshold.Text = s.DnWarnThreshold.ToString();
             CmbTheme.SelectedValue = s.ThemeKey ?? "antigravity-light";
-            int blur = Math.Max(0, Math.Min(100, s.DialPlanBlurPercent ?? 55));
-            SldDialPlanBlur.Value = blur;
-            UpdateBlurLabel(blur);
-        }
-
-        private void SldDialPlanBlur_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (TxtDialPlanBlurValue == null) return;
-            UpdateBlurLabel((int)Math.Round(e.NewValue));
-        }
-
-        private void UpdateBlurLabel(int percent)
-        {
-            TxtDialPlanBlurValue.Text = percent <= 0 ? "0% (미사용)" : (percent + "%");
         }
 
         private void CmbTheme_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -160,7 +145,6 @@ namespace CmOxeProvisioner.Views
             _workingSettings.DefaultProfileExt = TxtDefProfExt.Text.Trim();
             _workingSettings.DefaultProfileLogin = TxtDefProfLogin.Text.Trim();
             _workingSettings.DnWarnThreshold = warnThreshold;
-            _workingSettings.DialPlanBlurPercent = Math.Max(0, Math.Min(100, (int)Math.Round(SldDialPlanBlur.Value)));
 
             string selTheme = CmbTheme.SelectedValue as string;
             if (!string.IsNullOrEmpty(selTheme))

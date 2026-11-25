@@ -20,7 +20,6 @@ namespace CmOxeProvisioner.Models
         public string DefaultProfileExt { get; set; }
         public string DefaultProfileLogin { get; set; }
         public int DnWarnThreshold { get; set; }
-        public int? DialPlanBlurPercent { get; set; }
 
         public static AppSettings CreateDefault()
         {
@@ -41,7 +40,6 @@ namespace CmOxeProvisioner.Models
             s.DefaultProfileExt = "31090";
             s.DefaultProfileLogin = "71090";
             s.DnWarnThreshold = 8;
-            s.DialPlanBlurPercent = 55;
             return s;
         }
     }

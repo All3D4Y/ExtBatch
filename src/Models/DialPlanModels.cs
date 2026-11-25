@@ -88,9 +88,6 @@ namespace CmOxeProvisioner.Models
     public class DialPlanCenter : INotifyPropertyChanged
     {
         private bool _isDetailExpanded = false;
-        private bool _isDimmedByOther = false;
-        private double _rowBlurRadius = 0.0;
-        private double _rowContentOpacity = 1.0;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -131,15 +128,6 @@ namespace CmOxeProvisioner.Models
         public bool IsDetailExpanded { get { return _isDetailExpanded; } }
 
         [ScriptIgnore]
-        public bool IsBlurred { get { return _isDimmedByOther && _rowBlurRadius > 0.01; } }
-
-        [ScriptIgnore]
-        public double RowBlurRadius { get { return _rowBlurRadius; } }
-
-        [ScriptIgnore]
-        public double RowContentOpacity { get { return _rowContentOpacity; } }
-
-        [ScriptIgnore]
         public string ExpandButtonText { get { return _isDetailExpanded ? "▴ 접기" : "▾ 상세"; } }
 
         [ScriptIgnore]
@@ -165,27 +153,11 @@ namespace CmOxeProvisioner.Models
             }
         }
 
-        public void ApplyExpandFocusVisual(bool isExpanded, bool anyOtherExpanded, int blurPercent)
+        public void SetExpanded(bool isExpanded)
         {
-            int clamped = Math.Max(0, Math.Min(100, blurPercent));
+            if (_isDetailExpanded == isExpanded) return;
             _isDetailExpanded = isExpanded;
-            _isDimmedByOther = !isExpanded && anyOtherExpanded;
-
-            if (_isDimmedByOther && clamped > 0)
-            {
-                _rowBlurRadius = Math.Round((clamped / 100.0) * 10.0, 2);
-                _rowContentOpacity = Math.Round(1.0 - (clamped / 100.0) * 0.50, 3);
-            }
-            else
-            {
-                _rowBlurRadius = 0.0;
-                _rowContentOpacity = 1.0;
-            }
-
             OnPropertyChanged("IsDetailExpanded");
-            OnPropertyChanged("IsBlurred");
-            OnPropertyChanged("RowBlurRadius");
-            OnPropertyChanged("RowContentOpacity");
             OnPropertyChanged("ExpandButtonText");
             OnPropertyChanged("StatusMoveButtonText");
             OnPropertyChanged("DetailHeaderTitleText");

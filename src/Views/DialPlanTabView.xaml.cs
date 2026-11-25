@@ -46,7 +46,6 @@ namespace CmOxeProvisioner.Views
         private string _statusFilter = DialPlanStatus.Active;
         private string _dvgBandFilter = "all";
         private string _selectedLocation = "전체 위치";
-        private int _blurIntensityPercent = 55;
         private bool _suppressSelectionEvents = false;
         private DialPlanCenter _selectedCenter = null;
         private DialPlanCenter _expandedCenter = null;
@@ -57,12 +56,6 @@ namespace CmOxeProvisioner.Views
         {
             InitializeComponent();
             PreviewKeyDown += DialPlanTabView_PreviewKeyDown;
-        }
-
-        public void SetBlurIntensityPercent(int percent)
-        {
-            _blurIntensityPercent = Math.Max(0, Math.Min(100, percent));
-            RefreshExpandFocusVisuals();
         }
 
         public void Initialize(
@@ -457,11 +450,10 @@ namespace CmOxeProvisioner.Views
         private void RefreshExpandFocusVisuals()
         {
             if (_db == null || _db.centers == null) return;
-            bool anyExpanded = (_expandedCenter != null);
             foreach (var c in _db.centers)
             {
                 if (c != null)
-                    c.ApplyExpandFocusVisual(c == _expandedCenter, anyExpanded, _blurIntensityPercent);
+                    c.SetExpanded(c == _expandedCenter);
             }
         }
 

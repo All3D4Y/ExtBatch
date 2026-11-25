@@ -83,10 +83,6 @@ namespace CmOxeProvisioner.Services
                 if (string.IsNullOrEmpty(loaded.DefaultProfileExt)) loaded.DefaultProfileExt = defaults.DefaultProfileExt;
                 if (string.IsNullOrEmpty(loaded.DefaultProfileLogin)) loaded.DefaultProfileLogin = defaults.DefaultProfileLogin;
                 if (loaded.DnWarnThreshold <= 0) loaded.DnWarnThreshold = 8;
-                if (!loaded.DialPlanBlurPercent.HasValue)
-                    loaded.DialPlanBlurPercent = defaults.DialPlanBlurPercent;
-                else
-                    loaded.DialPlanBlurPercent = Math.Max(0, Math.Min(100, loaded.DialPlanBlurPercent.Value));
                 return loaded;
             }
             catch

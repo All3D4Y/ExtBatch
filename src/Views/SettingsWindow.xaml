@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="ExtBatch 환경 설정 · CM / LightGate 계정 및 기본값"
         Icon="pack://application:,,,/ExtBatch;component/icon.ico"
-        Width="560" Height="745"
+        Width="560" Height="710"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         Background="{DynamicResource AppBgBrush}"
@@ -161,30 +161,7 @@
                 </Grid>
 
                 <TextBlock Text="UI 테마 (안티그래비티 기준 · 선택 시 미리보기)" Style="{StaticResource FieldLabelStyle}" />
-                <ComboBox x:Name="CmbTheme" Style="{StaticResource ModernComboBox}" SelectionChanged="CmbTheme_SelectionChanged" Margin="0,0,0,10" />
-
-                <DockPanel Margin="0,0,0,4" LastChildFill="True">
-                  <TextBlock x:Name="TxtDialPlanBlurValue"
-                             DockPanel.Dock="Right"
-                             Text="55%"
-                             FontSize="12"
-                             FontWeight="Bold"
-                             FontFamily="Consolas"
-                             Foreground="{DynamicResource PrimaryBrush}"
-                             VerticalAlignment="Center" />
-                  <TextBlock Text="선번장 행 펼치기 배경 블러 강도 (0% ~ 100%)"
-                             Style="{StaticResource FieldLabelStyle}"
-                             Margin="0" />
-                </DockPanel>
-                <Slider x:Name="SldDialPlanBlur"
-                        Minimum="0"
-                        Maximum="100"
-                        TickFrequency="5"
-                        IsSnapToTickEnabled="True"
-                        SmallChange="5"
-                        LargeChange="10"
-                        ValueChanged="SldDialPlanBlur_ValueChanged"
-                        Margin="0,0,0,8" />
+                <ComboBox x:Name="CmbTheme" Style="{StaticResource ModernComboBox}" SelectionChanged="CmbTheme_SelectionChanged" Margin="0,0,0,8" />
 
                 <TextBlock x:Name="TxtStoragePath" FontSize="12" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
               </StackPanel>

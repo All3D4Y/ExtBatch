@@ -120,7 +120,6 @@ namespace CmOxeProvisioner.Views
                     AppendLog("INFO", msg);
                 },
                 RefreshCustomersFromDialPlan);
-            DialPlanTabControl.SetBlurIntensityPercent(_settings.DialPlanBlurPercent ?? 55);
 
             ChkEmsTerminalOnly.IsChecked = _settings.EmsTerminalOnly;
             SetActiveViewMode("Split");
@@ -687,10 +686,6 @@ namespace CmOxeProvisioner.Views
                 UpdateTabButtonStyle(BtnTabWork, _viewMode == "Work");
                 UpdateTabButtonStyle(BtnTabLightGate, _viewMode == "LightGate");
                 UpdatePreviewCounts();
-                if (DialPlanTabControl != null)
-                {
-                    DialPlanTabControl.SetBlurIntensityPercent(_settings.DialPlanBlurPercent ?? 55);
-                }
                 AppendLog("OK", "설정 저장 완료");
 
                 if (_webViewReady)
