@@ -1,2869 +1,2887 @@
 [
     {
-        "name":  "__TEST__ (테스트 폴더)",
-        "floor":  "TEST",
-        "agentLogin":  [
-                           "Test"
-                       ],
-        "acdPosition":  [
-                            "Test"
-                        ],
-        "agentDn":  [
-                        "TEST"
-                    ],
-        "place":  [
-                      "TEST"
-                  ],
-        "note":  "테스트 전용 폴더 (AgentLogin/ACDPosition=Test, AGENT_DN/Places=TEST)",
-        "oxePresets":  [
-                           {
-                               "label":  "테스트용 (Col Test: Ent 1 / PG 60991)",
-                               "entityNo":  "1",
-                               "entityName":  "DN",
-                               "agentPg":  "60991",
-                               "sampleExt":  "30101",
-                               "sampleLoginId":  "70101",
-                               "source":  "S1(테스트용)"
-                           }
-                       ]
-    },
-    {
-        "name":  "더본코리아",
-        "floor":  "21층",
-        "agentLogin":  [
-                           "21층",
-                           "더본코리아"
-                       ],
-        "acdPosition":  [
-                            "21층",
-                            "더본코리아"
-                        ],
-        "agentDn":  [
-                        "21층",
-                        "더본코리아"
-                    ],
-        "place":  [
-                      "21층",
-                      "더본코리아"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "더본코리아 #1 (Ent 91 / PG 61491)",
-                               "entityNo":  "91",
-                               "entityName":  "THEBORN",
-                               "agentPg":  "61491",
-                               "sampleExt":  "31090",
-                               "sampleLoginId":  "71090",
-                               "source":  "S1(Dial-Plan)"
-                           },
-                           {
-                               "label":  "더본코리아 #2 유통 (Ent 92 / PG 61492)",
-                               "entityNo":  "92",
-                               "entityName":  "THEBORN_2",
-                               "agentPg":  "61492",
-                               "sampleExt":  "31090",
-                               "sampleLoginId":  "71090",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "스타벅스",
-        "floor":  "21층",
-        "agentLogin":  [
-                           "21층",
-                           "스타벅스"
-                       ],
-        "acdPosition":  [
-                            "21층",
-                            "스타벅스"
-                        ],
-        "agentDn":  [
-                        "21층",
-                        "스타벅스"
-                    ],
-        "place":  [
-                      "21층",
-                      "스타벅스"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "스타벅스 (Ent 79 / PG 61691)",
-                               "entityNo":  "79",
-                               "entityName":  "STARBUCKS",
-                               "agentPg":  "61691",
-                               "sampleExt":  "39500",
-                               "sampleLoginId":  "79500",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "하이엠솔루텍OB",
-        "floor":  "21층",
-        "agentLogin":  [
-                           "21층",
-                           "하이엠솔루텍OB"
-                       ],
-        "acdPosition":  [
-                            "21층",
-                            "하이엠솔루텍OB"
-                        ],
-        "agentDn":  [
-                        "21층",
-                        "하이엠솔루텍OB"
-                    ],
-        "place":  [
-                      "21층",
-                      "하이엠솔루텍OB"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "하이엠솔루텍OB 해피콜 (Ent 39 / PG 66799)",
-                               "entityNo":  "39",
-                               "entityName":  "HIM",
-                               "agentPg":  "66799",
-                               "sampleExt":  "31030",
-                               "sampleLoginId":  "77104",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "ABC마트",
-        "floor":  "23층",
-        "agentLogin":  [
-                           "23층",
-                           "ABC마트"
-                       ],
-        "acdPosition":  [
-                            "23층",
-                            "ABC마트"
-                        ],
-        "agentDn":  null,
-        "place":  [
-                      "23층",
-                      "ABC마트"
-                  ],
-        "note":  "AGENT_DN에 ABC마트 폴더 없음",
-        "oxePresets":  [
-
-                       ]
-    },
-    {
-        "name":  "더원모바일",
-        "floor":  "23층",
-        "agentLogin":  [
-                           "23층",
-                           "더원모바일"
-                       ],
-        "acdPosition":  [
-                            "23층",
-                            "더원모바일"
-                        ],
-        "agentDn":  [
-                        "23층",
-                        "더원모바일"
-                    ],
-        "place":  [
-                      "23층",
-                      "더원모바일"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "더원모바일 (Ent 50 / PG 60891)",
-                               "entityNo":  "50",
-                               "entityName":  "THEONE",
-                               "agentPg":  "60891",
-                               "sampleExt":  "32850",
-                               "sampleLoginId":  "72850",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "더원플랫폼_개통센터",
-        "floor":  "23층",
-        "agentLogin":  [
-                           "23층",
-                           "더원플랫폼_개통센터"
-                       ],
-        "acdPosition":  [
-                            "23층",
-                            "더원플랫폼_개통센터"
-                        ],
-        "agentDn":  [
-                        "23층",
-                        "더원플랫폼_개통센터"
-                    ],
-        "place":  [
-                      "23층",
-                      "더원플랫폼_개통센터"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "더원플랫폼 알뜰폰 개통센터 (Ent 105 / PG 63397)",
-                               "entityNo":  "105",
-                               "entityName":  "THEONE_M",
-                               "agentPg":  "63397",
-                               "sampleExt":  "32950",
-                               "sampleLoginId":  "72950",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "바바패션AS",
-        "floor":  "23층",
-        "agentLogin":  [
-                           "23층",
-                           "바바패션AS"
-                       ],
-        "acdPosition":  [
-                            "23층",
-                            "바바패션AS"
-                        ],
-        "agentDn":  [
-                        "23층",
-                        "바바패션AS"
-                    ],
-        "place":  [
-                      "23층",
-                      "바바패션AS"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "바바패션 A/S (Ent 96 / PG 63891)",
-                               "entityNo":  "96",
-                               "entityName":  "BABA",
-                               "agentPg":  "63891",
-                               "sampleExt":  "33110",
-                               "sampleLoginId":  "73110",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "볼트테크코리아",
-        "floor":  "23층",
-        "agentLogin":  [
-                           "23층",
-                           "볼트테크코리아"
-                       ],
-        "acdPosition":  [
-                            "23층",
-                            "볼트테크코리아"
-                        ],
-        "agentDn":  [
-                        "23층",
-                        "볼트테크코리아"
-                    ],
-        "place":  [
-                      "23층",
-                      "볼트테크코리아"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "볼트테크 코리아 대표 (Ent 38 / PG 63798)",
-                               "entityNo":  "38",
-                               "entityName":  "BoltTech",
-                               "agentPg":  "63798",
-                               "sampleExt":  "33011",
-                               "sampleLoginId":  "73011",
-                               "source":  "S1(Dial-Plan)"
-                           },
-                           {
-                               "label":  "볼트테크 1670-8884 (Ent 37 / PG 확인필요)",
-                               "entityNo":  "37",
-                               "entityName":  "Bolttech_1670",
-                               "agentPg":  "",
-                               "sampleExt":  "33011",
-                               "sampleLoginId":  "73011",
-                               "source":  "S1(Dial-Plan)"
-                           },
-                           {
-                               "label":  "볼트테크 1670-1290 (Ent 31 / PG 확인필요)",
-                               "entityNo":  "31",
-                               "entityName":  "Bolt_16701290",
-                               "agentPg":  "",
-                               "sampleExt":  "33011",
-                               "sampleLoginId":  "73011",
-                               "source":  "S1(Dial-Plan)"
-                           },
-                           {
-                               "label":  "볼트테크 1544-5395 (Ent 29 / PG 확인필요)",
-                               "entityNo":  "29",
-                               "entityName":  "Bolt_5395",
-                               "agentPg":  "",
-                               "sampleExt":  "33011",
-                               "sampleLoginId":  "73011",
-                               "source":  "S1(Dial-Plan)"
-                           },
-                           {
-                               "label":  "볼트테크 1544-3841 (Ent 30 / PG 확인필요)",
-                               "entityNo":  "30",
-                               "entityName":  "Bolt_3841",
-                               "agentPg":  "",
-                               "sampleExt":  "33011",
-                               "sampleLoginId":  "73011",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "세종텔레콤",
-        "floor":  "23층",
-        "agentLogin":  [
-                           "23층",
-                           "세종텔레콤"
-                       ],
-        "acdPosition":  [
-                            "23층",
-                            "세종텔레콤"
-                        ],
-        "agentDn":  [
-                        "23층",
-                        "세종텔레콤"
-                    ],
-        "place":  [
-                      "23층",
-                      "세종텔레콤"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "세종텔레콤 #1 KT/LG/114 (Ent 55 / PG 66591)",
-                               "entityNo":  "55",
-                               "entityName":  "Seojong_T#1",
-                               "agentPg":  "66591",
-                               "sampleExt":  "33201",
-                               "sampleLoginId":  "77501",
-                               "source":  "S1(Dial-Plan)"
-                           },
-                           {
-                               "label":  "세종텔레콤 #2 개통센터 (Ent 88 / PG 66591)",
-                               "entityNo":  "88",
-                               "entityName":  "Seojong_T#2",
-                               "agentPg":  "66591",
-                               "sampleExt":  "33201",
-                               "sampleLoginId":  "77501",
-                               "source":  "S1(Dial-Plan)"
-                           },
-                           {
-                               "label":  "세종텔레콤 #3 SK고객센터 (Ent 87 / PG 66591)",
-                               "entityNo":  "87",
-                               "entityName":  "Seojong#3",
-                               "agentPg":  "66591",
-                               "sampleExt":  "33201",
-                               "sampleLoginId":  "77501",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "세종텔레콤_CCTV",
-        "floor":  "23층",
-        "agentLogin":  [
-                           "23층",
-                           "세종텔레콤_CCTV"
-                       ],
-        "acdPosition":  [
-                            "23층",
-                            "세종텔레콤_CCTV"
-                        ],
-        "agentDn":  [
-                        "23층",
-                        "세종텔레콤_CCTV"
-                    ],
-        "place":  [
-                      "23층",
-                      "세종텔레콤_CCTV"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "세종텔레콤 CCTV (Ent 83 / PG 66691)",
-                               "entityNo":  "83",
-                               "entityName":  "SeojongT#3",
-                               "agentPg":  "66691",
-                               "sampleExt":  "33900",
-                               "sampleLoginId":  "73900",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "워커힐",
-        "floor":  "23층",
-        "agentLogin":  [
-                           "23층",
-                           "워커힐"
-                       ],
-        "acdPosition":  [
-                            "23층",
-                            "워커힐"
-                        ],
-        "agentDn":  [
-                        "23층",
-                        "워커힐"
-                    ],
-        "place":  [
-                      "23층",
-                      "워커힐"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "워커힐 (Ent 75 / PG 63691)",
-                               "entityNo":  "75",
-                               "entityName":  "walkerhill",
-                               "agentPg":  "63691",
-                               "sampleExt":  "33070",
-                               "sampleLoginId":  "73070",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "LB헬프데스크",
-        "floor":  "24층",
-        "agentLogin":  [
-                           "24층",
-                           "LB헬프데스크"
-                       ],
-        "acdPosition":  [
-                            "24층",
-                            "LB헬프데스크"
-                        ],
-        "agentDn":  [
-                        "24층",
-                        "LB헬프데스크"
-                    ],
-        "place":  [
-                      "24층",
-                      "LB헬프데스크"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "엘비그룹 헬프데스크 (Ent 49 / PG 61391)",
-                               "entityNo":  "49",
-                               "entityName":  "LG_HELP",
-                               "agentPg":  "61391",
-                               "sampleExt":  "35800",
-                               "sampleLoginId":  "75800",
-                               "source":  "S1(Dial-Plan)"
-                           },
-                           {
-                               "label":  "엘비헬프 39995 발신전용IPT (Ent 12 / PG 61391)",
-                               "entityNo":  "12",
-                               "entityName":  "3995_IPT",
-                               "agentPg":  "61391",
-                               "sampleExt":  "35800",
-                               "sampleLoginId":  "75800",
-                               "source":  "S1(비고)+S13"
-                           }
-                       ]
-    },
-    {
-        "name":  "LGEIT",
-        "floor":  "24층",
-        "agentLogin":  [
-                           "24층",
-                           "LGEIT"
-                       ],
-        "acdPosition":  [
-                            "24층",
-                            "LGEIT"
-                        ],
-        "agentDn":  [
-                        "24층",
-                        "LGEIT"
-                    ],
-        "place":  [
-                      "24층",
-                      "LGEIT"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "LG전자 IT 업무지원 (Ent 54 / PG 60491)",
-                               "entityNo":  "54",
-                               "entityName":  "LGElec_IT",
-                               "agentPg":  "60491",
-                               "sampleExt":  "34030",
-                               "sampleLoginId":  "77001",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "LG생활건강",
-        "floor":  "24층/25층",
-        "agentLogin":  [
-                           "24층",
-                           "LG생활건강"
-                       ],
-        "acdPosition":  [
-                            "24층",
-                            "LG생활건강"
-                        ],
-        "agentDn":  [
-                        "25층",
-                        "LG생활건강"
-                    ],
-        "place":  [
-                      "25층",
-                      "LG생활건강"
-                  ],
-        "note":  "AgentLogin/ACDPosition은 24층, AGENT_DN/Places는 25층",
-        "oxePresets":  [
-                           {
-                               "label":  "LG생건 직영몰/외부몰/뷰티 (Ent 28 / PG 64593)",
-                               "entityNo":  "28",
-                               "entityName":  "LG_LIFE_T",
-                               "agentPg":  "64593",
-                               "sampleExt":  "34300",
-                               "sampleLoginId":  "77031",
-                               "source":  "S2(Dial-Plan #2)"
-                           },
-                           {
-                               "label":  "LG생활건강 외부몰 구시트 (Ent 70 / PG 64595)",
-                               "entityNo":  "70",
-                               "entityName":  "LGLifecare",
-                               "agentPg":  "64595",
-                               "sampleExt":  "34300",
-                               "sampleLoginId":  "77031",
-                               "source":  "S12(하단참고)"
-                           },
-                           {
-                               "label":  "LG생활건강 햄파맥스 구시트 (Ent 70 / PG 64594)",
-                               "entityNo":  "70",
-                               "entityName":  "LGLifecare",
-                               "agentPg":  "64594",
-                               "sampleExt":  "34300",
-                               "sampleLoginId":  "77031",
-                               "source":  "S12(하단참고)"
-                           }
-                       ]
-    },
-    {
-        "name":  "LG생활건강_외부몰",
-        "floor":  "24층",
-        "agentLogin":  [
-                           "24층",
-                           "LG생활건강_외부몰"
-                       ],
-        "acdPosition":  [
-                            "24층",
-                            "LG생활건강_외부몰"
-                        ],
-        "agentDn":  [
-                        "24층",
-                        "LG생활건강_외부몰"
-                    ],
-        "place":  [
-                      "24층",
-                      "LG생활건강_외부몰"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "LG생건 외부몰 (Ent 28 / PG 64593)",
-                               "entityNo":  "28",
-                               "entityName":  "LG_LIFE_T",
-                               "agentPg":  "64593",
-                               "sampleExt":  "34348",
-                               "sampleLoginId":  "77033",
-                               "source":  "S2(Dial-Plan #2)"
-                           },
-                           {
-                               "label":  "LG생활건강 외부몰 구시트 (Ent 70 / PG 64595)",
-                               "entityNo":  "70",
-                               "entityName":  "LGLifecare",
-                               "agentPg":  "64595",
-                               "sampleExt":  "34348",
-                               "sampleLoginId":  "77033",
-                               "source":  "S12(하단참고)"
-                           }
-                       ]
-    },
-    {
-        "name":  "LG하우시스_그린리모델링",
-        "floor":  "24층/25층",
-        "agentLogin":  [
-                           "24층",
-                           "LG하우시스_그린리모델링"
-                       ],
-        "acdPosition":  [
-                            "24층",
-                            "LG하우시스_그린리모델링"
-                        ],
-        "agentDn":  [
-                        "25층",
-                        "LG하우시스_그린리모델링"
-                    ],
-        "place":  [
-                      "25층",
-                      "LG하우시스_그린리모델링"
-                  ],
-        "note":  "AgentLogin/ACDPosition은 24층, AGENT_DN/Places는 25층",
-        "oxePresets":  [
-                           {
-                               "label":  "LG하우시스 그린리모델링 (Ent 43 / PG 62594)",
-                               "entityNo":  "43",
-                               "entityName":  "LGHausys_Green",
-                               "agentPg":  "62594",
-                               "sampleExt":  "31010",
-                               "sampleLoginId":  "73001",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "LG하우시스_신유통",
-        "floor":  "24층/25층",
-        "agentLogin":  [
-                           "24층",
-                           "LG하우시스_신유통"
-                       ],
-        "acdPosition":  [
-                            "24층",
-                            "LG하우시스_신유통"
-                        ],
-        "agentDn":  [
-                        "25층",
-                        "LX하우시스_신유통"
-                    ],
-        "place":  [
-                      "25층",
-                      "LG하우스_신유통"
-                  ],
-        "note":  "층(24/25층) 및 철자(LG하우시스/LX하우시스/LG하우스) 상이",
-        "oxePresets":  [
-                           {
-                               "label":  "[CM 기준 — Entity/PG 직접 입력]",
-                               "entityNo":  "",
-                               "entityName":  "",
-                               "agentPg":  "",
-                               "sampleExt":  "31009",
-                               "sampleLoginId":  "77191",
-                               "source":  "CM(최소번호)"
-                           }
-                       ]
-    },
-    {
-        "name":  "LG하우시스_커머셜",
-        "floor":  "24층",
-        "agentLogin":  [
-                           "24층",
-                           "LG하우시스_커머셜"
-                       ],
-        "acdPosition":  [
-                            "24층",
-                            "LG하우시스_커머셜"
-                        ],
-        "agentDn":  [
-                        "24층",
-                        "LG하우시스_커머셜"
-                    ],
-        "place":  [
-                      "24층",
-                      "LG하우시스_커머셜"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "[CM 기준 — Entity/PG 직접 입력]",
-                               "entityNo":  "",
-                               "entityName":  "",
-                               "agentPg":  "",
-                               "sampleExt":  "31013",
-                               "sampleLoginId":  "73006",
-                               "source":  "CM(최소번호)"
-                           }
-                       ]
-    },
-    {
-        "name":  "경기평생교육바우처",
-        "floor":  "24층",
-        "agentLogin":  [
-                           "24층",
-                           "경기평생교육바우처"
-                       ],
-        "acdPosition":  [
-                            "24층",
-                            "경기평생교육바우처"
-                        ],
-        "agentDn":  [
-                        "24층",
-                        "경기평생교육바우처"
-                    ],
-        "place":  [
-                      "24층",
-                      "경기평생교육바우처"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "경기도평생교육바우처 (Ent 67 / PG 65591)",
-                               "entityNo":  "67",
-                               "entityName":  "Edu_GG",
-                               "agentPg":  "65591",
-                               "sampleExt":  "34800",
-                               "sampleLoginId":  "74800",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "달콤한고래들",
-        "floor":  "24층",
-        "agentLogin":  [
-                           "24층",
-                           "달콤한고래들"
-                       ],
-        "acdPosition":  [
-                            "24층",
-                            "달콤한고래들"
-                        ],
-        "agentDn":  [
-                        "24층",
-                        "달콤한고래들"
-                    ],
-        "place":  [
-                      "24층",
-                      "달콤한고래들"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-
-                       ]
-    },
-    {
-        "name":  "더캐리",
-        "floor":  "24층",
-        "agentLogin":  [
-                           "24층",
-                           "더캐리"
-                       ],
-        "acdPosition":  [
-                            "24층",
-                            "더캐리"
-                        ],
-        "agentDn":  [
-                        "24층",
-                        "더캐리"
-                    ],
-        "place":  [
-                      "24층",
-                      "더캐리"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "더캐리 (Ent 46 / PG 63991 - ※Entity표 51 참고)",
-                               "entityNo":  "46",
-                               "entityName":  "The_Carry",
-                               "agentPg":  "63991",
-                               "sampleExt":  "37300",
-                               "sampleLoginId":  "73300",
-                               "source":  "S2(Dial-Plan #2)"
-                           },
-                           {
-                               "label":  "캐리마켓 (Ent 47 / PG 63991)",
-                               "entityNo":  "47",
-                               "entityName":  "Carry_Market",
-                               "agentPg":  "63991",
-                               "sampleExt":  "37300",
-                               "sampleLoginId":  "73300",
-                               "source":  "S2(Dial-Plan #2)"
-                           }
-                       ]
-    },
-    {
-        "name":  "벤디트",
-        "floor":  "24층",
-        "agentLogin":  [
-                           "24층",
-                           "벤디트"
-                       ],
-        "acdPosition":  [
-                            "24층",
-                            "벤디트"
-                        ],
-        "agentDn":  [
-                        "24층",
-                        "벤디트"
-                    ],
-        "place":  [
-                      "24층",
-                      "벤디트"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-
-                       ]
-    },
-    {
-        "name":  "아파트아이",
-        "floor":  "24층",
-        "agentLogin":  [
-                           "24층",
-                           "아파트아이"
-                       ],
-        "acdPosition":  [
-                            "24층",
-                            "아파트아이"
-                        ],
-        "agentDn":  [
-                        "24층",
-                        "아파트아이"
-                    ],
-        "place":  [
-                      "24층",
-                      "아파트아이"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "아파트아이 (Ent 106 / PG 67791)",
-                               "entityNo":  "106",
-                               "entityName":  "APTi",
-                               "agentPg":  "67791",
-                               "sampleExt":  "34150",
-                               "sampleLoginId":  "",
-                               "source":  "S12(하단)+S13"
-                           }
-                       ]
-    },
-    {
-        "name":  "전자세금계산서",
-        "floor":  "24층/25층",
-        "agentLogin":  [
-                           "24층",
-                           "전자세금계산서"
-                       ],
-        "acdPosition":  [
-                            "24층",
-                            "전자세금계산서"
-                        ],
-        "agentDn":  [
-                        "25층",
-                        "전자세금계산서"
-                    ],
-        "place":  [
-                      "25층",
-                      "전자세금계산서"
-                  ],
-        "note":  "AgentLogin/ACDPosition은 24층, AGENT_DN/Places는 25층",
-        "oxePresets":  [
-                           {
-                               "label":  "전자세금계산서/CNSPay/카카오 (Ent 44 / PG 63591)",
-                               "entityNo":  "44",
-                               "entityName":  "ElecTax",
-                               "agentPg":  "63591",
-                               "sampleExt":  "34329",
-                               "sampleLoginId":  "77051",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "충북평생교육이용권",
-        "floor":  "24층",
-        "agentLogin":  [
-                           "24층",
-                           "충북평생교육이용권"
-                       ],
-        "acdPosition":  [
-                            "24층",
-                            "충북평생교육이용권"
-                        ],
-        "agentDn":  [
-                        "24층",
-                        "충북평생교육이용권"
-                    ],
-        "place":  [
-                      "24층",
-                      "충북평생교육이용권"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "충북평생교육이용권센터 (Ent 110 / PG 60795)",
-                               "entityNo":  "110",
-                               "entityName":  "EduCN_C",
-                               "agentPg":  "60795",
-                               "sampleExt":  "39310",
-                               "sampleLoginId":  "79310",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "카닥",
-        "floor":  "24층",
-        "agentLogin":  [
-                           "24층",
-                           "카닥"
-                       ],
-        "acdPosition":  [
-                            "24층",
-                            "카닥"
-                        ],
-        "agentDn":  [
-                        "24층",
-                        "카닥"
-                    ],
-        "place":  [
-                      "24층",
-                      "카닥"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "카닥 (Ent 46 / PG 61891 - ※Entity46 더캐리와 중복확인)",
-                               "entityNo":  "46",
-                               "entityName":  "CARDOC",
-                               "agentPg":  "61891",
-                               "sampleExt":  "",
-                               "sampleLoginId":  "75500",
-                               "source":  "S12(하단)+S13"
-                           }
-                       ]
-    },
-    {
-        "name":  "하이프라자_개통센터",
-        "floor":  "24층",
-        "agentLogin":  [
-                           "24층",
-                           "하이프라자개통센터"
-                       ],
-        "acdPosition":  [
-                            "24층",
-                            "하이프라자_개통센터"
-                        ],
-        "agentDn":  [
-                        "24층",
-                        "하이프라자_개통센터"
-                    ],
-        "place":  [
-                      "24층",
-                      "하이프라자개통센터"
-                  ],
-        "note":  "언더스코어 유무 차이 자동 매핑",
-        "oxePresets":  [
-                           {
-                               "label":  "하이프라자 개통센터 (Ent 107 / PG 64492)",
-                               "entityNo":  "107",
-                               "entityName":  "HI_OPEN",
-                               "agentPg":  "64492",
-                               "sampleExt":  "34600",
-                               "sampleLoginId":  "74600",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "하이프라자_온라인몰",
-        "floor":  "24층",
-        "agentLogin":  [
-                           "24층",
-                           "하이프라자온라인몰"
-                       ],
-        "acdPosition":  [
-                            "24층",
-                            "하이프라자온라인몰"
-                        ],
-        "agentDn":  [
-                        "24층",
-                        "하이프라자_온라인몰"
-                    ],
-        "place":  [
-                      "24층",
-                      "하이프라자_온라인몰"
-                  ],
-        "note":  "언더스코어 유무 차이 자동 매핑",
-        "oxePresets":  [
-                           {
-                               "label":  "하이프라자 온라인몰 (Ent 57 / PG 64491)",
-                               "entityNo":  "57",
-                               "entityName":  "HI_Online",
-                               "agentPg":  "64491",
-                               "sampleExt":  "31128",
-                               "sampleLoginId":  "77160",
-                               "source":  "S1(Dial-Plan)"
-                           },
-                           {
-                               "label":  "LG휴대폰 온라인몰 (Ent 58 / PG 64491)",
-                               "entityNo":  "58",
-                               "entityName":  "HI_LGMobile",
-                               "agentPg":  "64491",
-                               "sampleExt":  "31128",
-                               "sampleLoginId":  "77160",
-                               "source":  "S1(Dial-Plan)"
-                           },
-                           {
-                               "label":  "LG베스트샵몰 모바일 (Ent 59 / PG 64491)",
-                               "entityNo":  "59",
-                               "entityName":  "HI_LGBestshop",
-                               "agentPg":  "64491",
-                               "sampleExt":  "31128",
-                               "sampleLoginId":  "77160",
-                               "source":  "S1(Dial-Plan)"
-                           },
-                           {
-                               "label":  "클라우드몰 (Ent 60 / PG 미기재)",
-                               "entityNo":  "60",
-                               "entityName":  "HI_Cloud",
-                               "agentPg":  "",
-                               "sampleExt":  "31128",
-                               "sampleLoginId":  "77160",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "하이프라자개통_개통실",
-        "floor":  "24층",
-        "agentLogin":  null,
-        "acdPosition":  null,
-        "agentDn":  [
-                        "24층",
-                        "하이프라자개통_개통실"
-                    ],
-        "place":  [
-                      "24층",
-                      "하이프라자개통_개통실"
-                  ],
-        "note":  "AGENT_DN 및 Places에만 존재",
-        "oxePresets":  [
-                           {
-                               "label":  "하이프라자 휴대폰개통 직통 (Ent 56 / PG 미기재)",
-                               "entityNo":  "56",
-                               "entityName":  "HI_Mobile",
-                               "agentPg":  "",
-                               "sampleExt":  "31121",
-                               "sampleLoginId":  "",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "AJ오토파킹",
-        "floor":  "25층",
-        "agentLogin":  [
-                           "25층",
-                           "AJ오토파킹"
-                       ],
-        "acdPosition":  [
-                            "25층",
-                            "AJ오토파킹"
-                        ],
-        "agentDn":  [
-                        "25층",
-                        "AJ오토파킹"
-                    ],
-        "place":  [
-                      "25층",
-                      "AJ오토파킹시스템즈"
-                  ],
-        "note":  "Places 폴더명이 AJ오토파킹시스템즈",
-        "oxePresets":  [
-                           {
-                               "label":  "[CM 기준 — Entity/PG 직접 입력]",
-                               "entityNo":  "",
-                               "entityName":  "",
-                               "agentPg":  "",
-                               "sampleExt":  "31040",
-                               "sampleLoginId":  "75400",
-                               "source":  "CM(최소번호)"
-                           }
-                       ]
-    },
-    {
-        "name":  "교육시설안전원",
-        "floor":  "25층",
-        "agentLogin":  [
-                           "25층",
-                           "교육시설안전원"
-                       ],
-        "acdPosition":  [
-                            "25층",
-                            "교육시설안전원"
-                        ],
-        "agentDn":  [
-                        "25층",
-                        "교육시설안전원"
-                    ],
-        "place":  [
-                      "25층",
-                      "교육시설안전원"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "교육시설안전원 일반 (Ent 52 / PG 62792)",
-                               "entityNo":  "52",
-                               "entityName":  "SECU_ADU",
-                               "agentPg":  "62792",
-                               "sampleExt":  "35900",
-                               "sampleLoginId":  "75900",
-                               "source":  "S1(Dial-Plan)"
-                           },
-                           {
-                               "label":  "교육시설안전원 공제가입CS (Ent 99 / PG 63391)",
-                               "entityNo":  "99",
-                               "entityName":  "EDUCS",
-                               "agentPg":  "63391",
-                               "sampleExt":  "35900",
-                               "sampleLoginId":  "75900",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "기프티엘",
-        "floor":  "25층",
-        "agentLogin":  [
-                           "25층",
-                           "기프티엘"
-                       ],
-        "acdPosition":  [
-                            "25층",
-                            "기프티엘"
-                        ],
-        "agentDn":  [
-                        "25층",
-                        "기프티엘"
-                    ],
-        "place":  [
-                      "25층",
-                      "기프티엘"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "기프티엘 B2C (Ent 101 / PG 66891)",
-                               "entityNo":  "101",
-                               "entityName":  "GiftL #1",
-                               "agentPg":  "66891",
-                               "sampleExt":  "36500",
-                               "sampleLoginId":  "76500",
-                               "source":  "S1(Dial-Plan)"
-                           },
-                           {
-                               "label":  "기프티엘 Biz (Ent 102 / PG 66891)",
-                               "entityNo":  "102",
-                               "entityName":  "GiftL #2",
-                               "agentPg":  "66891",
-                               "sampleExt":  "36500",
-                               "sampleLoginId":  "76500",
-                               "source":  "S1(Dial-Plan)"
-                           },
-                           {
-                               "label":  "기프티엘 롯데월드쿠폰 (Ent 113 / PG 66891)",
-                               "entityNo":  "113",
-                               "entityName":  "Lotte_Coup",
-                               "agentPg":  "66891",
-                               "sampleExt":  "36500",
-                               "sampleLoginId":  "76500",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "더스윙",
-        "floor":  "25층",
-        "agentLogin":  null,
-        "acdPosition":  null,
-        "agentDn":  [
-                        "25층",
-                        "더스윙"
-                    ],
-        "place":  [
-                      "25층",
-                      "더스윙"
-                  ],
-        "note":  "AGENT_DN 및 Places에만 존재",
-        "oxePresets":  [
-
-                       ]
-    },
-    {
-        "name":  "라이크와이즈",
-        "floor":  "25층",
-        "agentLogin":  [
-                           "25층",
-                           "라이크와이즈"
-                       ],
-        "acdPosition":  [
-                            "25층",
-                            "라이크와이즈"
-                        ],
-        "agentDn":  [
-                        "25층",
-                        "라이크와이즈"
-                    ],
-        "place":  [
-                      "25층",
-                      "라이크와이즈"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "라이크와이즈 (Ent 104 / PG 67691)",
-                               "entityNo":  "104",
-                               "entityName":  "LIKE",
-                               "agentPg":  "67691",
-                               "sampleExt":  "35700",
-                               "sampleLoginId":  "75700",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "라인프렌즈",
-        "floor":  "25층",
-        "agentLogin":  [
-                           "25층",
-                           "라인프렌즈"
-                       ],
-        "acdPosition":  [
-                            "25층",
-                            "라인프렌즈"
-                        ],
-        "agentDn":  [
-                        "25층",
-                        "라인프렌즈"
-                    ],
-        "place":  [
-                      "25층",
-                      "라인프렌즈"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "라인프렌즈 (Ent 53 / PG 67591)",
-                               "entityNo":  "53",
-                               "entityName":  "LINEFriend",
-                               "agentPg":  "67591",
-                               "sampleExt":  "35400",
-                               "sampleLoginId":  "74500",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "버킷스토어",
-        "floor":  "25층",
-        "agentLogin":  null,
-        "acdPosition":  null,
-        "agentDn":  [
-                        "25층",
-                        "버킷스토어"
-                    ],
-        "place":  [
-                      "25층",
-                      "버킷스토어"
-                  ],
-        "note":  "AGENT_DN 및 Places에만 존재",
-        "oxePresets":  [
-                           {
-                               "label":  "[CM 기준 — Entity/PG 직접 입력]",
-                               "entityNo":  "",
-                               "entityName":  "",
-                               "agentPg":  "",
-                               "sampleExt":  "35060",
-                               "sampleLoginId":  "",
-                               "source":  "CM(최소번호)"
-                           }
-                       ]
-    },
-    {
-        "name":  "서브웨이",
-        "floor":  "25층",
-        "agentLogin":  [
-                           "25층",
-                           "서브웨이"
-                       ],
-        "acdPosition":  [
-                            "25층",
-                            "서브웨이"
-                        ],
-        "agentDn":  [
-                        "25층",
-                        "서브웨이"
-                    ],
-        "place":  [
-                      "25층",
-                      "서브웨이"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "서브웨이 Guest (Ent 62 / PG 62191)",
-                               "entityNo":  "62",
-                               "entityName":  "SUBWAY_Guest",
-                               "agentPg":  "62191",
-                               "sampleExt":  "35090",
-                               "sampleLoginId":  "76090",
-                               "source":  "S1(Dial-Plan)"
-                           },
-                           {
-                               "label":  "서브웨이 FZ (Ent 61 / PG 62191)",
-                               "entityNo":  "61",
-                               "entityName":  "SUBWAY_FZ",
-                               "agentPg":  "62191",
-                               "sampleExt":  "35090",
-                               "sampleLoginId":  "76090",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "이랜드e몰",
-        "floor":  "25층",
-        "agentLogin":  [
-                           "25층",
-                           "이랜드e몰"
-                       ],
-        "acdPosition":  [
-                            "25층",
-                            "이랜드e몰"
-                        ],
-        "agentDn":  [
-                        "25층",
-                        "이랜드e몰"
-                    ],
-        "place":  [
-                      "25층",
-                      "이랜드e몰"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "이랜드e몰 (Ent 94 / PG 선번장미기재)",
-                               "entityNo":  "94",
-                               "entityName":  "ELANDMALL",
-                               "agentPg":  "",
-                               "sampleExt":  "35006",
-                               "sampleLoginId":  "75006",
-                               "source":  "S12+S13"
-                           }
-                       ]
-    },
-    {
-        "name":  "자몽컴퍼니",
-        "floor":  "25층",
-        "agentLogin":  null,
-        "acdPosition":  null,
-        "agentDn":  null,
-        "place":  [
-                      "25층",
-                      "자몽컴퍼니"
-                  ],
-        "note":  "Places에만 존재",
-        "oxePresets":  [
-
-                       ]
-    },
-    {
-        "name":  "주영앤에스",
-        "floor":  "25층",
-        "agentLogin":  [
-                           "25층",
-                           "주영앤에스"
-                       ],
-        "acdPosition":  [
-                            "25층",
-                            "주영앤에스"
-                        ],
-        "agentDn":  [
-                        "25층",
-                        "주영앤에스"
-                    ],
-        "place":  [
-                      "25층",
-                      "주영앤에스"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "주영앤에스 (Ent 45 / PG 62791)",
-                               "entityNo":  "45",
-                               "entityName":  "JYNS",
-                               "agentPg":  "62791",
-                               "sampleExt":  "34200",
-                               "sampleLoginId":  "74200",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "집꾸미기",
-        "floor":  "25층",
-        "agentLogin":  null,
-        "acdPosition":  null,
-        "agentDn":  [
-                        "25층",
-                        "집꾸미기"
-                    ],
-        "place":  [
-                      "25층",
-                      "집꾸미기"
-                  ],
-        "note":  "AGENT_DN 및 Places에만 존재",
-        "oxePresets":  [
-
-                       ]
-    },
-    {
-        "name":  "코카콜라",
-        "floor":  "25층",
-        "agentLogin":  [
-                           "25층",
-                           "코카콜라"
-                       ],
-        "acdPosition":  [
-                            "25층",
-                            "코카콜라"
-                        ],
-        "agentDn":  [
-                        "25층",
-                        "코카콜라"
-                    ],
-        "place":  [
-                      "25층",
-                      "코카콜라"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "코카콜라 NCC (Ent 40 / PG 60591)",
-                               "entityNo":  "40",
-                               "entityName":  "Coke_NCC",
-                               "agentPg":  "60591",
-                               "sampleExt":  "35057",
-                               "sampleLoginId":  "75019",
-                               "source":  "S1(Dial-Plan)"
-                           },
-                           {
-                               "label":  "코카콜라 1588-2638 (Ent 78 / PG 60592)",
-                               "entityNo":  "78",
-                               "entityName":  "Coke_2638",
-                               "agentPg":  "60592",
-                               "sampleExt":  "35057",
-                               "sampleLoginId":  "75019",
-                               "source":  "S1(Dial-Plan)"
-                           },
-                           {
-                               "label":  "코카콜라 다이아몬드샘물 (Ent 41 / PG 60591)",
-                               "entityNo":  "41",
-                               "entityName":  "Coke_Dia",
-                               "agentPg":  "60591",
-                               "sampleExt":  "35057",
-                               "sampleLoginId":  "75019",
-                               "source":  "S1(Dial-Plan)"
-                           },
-                           {
-                               "label":  "코카콜라 영업전담 (Ent 108 / PG 60594)",
-                               "entityNo":  "108",
-                               "entityName":  "Coke_Sale",
-                               "agentPg":  "60594",
-                               "sampleExt":  "35057",
-                               "sampleLoginId":  "75019",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "코트라IB",
-        "floor":  "25층",
-        "agentLogin":  null,
-        "acdPosition":  null,
-        "agentDn":  [
-                        "25층",
-                        "코트라IB"
-                    ],
-        "place":  [
-                      "25층",
-                      "코트라IB"
-                  ],
-        "note":  "AGENT_DN 및 Places에만 존재 (AgentLogin/ACDPosition은 LB휴넷18층/코트라 확인 필요)",
-        "oxePresets":  [
-
-                       ]
-    },
-    {
-        "name":  "코트라OB",
-        "floor":  "25층",
-        "agentLogin":  null,
-        "acdPosition":  null,
-        "agentDn":  [
-                        "25층",
-                        "코트라OB"
-                    ],
-        "place":  [
-                      "25층",
-                      "코트라OB"
-                  ],
-        "note":  "AGENT_DN 및 Places에만 존재 (AgentLogin/ACDPosition은 LB휴넷18층/코트라 확인 필요)",
-        "oxePresets":  [
-
-                       ]
-    },
-    {
-        "name":  "티켓플랫폼",
-        "floor":  "25층",
-        "agentLogin":  [
-                           "25층",
-                           "티켓플랫폼"
-                       ],
-        "acdPosition":  [
-                            "25층",
-                            "티켓플랫폼"
-                        ],
-        "agentDn":  [
-                        "25층",
-                        "티켓플랫폼"
-                    ],
-        "place":  [
-                      "25층",
-                      "티켓플랫폼"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "티켓플랫폼 고객센터 (Ent 73 / PG 62292)",
-                               "entityNo":  "73",
-                               "entityName":  "TicketPF",
-                               "agentPg":  "62292",
-                               "sampleExt":  "39400",
-                               "sampleLoginId":  "79400",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "화물잇고",
-        "floor":  "25층",
-        "agentLogin":  [
-                           "25층",
-                           "화물잇고"
-                       ],
-        "acdPosition":  [
-                            "25층",
-                            "화물잇고"
-                        ],
-        "agentDn":  [
-                        "25층",
-                        "화물잇고"
-                    ],
-        "place":  [
-                      "25층",
-                      "화물잇고"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "[CM 기준 — Entity/PG 직접 입력]",
-                               "entityNo":  "",
-                               "entityName":  "",
-                               "agentPg":  "",
-                               "sampleExt":  "35601",
-                               "sampleLoginId":  "75601",
-                               "source":  "CM(AGENT_DN/ACDPos)"
-                           }
-                       ]
-    },
-    {
-        "name":  "한국교육과정평가원",
-        "floor":  "26층",
-        "agentLogin":  [
-                           "26층",
-                           "한국교욱과정평가원"
-                       ],
-        "acdPosition":  [
-                            "26층",
-                            "한국교육과정평가원"
-                        ],
-        "agentDn":  [
-                        "26층",
-                        "한국고용평가진행원"
-                    ],
-        "place":  [
-                      "26층",
-                      "한국교육평가진행원"
-                  ],
-        "note":  "4개 메뉴 폴더명 전부 상이 (자동 매핑됨)",
-        "oxePresets":  [
-                           {
-                               "label":  "수능_UHD (Ent 90 / PG 61791)",
-                               "entityNo":  "90",
-                               "entityName":  "SU_UHD",
-                               "agentPg":  "61791",
-                               "sampleExt":  "36000",
-                               "sampleLoginId":  "76200",
-                               "source":  "S1(Dial-Plan)"
-                           },
-                           {
-                               "label":  "한국교육과정평가원 구시트 (Ent 81 / PG 61691)",
-                               "entityNo":  "81",
-                               "entityName":  "KICE",
-                               "agentPg":  "61691",
-                               "sampleExt":  "36000",
-                               "sampleLoginId":  "76200",
-                               "source":  "S12(하단참고)"
-                           }
-                       ]
-    },
-    {
-        "name":  "GS네트웍스",
-        "floor":  "LB휴넷18층",
-        "agentLogin":  [
-                           "LB휴넷18층",
-                           "GS네트웍스"
-                       ],
-        "acdPosition":  [
-                            "LB휴넷18층",
-                            "GS네트웍스"
-                        ],
-        "agentDn":  [
-                        "LB휴넷18층",
-                        "GS네트웍스"
-                    ],
-        "place":  [
-                      "LB휴넷18층",
-                      "GS네트웍스"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "GS네트웍스 일반 (Ent 68 / PG 64191)",
-                               "entityNo":  "68",
-                               "entityName":  "GSNet_Nor",
-                               "agentPg":  "64191",
-                               "sampleExt":  "31385",
-                               "sampleLoginId":  "75200",
-                               "source":  "S1(Dial-Plan)"
-                           },
-                           {
-                               "label":  "GS네트웍스 사업주 (Ent 69 / PG 64191)",
-                               "entityNo":  "69",
-                               "entityName":  "GSNet_SP",
-                               "agentPg":  "64191",
-                               "sampleExt":  "31385",
-                               "sampleLoginId":  "75200",
-                               "source":  "S1(Dial-Plan)"
-                           },
-                           {
-                               "label":  "GS네트웍스 편의점택배 (Ent 97 / PG 64191)",
-                               "entityNo":  "97",
-                               "entityName":  "GS_CVS",
-                               "agentPg":  "64191",
-                               "sampleExt":  "31385",
-                               "sampleLoginId":  "75200",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "GS랄라블라",
-        "floor":  "LB휴넷18층",
-        "agentLogin":  [
-                           "LB휴넷18층",
-                           "GS랄라블라"
-                       ],
-        "acdPosition":  [
-                            "LB휴넷18층",
-                            "GS랄라블라"
-                        ],
-        "agentDn":  null,
-        "place":  null,
-        "note":  "AgentLogin/ACDPosition에만 존재",
-        "oxePresets":  [
-                           {
-                               "label":  "[CM 기준 — Entity/PG 직접 입력]",
-                               "entityNo":  "",
-                               "entityName":  "",
-                               "agentPg":  "",
-                               "sampleExt":  "",
-                               "sampleLoginId":  "75196",
-                               "source":  "CM(최소번호)"
-                           }
-                       ]
-    },
-    {
-        "name":  "GS리테일",
-        "floor":  "LB휴넷18층",
-        "agentLogin":  [
-                           "LB휴넷18층",
-                           "GS리테일"
-                       ],
-        "acdPosition":  [
-                            "LB휴넷18층",
-                            "GS리테일"
-                        ],
-        "agentDn":  [
-                        "LB휴넷18층",
-                        "GS리테일"
-                    ],
-        "place":  [
-                      "LB휴넷18층",
-                      "GS리테일"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "GS리테일 쿠폰고객센터 (Ent 63 / PG 62195)",
-                               "entityNo":  "63",
-                               "entityName":  "GSRe_Coupon",
-                               "agentPg":  "62195",
-                               "sampleExt":  "31302",
-                               "sampleLoginId":  "75020",
-                               "source":  "S1(Dial-Plan)"
-                           },
-                           {
-                               "label":  "GS리테일 고객행복센터 구시트 (Ent 미기재 / PG 60191)",
-                               "entityNo":  "",
-                               "entityName":  "",
-                               "agentPg":  "60191",
-                               "sampleExt":  "31302",
-                               "sampleLoginId":  "75020",
-                               "source":  "S12(하단참고)"
-                           },
-                           {
-                               "label":  "GS리테일 OCS 학동 구시트 (Ent 미기재 / PG 63192)",
-                               "entityNo":  "",
-                               "entityName":  "",
-                               "agentPg":  "63192",
-                               "sampleExt":  "31302",
-                               "sampleLoginId":  "75020",
-                               "source":  "S12(하단참고)"
-                           }
-                       ]
-    },
-    {
-        "name":  "GS수퍼",
-        "floor":  "LB휴넷18층",
-        "agentLogin":  [
-                           "LB휴넷18층",
-                           "GS수퍼"
-                       ],
-        "acdPosition":  [
-                            "LB휴넷18층",
-                            "GS수퍼"
-                        ],
-        "agentDn":  null,
-        "place":  null,
-        "note":  "AgentLogin/ACDPosition에만 존재",
-        "oxePresets":  [
-                           {
-                               "label":  "[CM 기준 — Entity/PG 직접 입력]",
-                               "entityNo":  "",
-                               "entityName":  "",
-                               "agentPg":  "",
-                               "sampleExt":  "",
-                               "sampleLoginId":  "75050",
-                               "source":  "CM(최소번호)"
-                           }
-                       ]
-    },
-    {
-        "name":  "KFC",
-        "floor":  "LB휴넷18층",
-        "agentLogin":  [
-                           "LB휴넷18층",
-                           "KFC"
-                       ],
-        "acdPosition":  [
-                            "LB휴넷18층",
-                            "KFC"
-                        ],
-        "agentDn":  [
-                        "LB휴넷18층",
-                        "KFC"
-                    ],
-        "place":  [
-                      "LB휴넷18층",
-                      "KFC"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "KFC (Ent 111 / PG 67995)",
-                               "entityNo":  "111",
-                               "entityName":  "KFC",
-                               "agentPg":  "67995",
-                               "sampleExt":  "32800",
-                               "sampleLoginId":  "72800",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "MYLGID통신상담센터",
-        "floor":  "LB휴넷18층",
-        "agentLogin":  null,
-        "acdPosition":  [
-                            "LB휴넷18층",
-                            "MYLGID통신상담센터"
-                        ],
-        "agentDn":  null,
-        "place":  null,
-        "note":  "ACDPosition에만 존재",
-        "oxePresets":  [
-
-                       ]
-    },
-    {
-        "name":  "농어촌희망재단",
-        "floor":  "LB휴넷18층",
-        "agentLogin":  null,
-        "acdPosition":  null,
-        "agentDn":  [
-                        "LB휴넷18층",
-                        "농어촌희망재단"
-                    ],
-        "place":  [
-                      "LB휴넷18층",
-                      "농어촌희망재단"
-                  ],
-        "note":  "AGENT_DN/Places에만 존재",
-        "oxePresets":  [
-                           {
-                               "label":  "농어촌희망재단 (Ent 82 / PG 선번장미기재)",
-                               "entityNo":  "82",
-                               "entityName":  "HOPE",
-                               "agentPg":  "",
-                               "sampleExt":  "31001",
-                               "sampleLoginId":  "",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "롯데GFR_AS",
-        "floor":  "LB휴넷18층",
-        "agentLogin":  [
-                           "LB휴넷18층",
-                           "롯데GFR_AS"
-                       ],
-        "acdPosition":  [
-                            "LB휴넷18층",
-                            "롯데GFR_AS"
-                        ],
-        "agentDn":  [
-                        "LB휴넷18층",
-                        "롯데GFR_AS"
-                    ],
-        "place":  [
-                      "LB휴넷18층",
-                      "롯데GFR_AS"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "롯데GFR AS (Ent 65 / PG 62691)",
-                               "entityNo":  "65",
-                               "entityName":  "LOTTE_GFR1",
-                               "agentPg":  "62691",
-                               "sampleExt":  "31801",
-                               "sampleLoginId":  "71801",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "롯데GFR_CS",
-        "floor":  "LB휴넷18층",
-        "agentLogin":  [
-                           "LB휴넷18층",
-                           "롯데GFR_CS"
-                       ],
-        "acdPosition":  [
-                            "LB휴넷18층",
-                            "롯데GFR_CS"
-                        ],
-        "agentDn":  [
-                        "LB휴넷18층",
-                        "롯데GFR_CS"
-                    ],
-        "place":  [
-                      "LB휴넷18층",
-                      "롯데GFR_CS"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "롯데GFR CS (Ent 42 / PG 62692)",
-                               "entityNo":  "42",
-                               "entityName":  "LOTTE_GFR2",
-                               "agentPg":  "62692",
-                               "sampleExt":  "31811",
-                               "sampleLoginId":  "71811",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "엘칸토",
-        "floor":  "LB휴넷18층",
-        "agentLogin":  null,
-        "acdPosition":  null,
-        "agentDn":  [
-                        "LB휴넷18층",
-                        "엘칸토"
-                    ],
-        "place":  [
-                      "LB휴넷18층",
-                      "엘칸토"
-                  ],
-        "note":  "AGENT_DN/Places에만 존재",
-        "oxePresets":  [
-                           {
-                               "label":  "[CM 기준 — Entity/PG 직접 입력]",
-                               "entityNo":  "",
-                               "entityName":  "",
-                               "agentPg":  "",
-                               "sampleExt":  "31410",
-                               "sampleLoginId":  "",
-                               "source":  "CM(최소번호)"
-                           }
-                       ]
-    },
-    {
-        "name":  "우리은행예약센터",
-        "floor":  "LB휴넷18층",
-        "agentLogin":  [
-                           "LB휴넷18층",
-                           "우리은행예약센터"
-                       ],
-        "acdPosition":  [
-                            "LB휴넷18층",
-                            "우리은행예약센터"
-                        ],
-        "agentDn":  [
-                        "LB휴넷18층",
-                        "우리은행예약센터"
-                    ],
-        "place":  [
-                      "LB휴넷18층",
-                      "우리은행예약센터"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "우리은행 사전예약 (Ent 35 / PG 선번장미기재)",
-                               "entityNo":  "35",
-                               "entityName":  "Woori",
-                               "agentPg":  "",
-                               "sampleExt":  "36950",
-                               "sampleLoginId":  "76950",
-                               "source":  "S12+S13"
-                           }
-                       ]
-    },
-    {
-        "name":  "유니브스토어",
-        "floor":  "LB휴넷18층",
-        "agentLogin":  [
-                           "LB휴넷18층",
-                           "유니브스토어"
-                       ],
-        "acdPosition":  [
-                            "LB휴넷18층",
-                            "유니브스토어"
-                        ],
-        "agentDn":  [
-                        "LB휴넷18층",
-                        "유니브스토어"
-                    ],
-        "place":  null,
-        "note":  "Places에 유니브스토어 폴더 없음",
-        "oxePresets":  [
-                           {
-                               "label":  "유니브스토어 (Ent 84 / PG 61591)",
-                               "entityNo":  "84",
-                               "entityName":  "UNISTOVE",
-                               "agentPg":  "61591",
-                               "sampleExt":  "36900",
-                               "sampleLoginId":  "76900",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "유플러스제휴센터",
-        "floor":  "LB휴넷18층",
-        "agentLogin":  [
-                           "LB휴넷18층",
-                           "유플러스제휴센터"
-                       ],
-        "acdPosition":  [
-                            "LB휴넷18층",
-                            "유플러스제휴센터"
-                        ],
-        "agentDn":  [
-                        "LB휴넷18층",
-                        "유플러스제휴센터"
-                    ],
-        "place":  [
-                      "LB휴넷18층",
-                      "유플러스제휴센터"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "LGU+ 제휴센터/EOS (Ent 34 / PG 65691)",
-                               "entityNo":  "34",
-                               "entityName":  "LGU_co",
-                               "agentPg":  "65691",
-                               "sampleExt":  "36930",
-                               "sampleLoginId":  "76930",
-                               "source":  "S1(Dial-Plan)"
-                           },
-                           {
-                               "label":  "유플러스 오더 (Ent 35 / PG 65693)",
-                               "entityNo":  "35",
-                               "entityName":  "U+Order",
-                               "agentPg":  "65693",
-                               "sampleExt":  "36930",
-                               "sampleLoginId":  "76930",
-                               "source":  "S1(Dial-Plan)"
-                           },
-                           {
-                               "label":  "요요몰 (Ent 36 / PG 65691)",
-                               "entityNo":  "36",
-                               "entityName":  "YOYOMALL",
-                               "agentPg":  "65691",
-                               "sampleExt":  "36930",
-                               "sampleLoginId":  "76930",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "창업진흥원",
-        "floor":  "LB휴넷18층",
-        "agentLogin":  [
-                           "LB휴넷18층",
-                           "창업진흥원"
-                       ],
-        "acdPosition":  [
-                            "LB휴넷18층",
-                            "창업진흥원"
-                        ],
-        "agentDn":  [
-                        "LB휴넷18층",
-                        "창업진흥원"
-                    ],
-        "place":  [
-                      "LB휴넷18층",
-                      "창업진흥원"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "창업진흥원 (Ent 100 / PG 66393)",
-                               "entityNo":  "100",
-                               "entityName":  "CHANGUP",
-                               "agentPg":  "66393",
-                               "sampleExt":  "37700",
-                               "sampleLoginId":  "77700",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "충남평생교육바우처",
-        "floor":  "LB휴넷18층",
-        "agentLogin":  [
-                           "LB휴넷18층",
-                           "충남평생교육바우처"
-                       ],
-        "acdPosition":  null,
-        "agentDn":  [
-                        "LB휴넷18층",
-                        "충남평생교육바우처"
-                    ],
-        "place":  [
-                      "LB휴넷18층",
-                      "충남평생교육바우처"
-                  ],
-        "note":  "ACDPosition에 충남평생교육바우처 폴더 없음",
-        "oxePresets":  [
-                           {
-                               "label":  "충남평생교육바우처 (Ent 86 / PG 60791)",
-                               "entityNo":  "86",
-                               "entityName":  "Edu_CN",
-                               "agentPg":  "60791",
-                               "sampleExt":  "39300",
-                               "sampleLoginId":  "79300",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "코트라",
-        "floor":  "LB휴넷18층",
-        "agentLogin":  [
-                           "LB휴넷18층",
-                           "코트라"
-                       ],
-        "acdPosition":  [
-                            "LB휴넷18층",
-                            "코트라"
-                        ],
-        "agentDn":  [
-                        "LB휴넷18층",
-                        "코트라"
-                    ],
-        "place":  [
-                      "LB휴넷18층",
-                      "코트라"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "[CM 기준 — Entity/PG 직접 입력]",
-                               "entityNo":  "",
-                               "entityName":  "",
-                               "agentPg":  "",
-                               "sampleExt":  "31450",
-                               "sampleLoginId":  "",
-                               "source":  "CM(최소번호)"
-                           }
-                       ]
-    },
-    {
-        "name":  "크리스몰",
-        "floor":  "LB휴넷18층",
-        "agentLogin":  [
-                           "LB휴넷18층",
-                           "크리스몰"
-                       ],
-        "acdPosition":  [
-                            "LB휴넷18층",
-                            "크리스몰"
-                        ],
-        "agentDn":  [
-                        "LB휴넷18층",
-                        "크리스몰"
-                    ],
-        "place":  [
-                      "LB휴넷18층",
-                      "크리스몰"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "크리스몰 (Ent 71 / PG 62293)",
-                               "entityNo":  "71",
-                               "entityName":  "Chris",
-                               "agentPg":  "62293",
-                               "sampleExt":  "",
-                               "sampleLoginId":  "75300",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "평생교육바우처",
-        "floor":  "LB휴넷18층",
-        "agentLogin":  [
-                           "LB휴넷18층",
-                           "평생교육바우처"
-                       ],
-        "acdPosition":  [
-                            "LB휴넷18층",
-                            "평생교육바우처"
-                        ],
-        "agentDn":  [
-                        "LB휴넷18층",
-                        "평생교육바우처"
-                    ],
-        "place":  [
-                      "LB휴넷18층",
-                      "평생교육바우처"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "평생교육바우처 (Ent 81 / PG 61692)",
-                               "entityNo":  "81",
-                               "entityName":  "EDU_BAU",
-                               "agentPg":  "61692",
-                               "sampleExt":  "39800",
-                               "sampleLoginId":  "79800",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "현대홈쇼핑CIC",
-        "floor":  "LB휴넷18층",
-        "agentLogin":  [
-                           "LB휴넷18층",
-                           "현대홈쇼핑CIC"
-                       ],
-        "acdPosition":  [
-                            "LB휴넷18층",
-                            "현대홈쇼핑CIC"
-                        ],
-        "agentDn":  [
-                        "LB휴넷18층",
-                        "현대홈쇼핑CIC"
-                    ],
-        "place":  [
-                      "LB휴넷18층",
-                      "현대홈쇼핑CIC"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "현대홈쇼핑 CIC (Ent 95 / PG 62491)",
-                               "entityNo":  "95",
-                               "entityName":  "HYUNDAI_CI",
-                               "agentPg":  "62491",
-                               "sampleExt":  "36100",
-                               "sampleLoginId":  "76100",
-                               "source":  "S12(하단)+S13"
-                           },
-                           {
-                               "label":  "현대홈쇼핑 PDS (Ent 89 / PG 선번장미기재)",
-                               "entityNo":  "89",
-                               "entityName":  "HYUNDAI_PDS",
-                               "agentPg":  "",
-                               "sampleExt":  "36021",
-                               "sampleLoginId":  "",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "메가박스",
-        "floor":  "구로",
-        "agentLogin":  [
-                           "구로",
-                           "메가박스"
-                       ],
-        "acdPosition":  [
-                            "구로",
-                            "메가박스"
-                        ],
-        "agentDn":  [
-                        "구로",
-                        "메가박스"
-                    ],
-        "place":  [
-                      "구로",
-                      "메가박스"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "메가박스 (Ent 66 / PG 63191)",
-                               "entityNo":  "66",
-                               "entityName":  "MEGABOX",
-                               "agentPg":  "63191",
-                               "sampleExt":  "31500",
-                               "sampleLoginId":  "71500",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "마마카사르",
-        "floor":  "대치동",
-        "agentLogin":  [
-                           "대치동",
-                           "마마카사르"
-                       ],
-        "acdPosition":  null,
-        "agentDn":  null,
-        "place":  null,
-        "note":  "AgentLogin에만 존재 (ACDPosition에 대치동 폴더 없음)",
-        "oxePresets":  [
-
-                       ]
-    },
-    {
-        "name":  "아몬즈",
-        "floor":  "대치동",
-        "agentLogin":  [
-                           "대치동",
-                           "아몬즈"
-                       ],
-        "acdPosition":  null,
-        "agentDn":  [
-                        "대치동",
-                        "아몬즈"
-                    ],
-        "place":  [
-                      "대치동",
-                      "아몬즈"
-                  ],
-        "note":  "ACDPosition에 대치동 폴더 없음",
-        "oxePresets":  [
-
-                       ]
-    },
-    {
-        "name":  "LG라이프케어",
-        "floor":  "마곡LG사이언스파크",
-        "agentLogin":  [
-                           "마곡LG사이언스파크",
-                           "LG라이프케어"
-                       ],
-        "acdPosition":  [
-                            "마곡LG사이언스파크",
-                            "LG라이프케어"
-                        ],
-        "agentDn":  [
-                        "마곡LG사이언스파크",
-                        "LG라이프케어"
-                    ],
-        "place":  [
-                      "마곡LG사이언스파크",
-                      "LG라이프케어"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "LG라이프케어 포탈 (Ent 70 / PG 60291)",
-                               "entityNo":  "70",
-                               "entityName":  "LGLifecare",
-                               "agentPg":  "60291",
-                               "sampleExt":  "30021",
-                               "sampleLoginId":  "77133",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "LG통합ID",
-        "floor":  "마곡LG사이언스파크",
-        "agentLogin":  [
-                           "마곡LG사이언스파크",
-                           "LG통합ID"
-                       ],
-        "acdPosition":  [
-                            "마곡LG사이언스파크",
-                            "LG통합ID"
-                        ],
-        "agentDn":  [
-                        "마곡LG사이언스파크",
-                        "LG통합ID"
-                    ],
-        "place":  [
-                      "마곡LG사이언스파크",
-                      "LG통합ID"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "MY LG ID (Ent 77 / PG 60291)",
-                               "entityNo":  "77",
-                               "entityName":  "LG_ID",
-                               "agentPg":  "60291",
-                               "sampleExt":  "30037",
-                               "sampleLoginId":  "77211",
-                               "source":  "S1(Dial-Plan)"
-                           },
-                           {
-                               "label":  "원브레인 (Ent 76 / PG 60291)",
-                               "entityNo":  "76",
-                               "entityName":  "ONEBRAIN",
-                               "agentPg":  "60291",
-                               "sampleExt":  "30037",
-                               "sampleLoginId":  "77211",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "하루조각",
-        "floor":  "마곡LG사이언스파크",
-        "agentLogin":  [
-                           "마곡LG사이언스파크",
-                           "하루조각"
-                       ],
-        "acdPosition":  [
-                            "마곡LG사이언스파크",
-                            "하루조각"
-                        ],
-        "agentDn":  [
-                        "마곡LG사이언스파크",
-                        "하루조각"
-                    ],
-        "place":  [
-                      "마곡LG사이언스파크",
-                      "하루조각"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-
-                       ]
-    },
-    {
-        "name":  "헬로비전",
-        "floor":  "마곡LG사이언스파크",
-        "agentLogin":  [
-                           "마곡LG사이언스파크",
-                           "헬로비전"
-                       ],
-        "acdPosition":  [
-                            "마곡LG사이언스파크",
-                            "헬로비전"
-                        ],
-        "agentDn":  [
-                        "마곡LG사이언스파크",
-                        "헬로비전"
-                    ],
-        "place":  [
-                      "마곡LG사이언스파크",
-                      "헬로비전"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "[CM 기준 — Entity/PG 직접 입력]",
-                               "entityNo":  "",
-                               "entityName":  "",
-                               "agentPg":  "",
-                               "sampleExt":  "",
-                               "sampleLoginId":  "72200",
-                               "source":  "CM(최소번호)"
-                           }
-                       ]
-    },
-    {
-        "name":  "민팃",
-        "floor":  "상암",
-        "agentLogin":  [
-                           "상암",
-                           "민팃"
-                       ],
-        "acdPosition":  [
-                            "상암",
-                            "민팃"
-                        ],
-        "agentDn":  [
-                        "상암",
-                        "민팃"
-                    ],
-        "place":  [
-                      "상암",
-                      "민팃"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "민팃 안심거래 키오스크 (Ent 36 / PG 66791)",
-                               "entityNo":  "36",
-                               "entityName":  "Mintit_ESCRO",
-                               "agentPg":  "66791",
-                               "sampleExt":  "",
-                               "sampleLoginId":  "78800",
-                               "source":  "S12(하단)+S13"
-                           },
-                           {
-                               "label":  "민팃 관제센터 (Ent 32 / PG 66791)",
-                               "entityNo":  "32",
-                               "entityName":  "Mintit_Center",
-                               "agentPg":  "66791",
-                               "sampleExt":  "",
-                               "sampleLoginId":  "78800",
-                               "source":  "S12(하단)+S13"
-                           }
-                       ]
-    },
-    {
-        "name":  "삼정회계법인",
-        "floor":  "외부",
-        "agentLogin":  [
-                           "외부",
-                           "삼정회계법인"
-                       ],
-        "acdPosition":  [
-                            "외부",
-                            "삼정회계법인"
-                        ],
-        "agentDn":  [
-                        "외부",
-                        "삼정회계법인"
-                    ],
-        "place":  [
-                      "외부",
-                      "삼정회계법인"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "삼정회계법인 (Ent 93 / PG 63791)",
-                               "entityNo":  "93",
-                               "entityName":  "SAMJUNG",
-                               "agentPg":  "63791",
-                               "sampleExt":  "",
-                               "sampleLoginId":  "79900",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "슈가모바일",
-        "floor":  "외부/LB휴넷18층",
-        "agentLogin":  [
-                           "외부",
-                           "슈가모바일"
-                       ],
-        "acdPosition":  [
-                            "외부",
-                            "슈가모바일"
-                        ],
-        "agentDn":  [
-                        "외부",
-                        "슈가모바일"
-                    ],
-        "place":  [
-                      "LB휴넷18층",
-                      "슈가모바일"
-                  ],
-        "note":  "앞 3개는 외부, Places는 LB휴넷18층",
-        "oxePresets":  [
-                           {
-                               "label":  "슈가모바일 (Ent 64 / PG 67991)",
-                               "entityNo":  "64",
-                               "entityName":  "Sugar_M",
-                               "agentPg":  "67991",
-                               "sampleExt":  "38200",
-                               "sampleLoginId":  "78200",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "한국전기차충전서비스",
-        "floor":  "외부",
-        "agentLogin":  [
-                           "외부",
-                           "한국전기차충전서비스"
-                       ],
-        "acdPosition":  [
-                            "외부",
-                            "한국전기차충전서비스"
-                        ],
-        "agentDn":  [
-                        "외부",
-                        "한국전기차충전서비스"
-                    ],
-        "place":  [
-                      "외부",
-                      "한국전기차충전서비스"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "한국전기차충전서비스 (Ent 33 / PG 64591)",
-                               "entityNo":  "33",
-                               "entityName":  "Elec_CAR",
-                               "agentPg":  "64591",
-                               "sampleExt":  "37900",
-                               "sampleLoginId":  "78700",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "허클베리프로",
-        "floor":  "외부",
-        "agentLogin":  [
-                           "외부",
-                           "허클베리프로"
-                       ],
-        "acdPosition":  [
-                            "외부",
-                            "허클베리프로"
-                        ],
-        "agentDn":  [
-                        "외부",
-                        "허클베리프로"
-                    ],
-        "place":  [
-                      "외부",
-                      "허클베리프로"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-
-                       ]
-    },
-    {
-        "name":  "재택",
-        "floor":  "재택",
-        "agentLogin":  null,
-        "acdPosition":  null,
-        "agentDn":  [
-                        "재택"
-                    ],
-        "place":  [
-                      "재택"
-                  ],
-        "note":  "AGENT_DN 및 Places에만 존재",
-        "oxePresets":  [
-                           {
-                               "label":  "[CM 기준 — Entity/PG 직접 입력]",
-                               "entityNo":  "",
-                               "entityName":  "",
-                               "agentPg":  "",
-                               "sampleExt":  "39003",
-                               "sampleLoginId":  "",
-                               "source":  "CM(최소번호)"
-                           }
-                       ]
-    },
-    {
-        "name":  "LG하우시스_알루미늄",
-        "floor":  "충정로",
-        "agentLogin":  [
-                           "충정로",
-                           "LG하우시스_알루미늄"
-                       ],
-        "acdPosition":  [
-                            "충정로",
-                            "LG하우시스_알루미늄"
-                        ],
-        "agentDn":  [
-                        "충정로",
-                        "LG하우시스_알루미늄"
-                    ],
-        "place":  [
-                      "충정로",
-                      "LG하우시스_알루미늄"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "LG하우시스 알루미늄 (Ent 72 / PG 62291)",
-                               "entityNo":  "72",
-                               "entityName":  "LGHausys_AL",
-                               "agentPg":  "62291",
-                               "sampleExt":  "31063",
-                               "sampleLoginId":  "77320",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "LG하우시스_지인_해피콜",
-        "floor":  "충정로",
-        "agentLogin":  [
-                           "충정로",
-                           "LG하우시스_지인_해피콜"
-                       ],
-        "acdPosition":  [
-                            "충정로",
-                            "LG하우시스_지인_해피콜"
-                        ],
-        "agentDn":  [
-                        "충정로",
-                        "LG하우시스_지인_해피콜"
-                    ],
-        "place":  [
-                      "충정로",
-                      "LG하우시스_지인_해피콜"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "LX하우시스 지인 해피콜 (Ent 98 / PG 63394)",
-                               "entityNo":  "98",
-                               "entityName":  "LXHau_Zin",
-                               "agentPg":  "63394",
-                               "sampleExt":  "31085",
-                               "sampleLoginId":  "71085",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "LX하우시스_B2C",
-        "floor":  "충정로",
-        "agentLogin":  [
-                           "충정로",
-                           "LX하우시스_B2C"
-                       ],
-        "acdPosition":  [
-                            "충정로",
-                            "LX하우시스_B2C"
-                        ],
-        "agentDn":  [
-                        "충정로",
-                        "LX하우시스_B2C"
-                    ],
-        "place":  [
-                      "충정로",
-                      "LX하우시스_B2C"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-
-                       ]
-    },
-    {
-        "name":  "LX하우시스_영업지점견적센터",
-        "floor":  "충정로",
-        "agentLogin":  [
-                           "충정로",
-                           "LX하우시스_영업지점견적센터"
-                       ],
-        "acdPosition":  [
-                            "충정로",
-                            "LX하우시스_영업지점견적센터"
-                        ],
-        "agentDn":  [
-                        "충정로",
-                        "LX하우시스_영업지점견적센터"
-                    ],
-        "place":  [
-                      "충정로",
-                      "LX하우시스_영업지점견적센터"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "LX하우시스 제휴영업 견적지원 (Ent 112 / PG 63400)",
-                               "entityNo":  "112",
-                               "entityName":  "LX_estimate",
-                               "agentPg":  "63400",
-                               "sampleExt":  "31087",
-                               "sampleLoginId":  "71087",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
-    },
-    {
-        "name":  "LX하우시스_인테리어",
-        "floor":  "충정로",
-        "agentLogin":  [
-                           "충정로",
-                           "LX하우시스_인테리어"
-                       ],
-        "acdPosition":  [
-                            "충정로",
-                            "LX하우시스_인테리어"
-                        ],
-        "agentDn":  [
-                        "충정로",
-                        "LX하우시스_인테리어"
-                    ],
-        "place":  [
-                      "충정로",
-                      "LX하우시스_인테리어"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "LX하우시스 통합지원 인테리어 (Ent 109 / PG 63398)",
-                               "entityNo":  "109",
-                               "entityName":  "LX_Total",
-                               "agentPg":  "63398",
-                               "sampleExt":  "31070",
-                               "sampleLoginId":  "71070",
-                               "source":  "S1(Dial-Plan)"
-                           },
-                           {
-                               "label":  "LG하우시스 인테리어 구시트 (Ent 73 / PG 62292)",
-                               "entityNo":  "73",
-                               "entityName":  "LGHausys_Interi",
-                               "agentPg":  "62292",
-                               "sampleExt":  "31070",
-                               "sampleLoginId":  "71070",
-                               "source":  "S12(하단참고)"
-                           }
-                       ]
-    },
-    {
-        "name":  "LX하우시스_창호SCM",
-        "floor":  "충정로",
-        "agentLogin":  [
-                           "충정로",
-                           "LX하우시스_창호SCM"
-                       ],
-        "acdPosition":  [
-                            "충정로",
-                            "LX하우시스_창호SCM"
-                        ],
-        "agentDn":  [
-                        "충정로",
-                        "LX하우시스_창호SCM"
-                    ],
-        "place":  [
-                      "충정로",
-                      "LX하우시스_창호SCM"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "LX하우시스 통합지원 창호재 (Ent 109 / PG 63399)",
-                               "entityNo":  "109",
-                               "entityName":  "LX_Total",
-                               "agentPg":  "63399",
-                               "sampleExt":  "31052",
-                               "sampleLoginId":  "73200",
-                               "source":  "S1(Dial-Plan)"
-                           },
-                           {
-                               "label":  "LG하우시스 창호SCM 구시트 (Ent 71 / PG 62291)",
-                               "entityNo":  "71",
-                               "entityName":  "LGHausys_SCM",
-                               "agentPg":  "62291",
-                               "sampleExt":  "31052",
-                               "sampleLoginId":  "73200",
-                               "source":  "S12(하단참고)"
-                           }
-                       ]
-    },
-    {
-        "name":  "LX하우시스_한샘견적_지원센터",
-        "floor":  "충정로",
-        "agentLogin":  [
-                           "충정로",
-                           "LX하우시스_한샘견적_지원센터"
-                       ],
-        "acdPosition":  [
-                            "충정로",
-                            "LX하우시스_한샘견적_지원센터"
-                        ],
-        "agentDn":  [
-                        "충정로",
-                        "LX하우시스_한샘견적_지원센터"
-                    ],
-        "place":  [
-                      "충정로",
-                      "LX하우시스_한샘견적_지원센터"
-                  ],
-        "note":  "",
-        "oxePresets":  [
-                           {
-                               "label":  "LX하우시스 한샘견적 지원 (Ent 103 / PG 63396)",
-                               "entityNo":  "103",
-                               "entityName":  "LXHau_HAN",
-                               "agentPg":  "63396",
-                               "sampleExt":  "31086",
-                               "sampleLoginId":  "71035",
-                               "source":  "S1(Dial-Plan)"
-                           }
-                       ]
+        "name": "__TEST__ (테스트 폴더)",
+        "floor": "TEST",
+        "agentLogin": [
+            "Test"
+        ],
+        "acdPosition": [
+            "Test"
+        ],
+        "agentDn": [
+            "TEST"
+        ],
+        "place": [
+            "TEST"
+        ],
+        "useVQueue": false,
+        "useIvr": true,
+        "note": "테스트 전용 폴더 (AgentLogin/ACDPosition=Test, AGENT_DN/Places=TEST)",
+        "oxePresets": [
+            {
+                "label": "콜 테스트 용 (Ent - / PG 60994)",
+                "entityNo": "",
+                "entityName": "",
+                "agentPg": "60994",
+                "sampleExt": "",
+                "sampleLoginId": "",
+                "source": "Dial-Plan"
+            },
+            {
+                "label": "콜 테스트 용 (Ent 1 / PG 60991)",
+                "entityNo": "1",
+                "entityName": "",
+                "agentPg": "60991",
+                "sampleExt": "30101",
+                "sampleLoginId": "70101",
+                "source": "Dial-Plan",
+                "dnRange": "30101~30102",
+                "ctiRange": "70101~70102"
+            },
+            {
+                "label": "콜 테스트 용 (Ent 1 / PG 60992)",
+                "entityNo": "1",
+                "entityName": "",
+                "agentPg": "60992",
+                "sampleExt": "30101",
+                "sampleLoginId": "70101",
+                "source": "Dial-Plan",
+                "dnRange": "30101~30102",
+                "ctiRange": "70101~70102"
+            },
+            {
+                "label": "테스트중 (Ent - / PG ㄹ)",
+                "entityNo": "",
+                "entityName": "",
+                "agentPg": "",
+                "sampleExt": "",
+                "sampleLoginId": "",
+                "source": "Dial-Plan",
+                "dnRange": "-",
+                "ctiRange": "-"
+            },
+            {
+                "label": "테스트 계속 (Ent - / PG ㅋ)",
+                "entityNo": "",
+                "entityName": "",
+                "agentPg": "",
+                "sampleExt": "",
+                "sampleLoginId": "",
+                "source": "Dial-Plan",
+                "dnRange": "ㅋㅌ",
+                "ctiRange": "ㅌㅋㅋ"
+            }
+        ]
+    },
+    {
+        "name": "더본코리아",
+        "floor": "21층",
+        "agentLogin": [
+            "21층",
+            "더본코리아"
+        ],
+        "acdPosition": [
+            "21층",
+            "더본코리아"
+        ],
+        "agentDn": [
+            "21층",
+            "더본코리아"
+        ],
+        "place": [
+            "21층",
+            "더본코리아"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "더본코리아 #1 (Ent 91 / PG 61491)",
+                "entityNo": "91",
+                "entityName": "THEBORN",
+                "agentPg": "61491",
+                "sampleExt": "31090",
+                "sampleLoginId": "71090",
+                "source": "S1(Dial-Plan)"
+            },
+            {
+                "label": "더본코리아 #2 유통 (Ent 92 / PG 61492)",
+                "entityNo": "92",
+                "entityName": "THEBORN_2",
+                "agentPg": "61492",
+                "sampleExt": "31090",
+                "sampleLoginId": "71090",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "스타벅스",
+        "floor": "21층",
+        "agentLogin": [
+            "21층",
+            "스타벅스"
+        ],
+        "acdPosition": [
+            "21층",
+            "스타벅스"
+        ],
+        "agentDn": [
+            "21층",
+            "스타벅스"
+        ],
+        "place": [
+            "21층",
+            "스타벅스"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "스타벅스 (Ent 79 / PG 61691)",
+                "entityNo": "79",
+                "entityName": "STARBUCKS",
+                "agentPg": "61691",
+                "sampleExt": "39500",
+                "sampleLoginId": "79500",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "하이엠솔루텍OB",
+        "floor": "21층",
+        "agentLogin": [
+            "21층",
+            "하이엠솔루텍OB"
+        ],
+        "acdPosition": [
+            "21층",
+            "하이엠솔루텍OB"
+        ],
+        "agentDn": [
+            "21층",
+            "하이엠솔루텍OB"
+        ],
+        "place": [
+            "21층",
+            "하이엠솔루텍OB"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "하이엠솔루텍OB 해피콜 (Ent 39 / PG 66799)",
+                "entityNo": "39",
+                "entityName": "HIM",
+                "agentPg": "66799",
+                "sampleExt": "31030",
+                "sampleLoginId": "77104",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "ABC마트",
+        "floor": "23층",
+        "agentLogin": [
+            "23층",
+            "ABC마트"
+        ],
+        "acdPosition": [
+            "23층",
+            "ABC마트"
+        ],
+        "agentDn": null,
+        "place": [
+            "23층",
+            "ABC마트"
+        ],
+        "note": "AGENT_DN에 ABC마트 폴더 없음",
+        "oxePresets": []
+    },
+    {
+        "name": "더원모바일",
+        "floor": "23층",
+        "agentLogin": [
+            "23층",
+            "더원모바일"
+        ],
+        "acdPosition": [
+            "23층",
+            "더원모바일"
+        ],
+        "agentDn": [
+            "23층",
+            "더원모바일"
+        ],
+        "place": [
+            "23층",
+            "더원모바일"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "더원모바일 (Ent 50 / PG 60891)",
+                "entityNo": "50",
+                "entityName": "THEONE",
+                "agentPg": "60891",
+                "sampleExt": "32850",
+                "sampleLoginId": "72850",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "더원플랫폼_개통센터",
+        "floor": "23층",
+        "agentLogin": [
+            "23층",
+            "더원플랫폼_개통센터"
+        ],
+        "acdPosition": [
+            "23층",
+            "더원플랫폼_개통센터"
+        ],
+        "agentDn": [
+            "23층",
+            "더원플랫폼_개통센터"
+        ],
+        "place": [
+            "23층",
+            "더원플랫폼_개통센터"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "더원플랫폼 알뜰폰 개통센터 (Ent 105 / PG 63397)",
+                "entityNo": "105",
+                "entityName": "THEONE_M",
+                "agentPg": "63397",
+                "sampleExt": "32950",
+                "sampleLoginId": "72950",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "바바패션AS",
+        "floor": "23층",
+        "agentLogin": [
+            "23층",
+            "바바패션AS"
+        ],
+        "acdPosition": [
+            "23층",
+            "바바패션AS"
+        ],
+        "agentDn": [
+            "23층",
+            "바바패션AS"
+        ],
+        "place": [
+            "23층",
+            "바바패션AS"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "바바패션 A/S (Ent 96 / PG 63891)",
+                "entityNo": "96",
+                "entityName": "BABA",
+                "agentPg": "63891",
+                "sampleExt": "33110",
+                "sampleLoginId": "73110",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "볼트테크코리아",
+        "floor": "23층",
+        "agentLogin": [
+            "23층",
+            "볼트테크코리아"
+        ],
+        "acdPosition": [
+            "23층",
+            "볼트테크코리아"
+        ],
+        "agentDn": [
+            "23층",
+            "볼트테크코리아"
+        ],
+        "place": [
+            "23층",
+            "볼트테크코리아"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "볼트테크 코리아 대표 (Ent 38 / PG 63798)",
+                "entityNo": "38",
+                "entityName": "BoltTech",
+                "agentPg": "63798",
+                "sampleExt": "33011",
+                "sampleLoginId": "73011",
+                "source": "S1(Dial-Plan)"
+            },
+            {
+                "label": "볼트테크 1670-8884 (Ent 37 / PG 확인필요)",
+                "entityNo": "37",
+                "entityName": "Bolttech_1670",
+                "agentPg": "",
+                "sampleExt": "33011",
+                "sampleLoginId": "73011",
+                "source": "S1(Dial-Plan)"
+            },
+            {
+                "label": "볼트테크 1670-1290 (Ent 31 / PG 확인필요)",
+                "entityNo": "31",
+                "entityName": "Bolt_16701290",
+                "agentPg": "",
+                "sampleExt": "33011",
+                "sampleLoginId": "73011",
+                "source": "S1(Dial-Plan)"
+            },
+            {
+                "label": "볼트테크 1544-5395 (Ent 29 / PG 확인필요)",
+                "entityNo": "29",
+                "entityName": "Bolt_5395",
+                "agentPg": "",
+                "sampleExt": "33011",
+                "sampleLoginId": "73011",
+                "source": "S1(Dial-Plan)"
+            },
+            {
+                "label": "볼트테크 1544-3841 (Ent 30 / PG 확인필요)",
+                "entityNo": "30",
+                "entityName": "Bolt_3841",
+                "agentPg": "",
+                "sampleExt": "33011",
+                "sampleLoginId": "73011",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "세종텔레콤",
+        "floor": "23층",
+        "agentLogin": [
+            "23층",
+            "세종텔레콤"
+        ],
+        "acdPosition": [
+            "23층",
+            "세종텔레콤"
+        ],
+        "agentDn": [
+            "23층",
+            "세종텔레콤"
+        ],
+        "place": [
+            "23층",
+            "세종텔레콤"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "세종텔레콤 #1 KT/LG/114 (Ent 55 / PG 66591)",
+                "entityNo": "55",
+                "entityName": "Seojong_T#1",
+                "agentPg": "66591",
+                "sampleExt": "33201",
+                "sampleLoginId": "77501",
+                "source": "S1(Dial-Plan)"
+            },
+            {
+                "label": "세종텔레콤 #2 개통센터 (Ent 88 / PG 66591)",
+                "entityNo": "88",
+                "entityName": "Seojong_T#2",
+                "agentPg": "66591",
+                "sampleExt": "33201",
+                "sampleLoginId": "77501",
+                "source": "S1(Dial-Plan)"
+            },
+            {
+                "label": "세종텔레콤 #3 SK고객센터 (Ent 87 / PG 66591)",
+                "entityNo": "87",
+                "entityName": "Seojong#3",
+                "agentPg": "66591",
+                "sampleExt": "33201",
+                "sampleLoginId": "77501",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "세종텔레콤_CCTV",
+        "floor": "23층",
+        "agentLogin": [
+            "23층",
+            "세종텔레콤_CCTV"
+        ],
+        "acdPosition": [
+            "23층",
+            "세종텔레콤_CCTV"
+        ],
+        "agentDn": [
+            "23층",
+            "세종텔레콤_CCTV"
+        ],
+        "place": [
+            "23층",
+            "세종텔레콤_CCTV"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "세종텔레콤 CCTV (Ent 83 / PG 66691)",
+                "entityNo": "83",
+                "entityName": "SeojongT#3",
+                "agentPg": "66691",
+                "sampleExt": "33900",
+                "sampleLoginId": "73900",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "워커힐",
+        "floor": "23층",
+        "agentLogin": [
+            "23층",
+            "워커힐"
+        ],
+        "acdPosition": [
+            "23층",
+            "워커힐"
+        ],
+        "agentDn": [
+            "23층",
+            "워커힐"
+        ],
+        "place": [
+            "23층",
+            "워커힐"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "워커힐 (Ent 75 / PG 63691)",
+                "entityNo": "75",
+                "entityName": "walkerhill",
+                "agentPg": "63691",
+                "sampleExt": "33070",
+                "sampleLoginId": "73070",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "LB헬프데스크",
+        "floor": "24층",
+        "agentLogin": [
+            "24층",
+            "LB헬프데스크"
+        ],
+        "acdPosition": [
+            "24층",
+            "LB헬프데스크"
+        ],
+        "agentDn": [
+            "24층",
+            "LB헬프데스크"
+        ],
+        "place": [
+            "24층",
+            "LB헬프데스크"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "엘비그룹 헬프데스크 (Ent 49 / PG 61391)",
+                "entityNo": "49",
+                "entityName": "LG_HELP",
+                "agentPg": "61391",
+                "sampleExt": "35800",
+                "sampleLoginId": "75800",
+                "source": "S1(Dial-Plan)"
+            },
+            {
+                "label": "엘비헬프 39995 발신전용IPT (Ent 12 / PG 61391)",
+                "entityNo": "12",
+                "entityName": "3995_IPT",
+                "agentPg": "61391",
+                "sampleExt": "35800",
+                "sampleLoginId": "75800",
+                "source": "S1(비고)+S13"
+            }
+        ]
+    },
+    {
+        "name": "LGEIT",
+        "floor": "24층",
+        "agentLogin": [
+            "24층",
+            "LGEIT"
+        ],
+        "acdPosition": [
+            "24층",
+            "LGEIT"
+        ],
+        "agentDn": [
+            "24층",
+            "LGEIT"
+        ],
+        "place": [
+            "24층",
+            "LGEIT"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "LG전자 IT 업무지원 (Ent 54 / PG 60491)",
+                "entityNo": "54",
+                "entityName": "LGElec_IT",
+                "agentPg": "60491",
+                "sampleExt": "34030",
+                "sampleLoginId": "77001",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "LG생활건강",
+        "floor": "24층/25층",
+        "agentLogin": [
+            "24층",
+            "LG생활건강"
+        ],
+        "acdPosition": [
+            "24층",
+            "LG생활건강"
+        ],
+        "agentDn": [
+            "25층",
+            "LG생활건강"
+        ],
+        "place": [
+            "25층",
+            "LG생활건강"
+        ],
+        "note": "AgentLogin/ACDPosition은 24층, AGENT_DN/Places는 25층",
+        "oxePresets": [
+            {
+                "label": "LG생건 직영몰/외부몰/뷰티 (Ent 28 / PG 64593)",
+                "entityNo": "28",
+                "entityName": "LG_LIFE_T",
+                "agentPg": "64593",
+                "sampleExt": "34300",
+                "sampleLoginId": "77031",
+                "source": "S2(Dial-Plan #2)"
+            },
+            {
+                "label": "LG생활건강 외부몰 구시트 (Ent 70 / PG 64595)",
+                "entityNo": "70",
+                "entityName": "LGLifecare",
+                "agentPg": "64595",
+                "sampleExt": "34300",
+                "sampleLoginId": "77031",
+                "source": "S12(하단참고)"
+            },
+            {
+                "label": "LG생활건강 햄파맥스 구시트 (Ent 70 / PG 64594)",
+                "entityNo": "70",
+                "entityName": "LGLifecare",
+                "agentPg": "64594",
+                "sampleExt": "34300",
+                "sampleLoginId": "77031",
+                "source": "S12(하단참고)"
+            }
+        ]
+    },
+    {
+        "name": "LG생활건강_외부몰",
+        "floor": "24층",
+        "agentLogin": [
+            "24층",
+            "LG생활건강_외부몰"
+        ],
+        "acdPosition": [
+            "24층",
+            "LG생활건강_외부몰"
+        ],
+        "agentDn": [
+            "24층",
+            "LG생활건강_외부몰"
+        ],
+        "place": [
+            "24층",
+            "LG생활건강_외부몰"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "LG생건 외부몰 (Ent 28 / PG 64593)",
+                "entityNo": "28",
+                "entityName": "LG_LIFE_T",
+                "agentPg": "64593",
+                "sampleExt": "34348",
+                "sampleLoginId": "77033",
+                "source": "S2(Dial-Plan #2)"
+            },
+            {
+                "label": "LG생활건강 외부몰 구시트 (Ent 70 / PG 64595)",
+                "entityNo": "70",
+                "entityName": "LGLifecare",
+                "agentPg": "64595",
+                "sampleExt": "34348",
+                "sampleLoginId": "77033",
+                "source": "S12(하단참고)"
+            }
+        ]
+    },
+    {
+        "name": "LG하우시스_그린리모델링",
+        "floor": "24층/25층",
+        "agentLogin": [
+            "24층",
+            "LG하우시스_그린리모델링"
+        ],
+        "acdPosition": [
+            "24층",
+            "LG하우시스_그린리모델링"
+        ],
+        "agentDn": [
+            "25층",
+            "LG하우시스_그린리모델링"
+        ],
+        "place": [
+            "25층",
+            "LG하우시스_그린리모델링"
+        ],
+        "note": "AgentLogin/ACDPosition은 24층, AGENT_DN/Places는 25층",
+        "oxePresets": [
+            {
+                "label": "LG하우시스 그린리모델링 (Ent 43 / PG 62594)",
+                "entityNo": "43",
+                "entityName": "LGHausys_Green",
+                "agentPg": "62594",
+                "sampleExt": "31010",
+                "sampleLoginId": "73001",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "LG하우시스_신유통",
+        "floor": "24층/25층",
+        "agentLogin": [
+            "24층",
+            "LG하우시스_신유통"
+        ],
+        "acdPosition": [
+            "24층",
+            "LG하우시스_신유통"
+        ],
+        "agentDn": [
+            "25층",
+            "LX하우시스_신유통"
+        ],
+        "place": [
+            "25층",
+            "LG하우스_신유통"
+        ],
+        "note": "층(24/25층) 및 철자(LG하우시스/LX하우시스/LG하우스) 상이",
+        "oxePresets": [
+            {
+                "label": "[CM 기준 — Entity/PG 직접 입력]",
+                "entityNo": "",
+                "entityName": "",
+                "agentPg": "",
+                "sampleExt": "31009",
+                "sampleLoginId": "77191",
+                "source": "CM(최소번호)"
+            }
+        ]
+    },
+    {
+        "name": "LG하우시스_커머셜",
+        "floor": "24층",
+        "agentLogin": [
+            "24층",
+            "LG하우시스_커머셜"
+        ],
+        "acdPosition": [
+            "24층",
+            "LG하우시스_커머셜"
+        ],
+        "agentDn": [
+            "24층",
+            "LG하우시스_커머셜"
+        ],
+        "place": [
+            "24층",
+            "LG하우시스_커머셜"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "[CM 기준 — Entity/PG 직접 입력]",
+                "entityNo": "",
+                "entityName": "",
+                "agentPg": "",
+                "sampleExt": "31013",
+                "sampleLoginId": "73006",
+                "source": "CM(최소번호)"
+            }
+        ]
+    },
+    {
+        "name": "경기평생교육바우처",
+        "floor": "24층",
+        "agentLogin": [
+            "24층",
+            "경기평생교육바우처"
+        ],
+        "acdPosition": [
+            "24층",
+            "경기평생교육바우처"
+        ],
+        "agentDn": [
+            "24층",
+            "경기평생교육바우처"
+        ],
+        "place": [
+            "24층",
+            "경기평생교육바우처"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "경기도평생교육바우처 (Ent 67 / PG 65591)",
+                "entityNo": "67",
+                "entityName": "Edu_GG",
+                "agentPg": "65591",
+                "sampleExt": "34800",
+                "sampleLoginId": "74800",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "달콤한고래들",
+        "floor": "24층",
+        "agentLogin": [
+            "24층",
+            "달콤한고래들"
+        ],
+        "acdPosition": [
+            "24층",
+            "달콤한고래들"
+        ],
+        "agentDn": [
+            "24층",
+            "달콤한고래들"
+        ],
+        "place": [
+            "24층",
+            "달콤한고래들"
+        ],
+        "note": "",
+        "oxePresets": []
+    },
+    {
+        "name": "더캐리",
+        "floor": "24층",
+        "agentLogin": [
+            "24층",
+            "더캐리"
+        ],
+        "acdPosition": [
+            "24층",
+            "더캐리"
+        ],
+        "agentDn": [
+            "24층",
+            "더캐리"
+        ],
+        "place": [
+            "24층",
+            "더캐리"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "더캐리 (Ent 46 / PG 63991 - ※Entity표 51 참고)",
+                "entityNo": "46",
+                "entityName": "The_Carry",
+                "agentPg": "63991",
+                "sampleExt": "37300",
+                "sampleLoginId": "73300",
+                "source": "S2(Dial-Plan #2)"
+            },
+            {
+                "label": "캐리마켓 (Ent 47 / PG 63991)",
+                "entityNo": "47",
+                "entityName": "Carry_Market",
+                "agentPg": "63991",
+                "sampleExt": "37300",
+                "sampleLoginId": "73300",
+                "source": "S2(Dial-Plan #2)"
+            }
+        ]
+    },
+    {
+        "name": "벤디트",
+        "floor": "24층",
+        "agentLogin": [
+            "24층",
+            "벤디트"
+        ],
+        "acdPosition": [
+            "24층",
+            "벤디트"
+        ],
+        "agentDn": [
+            "24층",
+            "벤디트"
+        ],
+        "place": [
+            "24층",
+            "벤디트"
+        ],
+        "note": "",
+        "oxePresets": []
+    },
+    {
+        "name": "아파트아이",
+        "floor": "24층",
+        "agentLogin": [
+            "24층",
+            "아파트아이"
+        ],
+        "acdPosition": [
+            "24층",
+            "아파트아이"
+        ],
+        "agentDn": [
+            "24층",
+            "아파트아이"
+        ],
+        "place": [
+            "24층",
+            "아파트아이"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "아파트아이 (Ent 106 / PG 67791)",
+                "entityNo": "106",
+                "entityName": "APTi",
+                "agentPg": "67791",
+                "sampleExt": "34150",
+                "sampleLoginId": "",
+                "source": "S12(하단)+S13"
+            }
+        ]
+    },
+    {
+        "name": "전자세금계산서",
+        "floor": "24층/25층",
+        "agentLogin": [
+            "24층",
+            "전자세금계산서"
+        ],
+        "acdPosition": [
+            "24층",
+            "전자세금계산서"
+        ],
+        "agentDn": [
+            "25층",
+            "전자세금계산서"
+        ],
+        "place": [
+            "25층",
+            "전자세금계산서"
+        ],
+        "note": "AgentLogin/ACDPosition은 24층, AGENT_DN/Places는 25층",
+        "oxePresets": [
+            {
+                "label": "전자세금계산서/CNSPay/카카오 (Ent 44 / PG 63591)",
+                "entityNo": "44",
+                "entityName": "ElecTax",
+                "agentPg": "63591",
+                "sampleExt": "34329",
+                "sampleLoginId": "77051",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "충북평생교육이용권",
+        "floor": "24층",
+        "agentLogin": [
+            "24층",
+            "충북평생교육이용권"
+        ],
+        "acdPosition": [
+            "24층",
+            "충북평생교육이용권"
+        ],
+        "agentDn": [
+            "24층",
+            "충북평생교육이용권"
+        ],
+        "place": [
+            "24층",
+            "충북평생교육이용권"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "충북평생교육이용권센터 (Ent 110 / PG 60795)",
+                "entityNo": "110",
+                "entityName": "EduCN_C",
+                "agentPg": "60795",
+                "sampleExt": "39310",
+                "sampleLoginId": "79310",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "카닥",
+        "floor": "24층",
+        "agentLogin": [
+            "24층",
+            "카닥"
+        ],
+        "acdPosition": [
+            "24층",
+            "카닥"
+        ],
+        "agentDn": [
+            "24층",
+            "카닥"
+        ],
+        "place": [
+            "24층",
+            "카닥"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "카닥 (Ent 46 / PG 61891 - ※Entity46 더캐리와 중복확인)",
+                "entityNo": "46",
+                "entityName": "CARDOC",
+                "agentPg": "61891",
+                "sampleExt": "",
+                "sampleLoginId": "75500",
+                "source": "S12(하단)+S13"
+            }
+        ]
+    },
+    {
+        "name": "하이프라자_개통센터",
+        "floor": "24층",
+        "agentLogin": [
+            "24층",
+            "하이프라자개통센터"
+        ],
+        "acdPosition": [
+            "24층",
+            "하이프라자_개통센터"
+        ],
+        "agentDn": [
+            "24층",
+            "하이프라자_개통센터"
+        ],
+        "place": [
+            "24층",
+            "하이프라자개통센터"
+        ],
+        "note": "언더스코어 유무 차이 자동 매핑",
+        "oxePresets": [
+            {
+                "label": "하이프라자 개통센터 (Ent 107 / PG 64492)",
+                "entityNo": "107",
+                "entityName": "HI_OPEN",
+                "agentPg": "64492",
+                "sampleExt": "34600",
+                "sampleLoginId": "74600",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "하이프라자_온라인몰",
+        "floor": "24층",
+        "agentLogin": [
+            "24층",
+            "하이프라자온라인몰"
+        ],
+        "acdPosition": [
+            "24층",
+            "하이프라자온라인몰"
+        ],
+        "agentDn": [
+            "24층",
+            "하이프라자_온라인몰"
+        ],
+        "place": [
+            "24층",
+            "하이프라자_온라인몰"
+        ],
+        "note": "언더스코어 유무 차이 자동 매핑",
+        "oxePresets": [
+            {
+                "label": "하이프라자 온라인몰 (Ent 57 / PG 64491)",
+                "entityNo": "57",
+                "entityName": "HI_Online",
+                "agentPg": "64491",
+                "sampleExt": "31128",
+                "sampleLoginId": "77160",
+                "source": "S1(Dial-Plan)"
+            },
+            {
+                "label": "LG휴대폰 온라인몰 (Ent 58 / PG 64491)",
+                "entityNo": "58",
+                "entityName": "HI_LGMobile",
+                "agentPg": "64491",
+                "sampleExt": "31128",
+                "sampleLoginId": "77160",
+                "source": "S1(Dial-Plan)"
+            },
+            {
+                "label": "LG베스트샵몰 모바일 (Ent 59 / PG 64491)",
+                "entityNo": "59",
+                "entityName": "HI_LGBestshop",
+                "agentPg": "64491",
+                "sampleExt": "31128",
+                "sampleLoginId": "77160",
+                "source": "S1(Dial-Plan)"
+            },
+            {
+                "label": "클라우드몰 (Ent 60 / PG 미기재)",
+                "entityNo": "60",
+                "entityName": "HI_Cloud",
+                "agentPg": "",
+                "sampleExt": "31128",
+                "sampleLoginId": "77160",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "하이프라자개통_개통실",
+        "floor": "24층",
+        "agentLogin": null,
+        "acdPosition": null,
+        "agentDn": [
+            "24층",
+            "하이프라자개통_개통실"
+        ],
+        "place": [
+            "24층",
+            "하이프라자개통_개통실"
+        ],
+        "note": "AGENT_DN 및 Places에만 존재",
+        "oxePresets": [
+            {
+                "label": "하이프라자 휴대폰개통 직통 (Ent 56 / PG 미기재)",
+                "entityNo": "56",
+                "entityName": "HI_Mobile",
+                "agentPg": "",
+                "sampleExt": "31121",
+                "sampleLoginId": "",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "AJ오토파킹",
+        "floor": "25층",
+        "agentLogin": [
+            "25층",
+            "AJ오토파킹"
+        ],
+        "acdPosition": [
+            "25층",
+            "AJ오토파킹"
+        ],
+        "agentDn": [
+            "25층",
+            "AJ오토파킹"
+        ],
+        "place": [
+            "25층",
+            "AJ오토파킹시스템즈"
+        ],
+        "note": "Places 폴더명이 AJ오토파킹시스템즈",
+        "oxePresets": [
+            {
+                "label": "[CM 기준 — Entity/PG 직접 입력]",
+                "entityNo": "",
+                "entityName": "",
+                "agentPg": "",
+                "sampleExt": "31040",
+                "sampleLoginId": "75400",
+                "source": "CM(최소번호)"
+            }
+        ]
+    },
+    {
+        "name": "교육시설안전원",
+        "floor": "25층",
+        "agentLogin": [
+            "25층",
+            "교육시설안전원"
+        ],
+        "acdPosition": [
+            "25층",
+            "교육시설안전원"
+        ],
+        "agentDn": [
+            "25층",
+            "교육시설안전원"
+        ],
+        "place": [
+            "25층",
+            "교육시설안전원"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "교육시설안전원 일반 (Ent 52 / PG 62792)",
+                "entityNo": "52",
+                "entityName": "SECU_ADU",
+                "agentPg": "62792",
+                "sampleExt": "35900",
+                "sampleLoginId": "75900",
+                "source": "S1(Dial-Plan)"
+            },
+            {
+                "label": "교육시설안전원 공제가입CS (Ent 99 / PG 63391)",
+                "entityNo": "99",
+                "entityName": "EDUCS",
+                "agentPg": "63391",
+                "sampleExt": "35900",
+                "sampleLoginId": "75900",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "기프티엘",
+        "floor": "25층",
+        "agentLogin": [
+            "25층",
+            "기프티엘"
+        ],
+        "acdPosition": [
+            "25층",
+            "기프티엘"
+        ],
+        "agentDn": [
+            "25층",
+            "기프티엘"
+        ],
+        "place": [
+            "25층",
+            "기프티엘"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "기프티엘 B2C (Ent 101 / PG 66891)",
+                "entityNo": "101",
+                "entityName": "GiftL #1",
+                "agentPg": "66891",
+                "sampleExt": "36500",
+                "sampleLoginId": "76500",
+                "source": "S1(Dial-Plan)"
+            },
+            {
+                "label": "기프티엘 Biz (Ent 102 / PG 66891)",
+                "entityNo": "102",
+                "entityName": "GiftL #2",
+                "agentPg": "66891",
+                "sampleExt": "36500",
+                "sampleLoginId": "76500",
+                "source": "S1(Dial-Plan)"
+            },
+            {
+                "label": "기프티엘 롯데월드쿠폰 (Ent 113 / PG 66891)",
+                "entityNo": "113",
+                "entityName": "Lotte_Coup",
+                "agentPg": "66891",
+                "sampleExt": "36500",
+                "sampleLoginId": "76500",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "더스윙",
+        "floor": "25층",
+        "agentLogin": null,
+        "acdPosition": null,
+        "agentDn": [
+            "25층",
+            "더스윙"
+        ],
+        "place": [
+            "25층",
+            "더스윙"
+        ],
+        "note": "AGENT_DN 및 Places에만 존재",
+        "oxePresets": []
+    },
+    {
+        "name": "라이크와이즈",
+        "floor": "25층",
+        "agentLogin": [
+            "25층",
+            "라이크와이즈"
+        ],
+        "acdPosition": [
+            "25층",
+            "라이크와이즈"
+        ],
+        "agentDn": [
+            "25층",
+            "라이크와이즈"
+        ],
+        "place": [
+            "25층",
+            "라이크와이즈"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "라이크와이즈 (Ent 104 / PG 67691)",
+                "entityNo": "104",
+                "entityName": "LIKE",
+                "agentPg": "67691",
+                "sampleExt": "35700",
+                "sampleLoginId": "75700",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "라인프렌즈",
+        "floor": "25층",
+        "agentLogin": [
+            "25층",
+            "라인프렌즈"
+        ],
+        "acdPosition": [
+            "25층",
+            "라인프렌즈"
+        ],
+        "agentDn": [
+            "25층",
+            "라인프렌즈"
+        ],
+        "place": [
+            "25층",
+            "라인프렌즈"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "라인프렌즈 (Ent 53 / PG 67591)",
+                "entityNo": "53",
+                "entityName": "LINEFriend",
+                "agentPg": "67591",
+                "sampleExt": "35400",
+                "sampleLoginId": "74500",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "버킷스토어",
+        "floor": "25층",
+        "agentLogin": null,
+        "acdPosition": null,
+        "agentDn": [
+            "25층",
+            "버킷스토어"
+        ],
+        "place": [
+            "25층",
+            "버킷스토어"
+        ],
+        "note": "AGENT_DN 및 Places에만 존재",
+        "oxePresets": [
+            {
+                "label": "[CM 기준 — Entity/PG 직접 입력]",
+                "entityNo": "",
+                "entityName": "",
+                "agentPg": "",
+                "sampleExt": "35060",
+                "sampleLoginId": "",
+                "source": "CM(최소번호)"
+            }
+        ]
+    },
+    {
+        "name": "서브웨이",
+        "floor": "25층",
+        "agentLogin": [
+            "25층",
+            "서브웨이"
+        ],
+        "acdPosition": [
+            "25층",
+            "서브웨이"
+        ],
+        "agentDn": [
+            "25층",
+            "서브웨이"
+        ],
+        "place": [
+            "25층",
+            "서브웨이"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "서브웨이 Guest (Ent 62 / PG 62191)",
+                "entityNo": "62",
+                "entityName": "SUBWAY_Guest",
+                "agentPg": "62191",
+                "sampleExt": "35090",
+                "sampleLoginId": "76090",
+                "source": "S1(Dial-Plan)"
+            },
+            {
+                "label": "서브웨이 FZ (Ent 61 / PG 62191)",
+                "entityNo": "61",
+                "entityName": "SUBWAY_FZ",
+                "agentPg": "62191",
+                "sampleExt": "35090",
+                "sampleLoginId": "76090",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "이랜드e몰",
+        "floor": "25층",
+        "agentLogin": [
+            "25층",
+            "이랜드e몰"
+        ],
+        "acdPosition": [
+            "25층",
+            "이랜드e몰"
+        ],
+        "agentDn": [
+            "25층",
+            "이랜드e몰"
+        ],
+        "place": [
+            "25층",
+            "이랜드e몰"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "이랜드e몰 (Ent 94 / PG 선번장미기재)",
+                "entityNo": "94",
+                "entityName": "ELANDMALL",
+                "agentPg": "",
+                "sampleExt": "35006",
+                "sampleLoginId": "75006",
+                "source": "S12+S13"
+            }
+        ]
+    },
+    {
+        "name": "자몽컴퍼니",
+        "floor": "25층",
+        "agentLogin": null,
+        "acdPosition": null,
+        "agentDn": null,
+        "place": [
+            "25층",
+            "자몽컴퍼니"
+        ],
+        "note": "Places에만 존재",
+        "oxePresets": []
+    },
+    {
+        "name": "주영앤에스",
+        "floor": "25층",
+        "agentLogin": [
+            "25층",
+            "주영앤에스"
+        ],
+        "acdPosition": [
+            "25층",
+            "주영앤에스"
+        ],
+        "agentDn": [
+            "25층",
+            "주영앤에스"
+        ],
+        "place": [
+            "25층",
+            "주영앤에스"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "주영앤에스 (Ent 45 / PG 62791)",
+                "entityNo": "45",
+                "entityName": "JYNS",
+                "agentPg": "62791",
+                "sampleExt": "34200",
+                "sampleLoginId": "74200",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "집꾸미기",
+        "floor": "25층",
+        "agentLogin": null,
+        "acdPosition": null,
+        "agentDn": [
+            "25층",
+            "집꾸미기"
+        ],
+        "place": [
+            "25층",
+            "집꾸미기"
+        ],
+        "note": "AGENT_DN 및 Places에만 존재",
+        "oxePresets": []
+    },
+    {
+        "name": "코카콜라",
+        "floor": "25층",
+        "agentLogin": [
+            "25층",
+            "코카콜라"
+        ],
+        "acdPosition": [
+            "25층",
+            "코카콜라"
+        ],
+        "agentDn": [
+            "25층",
+            "코카콜라"
+        ],
+        "place": [
+            "25층",
+            "코카콜라"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "코카콜라 NCC (Ent 40 / PG 60591)",
+                "entityNo": "40",
+                "entityName": "Coke_NCC",
+                "agentPg": "60591",
+                "sampleExt": "35057",
+                "sampleLoginId": "75019",
+                "source": "S1(Dial-Plan)"
+            },
+            {
+                "label": "코카콜라 1588-2638 (Ent 78 / PG 60592)",
+                "entityNo": "78",
+                "entityName": "Coke_2638",
+                "agentPg": "60592",
+                "sampleExt": "35057",
+                "sampleLoginId": "75019",
+                "source": "S1(Dial-Plan)"
+            },
+            {
+                "label": "코카콜라 다이아몬드샘물 (Ent 41 / PG 60591)",
+                "entityNo": "41",
+                "entityName": "Coke_Dia",
+                "agentPg": "60591",
+                "sampleExt": "35057",
+                "sampleLoginId": "75019",
+                "source": "S1(Dial-Plan)"
+            },
+            {
+                "label": "코카콜라 영업전담 (Ent 108 / PG 60594)",
+                "entityNo": "108",
+                "entityName": "Coke_Sale",
+                "agentPg": "60594",
+                "sampleExt": "35057",
+                "sampleLoginId": "75019",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "코트라IB",
+        "floor": "25층",
+        "agentLogin": null,
+        "acdPosition": null,
+        "agentDn": [
+            "25층",
+            "코트라IB"
+        ],
+        "place": [
+            "25층",
+            "코트라IB"
+        ],
+        "note": "AGENT_DN 및 Places에만 존재 (AgentLogin/ACDPosition은 LB휴넷18층/코트라 확인 필요)",
+        "oxePresets": []
+    },
+    {
+        "name": "코트라OB",
+        "floor": "25층",
+        "agentLogin": null,
+        "acdPosition": null,
+        "agentDn": [
+            "25층",
+            "코트라OB"
+        ],
+        "place": [
+            "25층",
+            "코트라OB"
+        ],
+        "note": "AGENT_DN 및 Places에만 존재 (AgentLogin/ACDPosition은 LB휴넷18층/코트라 확인 필요)",
+        "oxePresets": []
+    },
+    {
+        "name": "티켓플랫폼",
+        "floor": "25층",
+        "agentLogin": [
+            "25층",
+            "티켓플랫폼"
+        ],
+        "acdPosition": [
+            "25층",
+            "티켓플랫폼"
+        ],
+        "agentDn": [
+            "25층",
+            "티켓플랫폼"
+        ],
+        "place": [
+            "25층",
+            "티켓플랫폼"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "티켓플랫폼 고객센터 (Ent 73 / PG 62292)",
+                "entityNo": "73",
+                "entityName": "TicketPF",
+                "agentPg": "62292",
+                "sampleExt": "39400",
+                "sampleLoginId": "79400",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "화물잇고",
+        "floor": "25층",
+        "agentLogin": [
+            "25층",
+            "화물잇고"
+        ],
+        "acdPosition": [
+            "25층",
+            "화물잇고"
+        ],
+        "agentDn": [
+            "25층",
+            "화물잇고"
+        ],
+        "place": [
+            "25층",
+            "화물잇고"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "[CM 기준 — Entity/PG 직접 입력]",
+                "entityNo": "",
+                "entityName": "",
+                "agentPg": "",
+                "sampleExt": "35601",
+                "sampleLoginId": "75601",
+                "source": "CM(AGENT_DN/ACDPos)"
+            }
+        ]
+    },
+    {
+        "name": "한국교육과정평가원",
+        "floor": "26층",
+        "agentLogin": [
+            "26층",
+            "한국교욱과정평가원"
+        ],
+        "acdPosition": [
+            "26층",
+            "한국교육과정평가원"
+        ],
+        "agentDn": [
+            "26층",
+            "한국고용평가진행원"
+        ],
+        "place": [
+            "26층",
+            "한국교육평가진행원"
+        ],
+        "note": "4개 메뉴 폴더명 전부 상이 (자동 매핑됨)",
+        "oxePresets": [
+            {
+                "label": "수능_UHD (Ent 90 / PG 61791)",
+                "entityNo": "90",
+                "entityName": "SU_UHD",
+                "agentPg": "61791",
+                "sampleExt": "36000",
+                "sampleLoginId": "76200",
+                "source": "S1(Dial-Plan)"
+            },
+            {
+                "label": "한국교육과정평가원 구시트 (Ent 81 / PG 61691)",
+                "entityNo": "81",
+                "entityName": "KICE",
+                "agentPg": "61691",
+                "sampleExt": "36000",
+                "sampleLoginId": "76200",
+                "source": "S12(하단참고)"
+            }
+        ]
+    },
+    {
+        "name": "GS네트웍스",
+        "floor": "LB휴넷18층",
+        "agentLogin": [
+            "LB휴넷18층",
+            "GS네트웍스"
+        ],
+        "acdPosition": [
+            "LB휴넷18층",
+            "GS네트웍스"
+        ],
+        "agentDn": [
+            "LB휴넷18층",
+            "GS네트웍스"
+        ],
+        "place": [
+            "LB휴넷18층",
+            "GS네트웍스"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "GS네트웍스 일반 (Ent 68 / PG 64191)",
+                "entityNo": "68",
+                "entityName": "GSNet_Nor",
+                "agentPg": "64191",
+                "sampleExt": "31385",
+                "sampleLoginId": "75200",
+                "source": "S1(Dial-Plan)"
+            },
+            {
+                "label": "GS네트웍스 사업주 (Ent 69 / PG 64191)",
+                "entityNo": "69",
+                "entityName": "GSNet_SP",
+                "agentPg": "64191",
+                "sampleExt": "31385",
+                "sampleLoginId": "75200",
+                "source": "S1(Dial-Plan)"
+            },
+            {
+                "label": "GS네트웍스 편의점택배 (Ent 97 / PG 64191)",
+                "entityNo": "97",
+                "entityName": "GS_CVS",
+                "agentPg": "64191",
+                "sampleExt": "31385",
+                "sampleLoginId": "75200",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "GS랄라블라",
+        "floor": "LB휴넷18층",
+        "agentLogin": [
+            "LB휴넷18층",
+            "GS랄라블라"
+        ],
+        "acdPosition": [
+            "LB휴넷18층",
+            "GS랄라블라"
+        ],
+        "agentDn": null,
+        "place": null,
+        "note": "AgentLogin/ACDPosition에만 존재",
+        "oxePresets": [
+            {
+                "label": "[CM 기준 — Entity/PG 직접 입력]",
+                "entityNo": "",
+                "entityName": "",
+                "agentPg": "",
+                "sampleExt": "",
+                "sampleLoginId": "75196",
+                "source": "CM(최소번호)"
+            }
+        ]
+    },
+    {
+        "name": "GS리테일",
+        "floor": "LB휴넷18층",
+        "agentLogin": [
+            "LB휴넷18층",
+            "GS리테일"
+        ],
+        "acdPosition": [
+            "LB휴넷18층",
+            "GS리테일"
+        ],
+        "agentDn": [
+            "LB휴넷18층",
+            "GS리테일"
+        ],
+        "place": [
+            "LB휴넷18층",
+            "GS리테일"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "GS리테일 쿠폰고객센터 (Ent 63 / PG 62195)",
+                "entityNo": "63",
+                "entityName": "GSRe_Coupon",
+                "agentPg": "62195",
+                "sampleExt": "31302",
+                "sampleLoginId": "75020",
+                "source": "S1(Dial-Plan)"
+            },
+            {
+                "label": "GS리테일 고객행복센터 구시트 (Ent 미기재 / PG 60191)",
+                "entityNo": "",
+                "entityName": "",
+                "agentPg": "60191",
+                "sampleExt": "31302",
+                "sampleLoginId": "75020",
+                "source": "S12(하단참고)"
+            },
+            {
+                "label": "GS리테일 OCS 학동 구시트 (Ent 미기재 / PG 63192)",
+                "entityNo": "",
+                "entityName": "",
+                "agentPg": "63192",
+                "sampleExt": "31302",
+                "sampleLoginId": "75020",
+                "source": "S12(하단참고)"
+            }
+        ]
+    },
+    {
+        "name": "GS수퍼",
+        "floor": "LB휴넷18층",
+        "agentLogin": [
+            "LB휴넷18층",
+            "GS수퍼"
+        ],
+        "acdPosition": [
+            "LB휴넷18층",
+            "GS수퍼"
+        ],
+        "agentDn": null,
+        "place": null,
+        "note": "AgentLogin/ACDPosition에만 존재",
+        "oxePresets": [
+            {
+                "label": "[CM 기준 — Entity/PG 직접 입력]",
+                "entityNo": "",
+                "entityName": "",
+                "agentPg": "",
+                "sampleExt": "",
+                "sampleLoginId": "75050",
+                "source": "CM(최소번호)"
+            }
+        ]
+    },
+    {
+        "name": "KFC",
+        "floor": "LB휴넷18층",
+        "agentLogin": [
+            "LB휴넷18층",
+            "KFC"
+        ],
+        "acdPosition": [
+            "LB휴넷18층",
+            "KFC"
+        ],
+        "agentDn": [
+            "LB휴넷18층",
+            "KFC"
+        ],
+        "place": [
+            "LB휴넷18층",
+            "KFC"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "KFC (Ent 111 / PG 67995)",
+                "entityNo": "111",
+                "entityName": "KFC",
+                "agentPg": "67995",
+                "sampleExt": "32800",
+                "sampleLoginId": "72800",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "MYLGID통신상담센터",
+        "floor": "LB휴넷18층",
+        "agentLogin": null,
+        "acdPosition": [
+            "LB휴넷18층",
+            "MYLGID통신상담센터"
+        ],
+        "agentDn": null,
+        "place": null,
+        "note": "ACDPosition에만 존재",
+        "oxePresets": []
+    },
+    {
+        "name": "농어촌희망재단",
+        "floor": "LB휴넷18층",
+        "agentLogin": null,
+        "acdPosition": null,
+        "agentDn": [
+            "LB휴넷18층",
+            "농어촌희망재단"
+        ],
+        "place": [
+            "LB휴넷18층",
+            "농어촌희망재단"
+        ],
+        "note": "AGENT_DN/Places에만 존재",
+        "oxePresets": [
+            {
+                "label": "농어촌희망재단 (Ent 82 / PG 선번장미기재)",
+                "entityNo": "82",
+                "entityName": "HOPE",
+                "agentPg": "",
+                "sampleExt": "31001",
+                "sampleLoginId": "",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "롯데GFR_AS",
+        "floor": "LB휴넷18층",
+        "agentLogin": [
+            "LB휴넷18층",
+            "롯데GFR_AS"
+        ],
+        "acdPosition": [
+            "LB휴넷18층",
+            "롯데GFR_AS"
+        ],
+        "agentDn": [
+            "LB휴넷18층",
+            "롯데GFR_AS"
+        ],
+        "place": [
+            "LB휴넷18층",
+            "롯데GFR_AS"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "롯데GFR AS (Ent 65 / PG 62691)",
+                "entityNo": "65",
+                "entityName": "LOTTE_GFR1",
+                "agentPg": "62691",
+                "sampleExt": "31801",
+                "sampleLoginId": "71801",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "롯데GFR_CS",
+        "floor": "LB휴넷18층",
+        "agentLogin": [
+            "LB휴넷18층",
+            "롯데GFR_CS"
+        ],
+        "acdPosition": [
+            "LB휴넷18층",
+            "롯데GFR_CS"
+        ],
+        "agentDn": [
+            "LB휴넷18층",
+            "롯데GFR_CS"
+        ],
+        "place": [
+            "LB휴넷18층",
+            "롯데GFR_CS"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "롯데GFR CS (Ent 42 / PG 62692)",
+                "entityNo": "42",
+                "entityName": "LOTTE_GFR2",
+                "agentPg": "62692",
+                "sampleExt": "31811",
+                "sampleLoginId": "71811",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "엘칸토",
+        "floor": "LB휴넷18층",
+        "agentLogin": null,
+        "acdPosition": null,
+        "agentDn": [
+            "LB휴넷18층",
+            "엘칸토"
+        ],
+        "place": [
+            "LB휴넷18층",
+            "엘칸토"
+        ],
+        "note": "AGENT_DN/Places에만 존재",
+        "oxePresets": [
+            {
+                "label": "[CM 기준 — Entity/PG 직접 입력]",
+                "entityNo": "",
+                "entityName": "",
+                "agentPg": "",
+                "sampleExt": "31410",
+                "sampleLoginId": "",
+                "source": "CM(최소번호)"
+            }
+        ]
+    },
+    {
+        "name": "우리은행예약센터",
+        "floor": "LB휴넷18층",
+        "agentLogin": [
+            "LB휴넷18층",
+            "우리은행예약센터"
+        ],
+        "acdPosition": [
+            "LB휴넷18층",
+            "우리은행예약센터"
+        ],
+        "agentDn": [
+            "LB휴넷18층",
+            "우리은행예약센터"
+        ],
+        "place": [
+            "LB휴넷18층",
+            "우리은행예약센터"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "우리은행 사전예약 (Ent 35 / PG 선번장미기재)",
+                "entityNo": "35",
+                "entityName": "Woori",
+                "agentPg": "",
+                "sampleExt": "36950",
+                "sampleLoginId": "76950",
+                "source": "S12+S13"
+            }
+        ]
+    },
+    {
+        "name": "유니브스토어",
+        "floor": "LB휴넷18층",
+        "agentLogin": [
+            "LB휴넷18층",
+            "유니브스토어"
+        ],
+        "acdPosition": [
+            "LB휴넷18층",
+            "유니브스토어"
+        ],
+        "agentDn": [
+            "LB휴넷18층",
+            "유니브스토어"
+        ],
+        "place": null,
+        "note": "Places에 유니브스토어 폴더 없음",
+        "oxePresets": [
+            {
+                "label": "유니브스토어 (Ent 84 / PG 61591)",
+                "entityNo": "84",
+                "entityName": "UNISTOVE",
+                "agentPg": "61591",
+                "sampleExt": "36900",
+                "sampleLoginId": "76900",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "유플러스제휴센터",
+        "floor": "LB휴넷18층",
+        "agentLogin": [
+            "LB휴넷18층",
+            "유플러스제휴센터"
+        ],
+        "acdPosition": [
+            "LB휴넷18층",
+            "유플러스제휴센터"
+        ],
+        "agentDn": [
+            "LB휴넷18층",
+            "유플러스제휴센터"
+        ],
+        "place": [
+            "LB휴넷18층",
+            "유플러스제휴센터"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "LGU+ 제휴센터/EOS (Ent 34 / PG 65691)",
+                "entityNo": "34",
+                "entityName": "LGU_co",
+                "agentPg": "65691",
+                "sampleExt": "36930",
+                "sampleLoginId": "76930",
+                "source": "S1(Dial-Plan)"
+            },
+            {
+                "label": "유플러스 오더 (Ent 35 / PG 65693)",
+                "entityNo": "35",
+                "entityName": "U+Order",
+                "agentPg": "65693",
+                "sampleExt": "36930",
+                "sampleLoginId": "76930",
+                "source": "S1(Dial-Plan)"
+            },
+            {
+                "label": "요요몰 (Ent 36 / PG 65691)",
+                "entityNo": "36",
+                "entityName": "YOYOMALL",
+                "agentPg": "65691",
+                "sampleExt": "36930",
+                "sampleLoginId": "76930",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "창업진흥원",
+        "floor": "LB휴넷18층",
+        "agentLogin": [
+            "LB휴넷18층",
+            "창업진흥원"
+        ],
+        "acdPosition": [
+            "LB휴넷18층",
+            "창업진흥원"
+        ],
+        "agentDn": [
+            "LB휴넷18층",
+            "창업진흥원"
+        ],
+        "place": [
+            "LB휴넷18층",
+            "창업진흥원"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "창업진흥원 (Ent 100 / PG 66393)",
+                "entityNo": "100",
+                "entityName": "CHANGUP",
+                "agentPg": "66393",
+                "sampleExt": "37700",
+                "sampleLoginId": "77700",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "충남평생교육바우처",
+        "floor": "LB휴넷18층",
+        "agentLogin": [
+            "LB휴넷18층",
+            "충남평생교육바우처"
+        ],
+        "acdPosition": null,
+        "agentDn": [
+            "LB휴넷18층",
+            "충남평생교육바우처"
+        ],
+        "place": [
+            "LB휴넷18층",
+            "충남평생교육바우처"
+        ],
+        "note": "ACDPosition에 충남평생교육바우처 폴더 없음",
+        "oxePresets": [
+            {
+                "label": "충남평생교육바우처 (Ent 86 / PG 60791)",
+                "entityNo": "86",
+                "entityName": "Edu_CN",
+                "agentPg": "60791",
+                "sampleExt": "39300",
+                "sampleLoginId": "79300",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "코트라",
+        "floor": "LB휴넷18층",
+        "agentLogin": [
+            "LB휴넷18층",
+            "코트라"
+        ],
+        "acdPosition": [
+            "LB휴넷18층",
+            "코트라"
+        ],
+        "agentDn": [
+            "LB휴넷18층",
+            "코트라"
+        ],
+        "place": [
+            "LB휴넷18층",
+            "코트라"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "[CM 기준 — Entity/PG 직접 입력]",
+                "entityNo": "",
+                "entityName": "",
+                "agentPg": "",
+                "sampleExt": "31450",
+                "sampleLoginId": "",
+                "source": "CM(최소번호)"
+            }
+        ]
+    },
+    {
+        "name": "크리스몰",
+        "floor": "LB휴넷18층",
+        "agentLogin": [
+            "LB휴넷18층",
+            "크리스몰"
+        ],
+        "acdPosition": [
+            "LB휴넷18층",
+            "크리스몰"
+        ],
+        "agentDn": [
+            "LB휴넷18층",
+            "크리스몰"
+        ],
+        "place": [
+            "LB휴넷18층",
+            "크리스몰"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "크리스몰 (Ent 71 / PG 62293)",
+                "entityNo": "71",
+                "entityName": "Chris",
+                "agentPg": "62293",
+                "sampleExt": "",
+                "sampleLoginId": "75300",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "평생교육바우처",
+        "floor": "LB휴넷18층",
+        "agentLogin": [
+            "LB휴넷18층",
+            "평생교육바우처"
+        ],
+        "acdPosition": [
+            "LB휴넷18층",
+            "평생교육바우처"
+        ],
+        "agentDn": [
+            "LB휴넷18층",
+            "평생교육바우처"
+        ],
+        "place": [
+            "LB휴넷18층",
+            "평생교육바우처"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "평생교육바우처 (Ent 81 / PG 61692)",
+                "entityNo": "81",
+                "entityName": "EDU_BAU",
+                "agentPg": "61692",
+                "sampleExt": "39800",
+                "sampleLoginId": "79800",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "현대홈쇼핑CIC",
+        "floor": "LB휴넷18층",
+        "agentLogin": [
+            "LB휴넷18층",
+            "현대홈쇼핑CIC"
+        ],
+        "acdPosition": [
+            "LB휴넷18층",
+            "현대홈쇼핑CIC"
+        ],
+        "agentDn": [
+            "LB휴넷18층",
+            "현대홈쇼핑CIC"
+        ],
+        "place": [
+            "LB휴넷18층",
+            "현대홈쇼핑CIC"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "현대홈쇼핑 CIC (Ent 95 / PG 62491)",
+                "entityNo": "95",
+                "entityName": "HYUNDAI_CI",
+                "agentPg": "62491",
+                "sampleExt": "36100",
+                "sampleLoginId": "76100",
+                "source": "S12(하단)+S13"
+            },
+            {
+                "label": "현대홈쇼핑 PDS (Ent 89 / PG 선번장미기재)",
+                "entityNo": "89",
+                "entityName": "HYUNDAI_PDS",
+                "agentPg": "",
+                "sampleExt": "36021",
+                "sampleLoginId": "",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "메가박스",
+        "floor": "구로",
+        "agentLogin": [
+            "구로",
+            "메가박스"
+        ],
+        "acdPosition": [
+            "구로",
+            "메가박스"
+        ],
+        "agentDn": [
+            "구로",
+            "메가박스"
+        ],
+        "place": [
+            "구로",
+            "메가박스"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "메가박스 (Ent 66 / PG 63191)",
+                "entityNo": "66",
+                "entityName": "MEGABOX",
+                "agentPg": "63191",
+                "sampleExt": "31500",
+                "sampleLoginId": "71500",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "마마카사르",
+        "floor": "대치동",
+        "agentLogin": [
+            "대치동",
+            "마마카사르"
+        ],
+        "acdPosition": null,
+        "agentDn": null,
+        "place": null,
+        "note": "AgentLogin에만 존재 (ACDPosition에 대치동 폴더 없음)",
+        "oxePresets": []
+    },
+    {
+        "name": "아몬즈",
+        "floor": "대치동",
+        "agentLogin": [
+            "대치동",
+            "아몬즈"
+        ],
+        "acdPosition": null,
+        "agentDn": [
+            "대치동",
+            "아몬즈"
+        ],
+        "place": [
+            "대치동",
+            "아몬즈"
+        ],
+        "note": "ACDPosition에 대치동 폴더 없음",
+        "oxePresets": []
+    },
+    {
+        "name": "LG라이프케어",
+        "floor": "마곡LG사이언스파크",
+        "agentLogin": [
+            "마곡LG사이언스파크",
+            "LG라이프케어"
+        ],
+        "acdPosition": [
+            "마곡LG사이언스파크",
+            "LG라이프케어"
+        ],
+        "agentDn": [
+            "마곡LG사이언스파크",
+            "LG라이프케어"
+        ],
+        "place": [
+            "마곡LG사이언스파크",
+            "LG라이프케어"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "LG라이프케어 포탈 (Ent 70 / PG 60291)",
+                "entityNo": "70",
+                "entityName": "LGLifecare",
+                "agentPg": "60291",
+                "sampleExt": "30021",
+                "sampleLoginId": "77133",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "LG통합ID",
+        "floor": "마곡LG사이언스파크",
+        "agentLogin": [
+            "마곡LG사이언스파크",
+            "LG통합ID"
+        ],
+        "acdPosition": [
+            "마곡LG사이언스파크",
+            "LG통합ID"
+        ],
+        "agentDn": [
+            "마곡LG사이언스파크",
+            "LG통합ID"
+        ],
+        "place": [
+            "마곡LG사이언스파크",
+            "LG통합ID"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "MY LG ID (Ent 77 / PG 60291)",
+                "entityNo": "77",
+                "entityName": "LG_ID",
+                "agentPg": "60291",
+                "sampleExt": "30037",
+                "sampleLoginId": "77211",
+                "source": "S1(Dial-Plan)"
+            },
+            {
+                "label": "원브레인 (Ent 76 / PG 60291)",
+                "entityNo": "76",
+                "entityName": "ONEBRAIN",
+                "agentPg": "60291",
+                "sampleExt": "30037",
+                "sampleLoginId": "77211",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "하루조각",
+        "floor": "마곡LG사이언스파크",
+        "agentLogin": [
+            "마곡LG사이언스파크",
+            "하루조각"
+        ],
+        "acdPosition": [
+            "마곡LG사이언스파크",
+            "하루조각"
+        ],
+        "agentDn": [
+            "마곡LG사이언스파크",
+            "하루조각"
+        ],
+        "place": [
+            "마곡LG사이언스파크",
+            "하루조각"
+        ],
+        "note": "",
+        "oxePresets": []
+    },
+    {
+        "name": "헬로비전",
+        "floor": "마곡LG사이언스파크",
+        "agentLogin": [
+            "마곡LG사이언스파크",
+            "헬로비전"
+        ],
+        "acdPosition": [
+            "마곡LG사이언스파크",
+            "헬로비전"
+        ],
+        "agentDn": [
+            "마곡LG사이언스파크",
+            "헬로비전"
+        ],
+        "place": [
+            "마곡LG사이언스파크",
+            "헬로비전"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "[CM 기준 — Entity/PG 직접 입력]",
+                "entityNo": "",
+                "entityName": "",
+                "agentPg": "",
+                "sampleExt": "",
+                "sampleLoginId": "72200",
+                "source": "CM(최소번호)"
+            }
+        ]
+    },
+    {
+        "name": "민팃",
+        "floor": "상암",
+        "agentLogin": [
+            "상암",
+            "민팃"
+        ],
+        "acdPosition": [
+            "상암",
+            "민팃"
+        ],
+        "agentDn": [
+            "상암",
+            "민팃"
+        ],
+        "place": [
+            "상암",
+            "민팃"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "민팃 안심거래 키오스크 (Ent 36 / PG 66791)",
+                "entityNo": "36",
+                "entityName": "Mintit_ESCRO",
+                "agentPg": "66791",
+                "sampleExt": "",
+                "sampleLoginId": "78800",
+                "source": "S12(하단)+S13"
+            },
+            {
+                "label": "민팃 관제센터 (Ent 32 / PG 66791)",
+                "entityNo": "32",
+                "entityName": "Mintit_Center",
+                "agentPg": "66791",
+                "sampleExt": "",
+                "sampleLoginId": "78800",
+                "source": "S12(하단)+S13"
+            }
+        ]
+    },
+    {
+        "name": "삼정회계법인",
+        "floor": "외부",
+        "agentLogin": [
+            "외부",
+            "삼정회계법인"
+        ],
+        "acdPosition": [
+            "외부",
+            "삼정회계법인"
+        ],
+        "agentDn": [
+            "외부",
+            "삼정회계법인"
+        ],
+        "place": [
+            "외부",
+            "삼정회계법인"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "삼정회계법인 (Ent 93 / PG 63791)",
+                "entityNo": "93",
+                "entityName": "SAMJUNG",
+                "agentPg": "63791",
+                "sampleExt": "",
+                "sampleLoginId": "79900",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "슈가모바일",
+        "floor": "외부/LB휴넷18층",
+        "agentLogin": [
+            "외부",
+            "슈가모바일"
+        ],
+        "acdPosition": [
+            "외부",
+            "슈가모바일"
+        ],
+        "agentDn": [
+            "외부",
+            "슈가모바일"
+        ],
+        "place": [
+            "LB휴넷18층",
+            "슈가모바일"
+        ],
+        "note": "앞 3개는 외부, Places는 LB휴넷18층",
+        "oxePresets": [
+            {
+                "label": "슈가모바일 (Ent 64 / PG 67991)",
+                "entityNo": "64",
+                "entityName": "Sugar_M",
+                "agentPg": "67991",
+                "sampleExt": "38200",
+                "sampleLoginId": "78200",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "한국전기차충전서비스",
+        "floor": "외부",
+        "agentLogin": [
+            "외부",
+            "한국전기차충전서비스"
+        ],
+        "acdPosition": [
+            "외부",
+            "한국전기차충전서비스"
+        ],
+        "agentDn": [
+            "외부",
+            "한국전기차충전서비스"
+        ],
+        "place": [
+            "외부",
+            "한국전기차충전서비스"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "한국전기차충전서비스 (Ent 33 / PG 64591)",
+                "entityNo": "33",
+                "entityName": "Elec_CAR",
+                "agentPg": "64591",
+                "sampleExt": "37900",
+                "sampleLoginId": "78700",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "허클베리프로",
+        "floor": "외부",
+        "agentLogin": [
+            "외부",
+            "허클베리프로"
+        ],
+        "acdPosition": [
+            "외부",
+            "허클베리프로"
+        ],
+        "agentDn": [
+            "외부",
+            "허클베리프로"
+        ],
+        "place": [
+            "외부",
+            "허클베리프로"
+        ],
+        "note": "",
+        "oxePresets": []
+    },
+    {
+        "name": "재택",
+        "floor": "재택",
+        "agentLogin": null,
+        "acdPosition": null,
+        "agentDn": [
+            "재택"
+        ],
+        "place": [
+            "재택"
+        ],
+        "note": "AGENT_DN 및 Places에만 존재",
+        "oxePresets": [
+            {
+                "label": "[CM 기준 — Entity/PG 직접 입력]",
+                "entityNo": "",
+                "entityName": "",
+                "agentPg": "",
+                "sampleExt": "39003",
+                "sampleLoginId": "",
+                "source": "CM(최소번호)"
+            }
+        ]
+    },
+    {
+        "name": "LG하우시스_알루미늄",
+        "floor": "충정로",
+        "agentLogin": [
+            "충정로",
+            "LG하우시스_알루미늄"
+        ],
+        "acdPosition": [
+            "충정로",
+            "LG하우시스_알루미늄"
+        ],
+        "agentDn": [
+            "충정로",
+            "LG하우시스_알루미늄"
+        ],
+        "place": [
+            "충정로",
+            "LG하우시스_알루미늄"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "LG하우시스 알루미늄 (Ent 72 / PG 62291)",
+                "entityNo": "72",
+                "entityName": "LGHausys_AL",
+                "agentPg": "62291",
+                "sampleExt": "31063",
+                "sampleLoginId": "77320",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "LG하우시스_지인_해피콜",
+        "floor": "충정로",
+        "agentLogin": [
+            "충정로",
+            "LG하우시스_지인_해피콜"
+        ],
+        "acdPosition": [
+            "충정로",
+            "LG하우시스_지인_해피콜"
+        ],
+        "agentDn": [
+            "충정로",
+            "LG하우시스_지인_해피콜"
+        ],
+        "place": [
+            "충정로",
+            "LG하우시스_지인_해피콜"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "LX하우시스 지인 해피콜 (Ent 98 / PG 63394)",
+                "entityNo": "98",
+                "entityName": "LXHau_Zin",
+                "agentPg": "63394",
+                "sampleExt": "31085",
+                "sampleLoginId": "71085",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "LX하우시스_B2C",
+        "floor": "충정로",
+        "agentLogin": [
+            "충정로",
+            "LX하우시스_B2C"
+        ],
+        "acdPosition": [
+            "충정로",
+            "LX하우시스_B2C"
+        ],
+        "agentDn": [
+            "충정로",
+            "LX하우시스_B2C"
+        ],
+        "place": [
+            "충정로",
+            "LX하우시스_B2C"
+        ],
+        "note": "",
+        "oxePresets": []
+    },
+    {
+        "name": "LX하우시스_영업지점견적센터",
+        "floor": "충정로",
+        "agentLogin": [
+            "충정로",
+            "LX하우시스_영업지점견적센터"
+        ],
+        "acdPosition": [
+            "충정로",
+            "LX하우시스_영업지점견적센터"
+        ],
+        "agentDn": [
+            "충정로",
+            "LX하우시스_영업지점견적센터"
+        ],
+        "place": [
+            "충정로",
+            "LX하우시스_영업지점견적센터"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "LX하우시스 제휴영업 견적지원 (Ent 112 / PG 63400)",
+                "entityNo": "112",
+                "entityName": "LX_estimate",
+                "agentPg": "63400",
+                "sampleExt": "31087",
+                "sampleLoginId": "71087",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
+    },
+    {
+        "name": "LX하우시스_인테리어",
+        "floor": "충정로",
+        "agentLogin": [
+            "충정로",
+            "LX하우시스_인테리어"
+        ],
+        "acdPosition": [
+            "충정로",
+            "LX하우시스_인테리어"
+        ],
+        "agentDn": [
+            "충정로",
+            "LX하우시스_인테리어"
+        ],
+        "place": [
+            "충정로",
+            "LX하우시스_인테리어"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "LX하우시스 통합지원 인테리어 (Ent 109 / PG 63398)",
+                "entityNo": "109",
+                "entityName": "LX_Total",
+                "agentPg": "63398",
+                "sampleExt": "31070",
+                "sampleLoginId": "71070",
+                "source": "S1(Dial-Plan)"
+            },
+            {
+                "label": "LG하우시스 인테리어 구시트 (Ent 73 / PG 62292)",
+                "entityNo": "73",
+                "entityName": "LGHausys_Interi",
+                "agentPg": "62292",
+                "sampleExt": "31070",
+                "sampleLoginId": "71070",
+                "source": "S12(하단참고)"
+            }
+        ]
+    },
+    {
+        "name": "LX하우시스_창호SCM",
+        "floor": "충정로",
+        "agentLogin": [
+            "충정로",
+            "LX하우시스_창호SCM"
+        ],
+        "acdPosition": [
+            "충정로",
+            "LX하우시스_창호SCM"
+        ],
+        "agentDn": [
+            "충정로",
+            "LX하우시스_창호SCM"
+        ],
+        "place": [
+            "충정로",
+            "LX하우시스_창호SCM"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "LX하우시스 통합지원 창호재 (Ent 109 / PG 63399)",
+                "entityNo": "109",
+                "entityName": "LX_Total",
+                "agentPg": "63399",
+                "sampleExt": "31052",
+                "sampleLoginId": "73200",
+                "source": "S1(Dial-Plan)"
+            },
+            {
+                "label": "LG하우시스 창호SCM 구시트 (Ent 71 / PG 62291)",
+                "entityNo": "71",
+                "entityName": "LGHausys_SCM",
+                "agentPg": "62291",
+                "sampleExt": "31052",
+                "sampleLoginId": "73200",
+                "source": "S12(하단참고)"
+            }
+        ]
+    },
+    {
+        "name": "LX하우시스_한샘견적_지원센터",
+        "floor": "충정로",
+        "agentLogin": [
+            "충정로",
+            "LX하우시스_한샘견적_지원센터"
+        ],
+        "acdPosition": [
+            "충정로",
+            "LX하우시스_한샘견적_지원센터"
+        ],
+        "agentDn": [
+            "충정로",
+            "LX하우시스_한샘견적_지원센터"
+        ],
+        "place": [
+            "충정로",
+            "LX하우시스_한샘견적_지원센터"
+        ],
+        "note": "",
+        "oxePresets": [
+            {
+                "label": "LX하우시스 한샘견적 지원 (Ent 103 / PG 63396)",
+                "entityNo": "103",
+                "entityName": "LXHau_HAN",
+                "agentPg": "63396",
+                "sampleExt": "31086",
+                "sampleLoginId": "71035",
+                "source": "S1(Dial-Plan)"
+            }
+        ]
     }
 ]

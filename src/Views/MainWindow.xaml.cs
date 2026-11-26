@@ -23,6 +23,7 @@ namespace CmOxeProvisioner.Views
         private readonly SettingsService _settingsService;
         private readonly string _baseDir;
         private readonly string _auditLogDir;
+        private readonly BackendProcessService _backendService;
         private readonly CmWorkerService _cmWorker;
 
         private AppSettings _settings;
@@ -43,7 +44,6 @@ namespace CmOxeProvisioner.Views
         private bool _prefAcdPos = true;
         private bool _isCmBusy = false;
         private bool _isPbxCheckBusy = false;
-        private bool _isCmConnected = false;
         private bool _startupAutoConnectDone = false;
         private bool? _cmOptRealVq = null;
         private bool? _cmOptRealIvr = null;
@@ -92,7 +92,8 @@ namespace CmOxeProvisioner.Views
                 }
             }
             _auditLogDir = Path.Combine(_baseDir, "logs");
-            _cmWorker = new CmWorkerService(Path.Combine(_baseDir, "cm_batch_engine.ps1"));
+            _backendService = new BackendProcessService(_baseDir, _auditLogDir, delegate() { return _settings; });
+            _cmWorker = new CmWorkerService(_backendService, delegate() { return _settings; });
 
             LoadCustomers();
             PersonTabControl.SetCustomers(_allCustomers);
@@ -121,6 +122,43 @@ namespace CmOxeProvisioner.Views
                 },
                 RefreshCustomersFromDialPlan);
 
+            if (UnifiedLookupTabControl != null)
+            {
+                UnifiedLookupTabControl.Initialize(
+                    _cmWorker,
+                    () => _allCustomers,
+                    () => Path.Combine(_baseDir, "dialplan_db.json"),
+                    NavigateToExtCtiFromLookup,
+                    NavigateToPersonFromLookup,
+                    delegate(string level, string msg)
+                    {
+                        AppendLog(level, msg);
+                    });
+            }
+
+            if (SnapshotDiffTabControl != null)
+            {
+                SnapshotDiffTabControl.Initialize(
+                    _cmWorker,
+                    () => _allCustomers,
+                    delegate(string level, string msg)
+                    {
+                        AppendLog(level, msg);
+                    },
+                    delegate(List<AuditEventDto> events)
+                    {
+                        if (events == null) return;
+                        for (int i = 0; i < events.Count; i++)
+                        {
+                            string line = AuditLogService.FormatAuditEvent(events[i]);
+                            if (!string.IsNullOrWhiteSpace(line))
+                            {
+                                AuditLogService.AppendLine(_auditLogDir, line);
+                            }
+                        }
+                    });
+            }
+
             ChkEmsTerminalOnly.IsChecked = _settings.EmsTerminalOnly;
             SetActiveViewMode("Split");
             OpenOrActivateTab("extcti");
@@ -132,6 +170,7 @@ namespace CmOxeProvisioner.Views
             this.Loaded += MainWindow_Loaded;
             this.StateChanged += MainWindow_StateChanged;
             this.Closing += MainWindow_Closing;
+            this.Closed += MainWindow_Closed;
         }
 
         private ExtCtiImportContext GetExtCtiImportContext()
@@ -155,16 +194,10 @@ namespace CmOxeProvisioner.Views
             if (_startupAutoConnectDone) return;
             _startupAutoConnectDone = true;
 
-            string cmPath = (_settings.CmExePath ?? "").Trim();
-            if (string.IsNullOrEmpty(cmPath)) return;
-
-            if (!File.Exists(cmPath))
-            {
-                return;
-            }
+            if (string.IsNullOrWhiteSpace(_settings.CmPrimaryHost)) return;
 
             await Task.Delay(250);
-            await ConnectCmAsync(true);
+            await ConnectConfigBackgroundAsync(true);
         }
 
         private void MainWindow_StateChanged(object sender, EventArgs e)
@@ -201,7 +234,7 @@ namespace CmOxeProvisioner.Views
             {
                 MessageBoxResult res = MessageBox.Show(
                     this,
-                    "CM 작업이 현재 실행 중입니다. 그래도 창을 닫으시겠습니까?",
+                    "Config 작업이 현재 실행 중입니다. 그래도 창을 닫으시겠습니까?",
                     "작업 진행 중",
                     MessageBoxButton.YesNo,
                     MessageBoxImage.Warning);
@@ -209,6 +242,22 @@ namespace CmOxeProvisioner.Views
                 {
                     e.Cancel = true;
                 }
+            }
+        }
+
+        private void MainWindow_Closed(object sender, EventArgs e)
+        {
+            ShutdownBackend();
+        }
+
+        internal void ShutdownBackend()
+        {
+            try
+            {
+                _backendService.Dispose();
+            }
+            catch
+            {
             }
         }
 
@@ -671,11 +720,20 @@ namespace CmOxeProvisioner.Views
         {
             _pathsExpanded = !_pathsExpanded;
             BdCmPaths.Visibility = _pathsExpanded ? Visibility.Visible : Visibility.Collapsed;
-            BtnTogglePaths.Content = _pathsExpanded ? "CM 경로 ▴" : "CM 경로 ▾";
+            BtnTogglePaths.Content = _pathsExpanded ? "Config 경로 ▴" : "Config 경로 ▾";
         }
 
         private async void BtnSettings_Click(object sender, RoutedEventArgs e)
         {
+            string prevHost = _settings.CmPrimaryHost;
+            int prevPort = _settings.CmPrimaryPort;
+            string prevBkHost = _settings.CmBackupHost;
+            int prevBkPort = _settings.CmBackupPort;
+            string prevClient = _settings.CmClientName;
+            string prevUser = _settings.CmUserId;
+            string prevPass = _settings.CmPasswordEnc;
+            int prevBePort = _settings.BackendPort;
+
             SettingsWindow sw = new SettingsWindow(_settingsService, _settings);
             sw.Owner = this;
             if (sw.ShowDialog() == true && sw.SavedSettings != null)
@@ -692,6 +750,25 @@ namespace CmOxeProvisioner.Views
                 UpdateTabButtonStyle(BtnTabLightGate, _viewMode == "LightGate");
                 UpdatePreviewCounts();
                 AppendLog("OK", "설정 저장 완료");
+
+                bool cmChanged = !string.Equals(prevHost ?? "", _settings.CmPrimaryHost ?? "", StringComparison.OrdinalIgnoreCase)
+                    || prevPort != _settings.CmPrimaryPort
+                    || !string.Equals(prevBkHost ?? "", _settings.CmBackupHost ?? "", StringComparison.OrdinalIgnoreCase)
+                    || prevBkPort != _settings.CmBackupPort
+                    || !string.Equals(prevClient ?? "", _settings.CmClientName ?? "", StringComparison.Ordinal)
+                    || !string.Equals(prevUser ?? "", _settings.CmUserId ?? "", StringComparison.Ordinal)
+                    || !string.Equals(prevPass ?? "", _settings.CmPasswordEnc ?? "", StringComparison.Ordinal);
+
+                if (prevBePort != _settings.BackendPort && _backendService.IsRunning)
+                {
+                    AppendLog("INFO", "로컬 백엔드 포트 변경은 프로그램 재시작 후 적용됩니다.");
+                }
+
+                if (cmChanged && !_isCmBusy)
+                {
+                    await _cmWorker.DisconnectDirectAsync();
+                    await ConnectConfigBackgroundAsync(false);
+                }
 
                 if (_webViewReady)
                 {
@@ -888,37 +965,33 @@ namespace CmOxeProvisioner.Views
             }
         }
 
-        // ==================== CM WORKER ACTIONS ====================
-        private async void BtnConnectCm_Click(object sender, RoutedEventArgs e)
+        // ==================== CONFIG SERVER BACKGROUND CONNECT ====================
+        private async Task ConnectConfigBackgroundAsync(bool isAuto)
         {
             if (_isCmBusy) return;
-
-            if (_isCmConnected)
+            try
             {
-                SetCmConnState(false);
-                AppendLog("INFO", "Configuration Manager 연결 해제");
-                return;
+                CmConnectResponse conn = await _cmWorker.ConnectDirectAsync(
+                    (_settings.CmUserId ?? "").Trim(),
+                    SettingsService.UnprotectString(_settings.CmPasswordEnc));
+                if (conn != null && conn.connected)
+                {
+                    string epNote = string.IsNullOrEmpty(conn.activeEndpoint) ? "" : (" (" + conn.activeEndpoint + ")");
+                    AppendLog("OK", "Genesys Config Server 연결 완료" + epNote);
+                }
+                else
+                {
+                    string msg = (conn != null && !string.IsNullOrEmpty(conn.message)) ? conn.message : "Config Server 연결 대기 중";
+                    AppendLog("WARN", "Genesys Config Server 초기 연결 확인 필요: " + msg);
+                }
             }
-
-            await ConnectCmAsync(false);
-        }
-
-        private async Task ConnectCmAsync(bool isAuto)
-        {
-            if (_isCmBusy || _isCmConnected) return;
-
-            CmWorkerRequest req = new CmWorkerRequest();
-            req.Action = "Connect";
-            req.CmExePath = (_settings.CmExePath ?? "").Trim();
-            req.CmUserId = (_settings.CmUserId ?? "").Trim();
-            req.CmPasswordPlain = SettingsService.UnprotectString(_settings.CmPasswordEnc);
-
-            int exit = await ExecuteCmWorkerAsync(req, "CM 연결 중...");
-            bool ok = (exit == 0);
-            SetCmConnState(ok);
-            if (ok)
+            catch (Exception ex)
             {
-                AppendLog("OK", "Configuration Manager 연결 성공");
+                AppendLog("WARN", "Config Server 백그라운드 연결 실패: " + ex.Message);
+                if (!isAuto)
+                {
+                    PopupDialogs.ShowSyntaxToast(this, false, "Config Server 연결 실패", "설정의 Config Server 정보 또는 Log를 확인하세요.");
+                }
             }
         }
 
@@ -929,12 +1002,6 @@ namespace CmOxeProvisioner.Views
             btn.SetResourceReference(Button.BackgroundProperty, connected ? "OkBgBrush" : "SurfaceAltBrush");
             btn.SetResourceReference(Button.BorderBrushProperty, connected ? "OkBorderBrush" : "BorderBrush");
             btn.SetResourceReference(Button.ForegroundProperty, connected ? "OkFgBrush" : "MutedBrush");
-        }
-
-        private void SetCmConnState(bool connected)
-        {
-            _isCmConnected = connected;
-            ApplyConnPillVisual(BtnConnectCm, connected, connected ? "CM 연결됨" : "CM 미연결");
         }
 
         private void SetEmsTerminalState(bool connected, string statusText = null)
@@ -1303,7 +1370,7 @@ namespace CmOxeProvisioner.Views
 
             if (!needCti && !needDn)
             {
-                PopupDialogs.ShowSyntaxToast(this, false, "선택 항목 없음", "입력된 번호에 해당하는 CM 항목을 하나 이상 선택하세요.");
+                PopupDialogs.ShowSyntaxToast(this, false, "선택 항목 없음", "입력된 번호에 해당하는 Config 항목을 하나 이상 선택하세요.");
                 return false;
             }
             return true;
@@ -1325,7 +1392,6 @@ namespace CmOxeProvisioner.Views
                 : ((_selectedCustomer != null) ? _selectedCustomer.name : "");
             req.DnSpec = (runDn || runPlace) ? TxtDn.Text : "";
             req.CtiSpec = (runLogin || runAcd) ? TxtCti.Text : "";
-            req.CmExePath = _settings.CmExePath;
             req.CmUserId = _settings.CmUserId;
             req.CmPasswordPlain = SettingsService.UnprotectString(_settings.CmPasswordEnc);
             req.DoAgentLogin = runLogin;
@@ -1344,10 +1410,10 @@ namespace CmOxeProvisioner.Views
             CmWorkerRequest req = BuildCmRequest("Check", dnRes, ctiRes);
             int targetDn = (req.DoAgentDn || req.DoPlace) ? dnRes.Items.Count : 0;
             int targetCti = (req.DoAgentLogin || req.DoAcdPosition) ? ctiRes.Items.Count : 0;
-            AppendLog("INFO", string.Format("[CM 내선/CTI ID 검색] 검색 시작 (내선 {0} / CTI {1})", targetDn, targetCti));
+            AppendLog("INFO", string.Format("[Config 내선/CTI ID 검색] 검색 시작 (내선 {0} / CTI {1})", targetDn, targetCti));
 
             string checkJsonRaw = null;
-            int exit = await ExecuteCmWorkerAsync(req, "CM 내선/CTI ID 검색 중...", delegate(string rawLine)
+            int exit = await ExecuteCmWorkerAsync(req, "Config 내선/CTI ID 검색 중...", delegate(string rawLine)
             {
                 if (rawLine.StartsWith("##CM_CHECK_JSON##", StringComparison.Ordinal))
                 {
@@ -1357,7 +1423,6 @@ namespace CmOxeProvisioner.Views
 
             if (exit == 0)
             {
-                SetCmConnState(true);
                 CmCheckSummary summary = ParseCmCheckSummary(checkJsonRaw);
                 if (summary != null)
                 {
@@ -1365,14 +1430,13 @@ namespace CmOxeProvisioner.Views
                 }
                 else
                 {
-                    AuditLogService.AppendError(_auditLogDir, "CM", "Batch:Check", "CM 내선/CTI ID 검색 결과를 파싱할 수 없습니다.");
-                    PopupDialogs.ShowSyntaxToast(this, true, "CM 내선/CTI ID 검색 완료", "폴더 및 검색 결과를 Log에서 확인하세요.");
+                    AuditLogService.AppendError(_auditLogDir, "Config", "Batch:Check", "Config 내선/CTI ID 검색 결과를 파싱할 수 없습니다.");
+                    PopupDialogs.ShowSyntaxToast(this, true, "Config 내선/CTI ID 검색 완료", "폴더 및 검색 결과를 Log에서 확인하세요.");
                 }
             }
             else
             {
-                SetCmConnState(false);
-                PopupDialogs.ShowSyntaxToast(this, false, "CM 내선/CTI ID 검색 오류", "Log의 오류 내용을 확인하세요.");
+                PopupDialogs.ShowSyntaxToast(this, false, "Config 내선/CTI ID 검색 오류", "Log의 오류 내용을 확인하세요.");
             }
         }
 
@@ -1399,25 +1463,23 @@ namespace CmOxeProvisioner.Views
             CmWorkerRequest req = BuildCmRequest("Create", dnRes, ctiRes);
             if ((req.DoAgentDn || req.DoPlace) && !CheckLargeDnBeforeCreate(dnRes.Items))
             {
-                AppendLog("WARN", "[CM 일괄 생성] 사용자에 의해 취소되었습니다.");
+                AppendLog("WARN", "[Object 생성] 사용자에 의해 취소되었습니다.");
                 return;
             }
 
             int targetDn = (req.DoAgentDn || req.DoPlace) ? dnRes.Items.Count : 0;
             int targetCti = (req.DoAgentLogin || req.DoAcdPosition) ? ctiRes.Items.Count : 0;
-            string startMsg = string.Format("[CM 일괄 생성] '{0}' 시작 (내선 {1} / CTI {2})", _selectedCustomer.name, targetDn, targetCti);
+            string startMsg = string.Format("[Object 생성] '{0}' 시작 (내선 {1} / CTI {2})", _selectedCustomer.name, targetDn, targetCti);
             AppendLog("INFO", startMsg);
 
-            int exit = await ExecuteCmWorkerAsync(req, "CM 일괄 생성 중...");
+            int exit = await ExecuteCmWorkerAsync(req, "Object 생성 중...");
             if (exit == 0)
             {
-                SetCmConnState(true);
-                PopupDialogs.ShowSyntaxToast(this, true, "CM 일괄 생성 완료", "요청된 항목 생성이 완료되었습니다.");
+                PopupDialogs.ShowSyntaxToast(this, true, "Object 생성 완료", "요청된 Config Object 생성이 완료되었습니다.");
             }
             else
             {
-                SetCmConnState(false);
-                PopupDialogs.ShowSyntaxToast(this, false, "CM 일괄 생성 오류", "Log의 오류 내용을 확인하세요.");
+                PopupDialogs.ShowSyntaxToast(this, false, "Object 생성 오류", "Log의 오류 내용을 확인하세요.");
             }
         }
 
@@ -1430,37 +1492,34 @@ namespace CmOxeProvisioner.Views
             CmWorkerRequest req = BuildCmRequest("Delete", dnRes, ctiRes);
             int targetDn = (req.DoAgentDn || req.DoPlace) ? dnRes.Items.Count : 0;
             int targetCti = (req.DoAgentLogin || req.DoAcdPosition) ? ctiRes.Items.Count : 0;
-            string custLabel = (_selectedCustomer != null) ? _selectedCustomer.name : "센터 무관 (CM 전체 검색 삭제)";
+            string custLabel = (_selectedCustomer != null) ? _selectedCustomer.name : "센터 무관 (Config 전체 검색 삭제)";
             string cmDelDetail = string.Format(
-                "삭제 방식: CM 전체 검색 삭제 ({0})\n대상: 내선 {1}건 / CTI {2}건",
+                "삭제 방식: Config 전체 검색 삭제 ({0})\n대상: 내선 {1}건 / CTI {2}건",
                 custLabel,
                 targetDn,
                 targetCti);
-            if (!PopupDialogs.ConfirmDelete(this, "CM 일괄 삭제 확인", "CM 객체 일괄 삭제 확인", cmDelDetail))
+            if (!PopupDialogs.ConfirmDelete(this, "Object 삭제 확인", "Config Object 삭제 확인", cmDelDetail))
             {
-                AppendLog("WARN", "[CM 일괄 삭제] 사용자에 의해 취소되었습니다.");
+                AppendLog("WARN", "[Object 삭제] 사용자에 의해 취소되었습니다.");
                 return;
             }
 
-            AppendLog("WARN", string.Format("[CM 일괄 삭제] 시작 ({0} · 내선 {1} / CTI {2})", custLabel, targetDn, targetCti));
+            AppendLog("WARN", string.Format("[Object 삭제] 시작 ({0} · 내선 {1} / CTI {2})", custLabel, targetDn, targetCti));
 
-            int exit = await ExecuteCmWorkerAsync(req, "CM 일괄 삭제 중...");
+            int exit = await ExecuteCmWorkerAsync(req, "Object 삭제 중...");
             if (exit == 0)
             {
-                SetCmConnState(true);
-                PopupDialogs.ShowSyntaxToast(this, true, "CM 일괄 삭제 완료", "다중 선택 일괄 삭제가 완료되었습니다.");
+                PopupDialogs.ShowSyntaxToast(this, true, "Object 삭제 완료", "요청된 Config Object 삭제가 완료되었습니다.");
             }
             else
             {
-                SetCmConnState(false);
-                PopupDialogs.ShowSyntaxToast(this, false, "CM 일괄 삭제 오류", "Log의 오류 내용을 확인하세요.");
+                PopupDialogs.ShowSyntaxToast(this, false, "Object 삭제 오류", "Log의 오류 내용을 확인하세요.");
             }
         }
 
         private async Task<int> ExecuteCmWorkerAsync(CmWorkerRequest req, string busyMsg, Action<string> onControlLine = null)
         {
             SetCmButtonsEnabled(false);
-            BtnConnectCm.Content = busyMsg;
             bool psErrorAudited = false;
             string lastPsErr = null;
             string actionLabel = (req != null && !string.IsNullOrWhiteSpace(req.Action))
@@ -1496,9 +1555,9 @@ namespace CmOxeProvisioner.Views
                 {
                     AuditLogService.AppendError(
                         _auditLogDir,
-                        "CM",
+                        "Config",
                         actionLabel,
-                        !string.IsNullOrWhiteSpace(lastPsErr) ? lastPsErr : string.Format("CM 작업 비정상 종료 (exit={0})", exit),
+                        !string.IsNullOrWhiteSpace(lastPsErr) ? lastPsErr : string.Format("Config 작업 비정상 종료 (exit={0})", exit),
                         req != null ? req.CustomerName : null);
                 }
                 return exit;
@@ -1507,21 +1566,19 @@ namespace CmOxeProvisioner.Views
             {
                 if (!psErrorAudited)
                 {
-                    AuditLogService.AppendError(_auditLogDir, "CM", actionLabel, ex.Message, req != null ? req.CustomerName : null);
+                    AuditLogService.AppendError(_auditLogDir, "Config", actionLabel, ex.Message, req != null ? req.CustomerName : null);
                 }
                 throw;
             }
             finally
             {
                 SetCmButtonsEnabled(true);
-                SetCmConnState(_isCmConnected);
             }
         }
 
         private void SetCmButtonsEnabled(bool enabled)
         {
             _isCmBusy = !enabled;
-            BtnConnectCm.IsEnabled = enabled;
             BtnCmCheck.IsEnabled = enabled;
             BtnCmCreate.IsEnabled = enabled;
             BtnCmDelete.IsEnabled = enabled;
@@ -1538,17 +1595,12 @@ namespace CmOxeProvisioner.Views
                 DialPlanTabControl.IsEnabled = enabled;
         }
 
-        // ==================== PERSON TAB CM HANDLERS ====================
+        // ==================== PERSON TAB CONFIG HANDLERS ====================
         private void EnsureCmReadyForPerson()
         {
             if (_isCmBusy)
             {
-                throw new InvalidOperationException("다른 CM 작업이 진행 중입니다. 완료 후 다시 시도하세요.");
-            }
-            if (string.IsNullOrWhiteSpace(_settings.CmExePath) || !File.Exists(_settings.CmExePath))
-            {
-                AuditLogService.AppendError(_auditLogDir, "CM", "Person", "Settings에서 유효한 sce.exe 경로를 먼저 설정하세요.");
-                throw new InvalidOperationException("Settings에서 유효한 sce.exe 경로를 먼저 설정하세요.");
+                throw new InvalidOperationException("다른 Config 작업이 진행 중입니다. 완료 후 다시 시도하세요.");
             }
         }
 
@@ -1557,7 +1609,6 @@ namespace CmOxeProvisioner.Views
             CmPersonWorkerRequest req = new CmPersonWorkerRequest();
             req.Action = action;
             req.CustomerName = (customer != null) ? customer.name : "";
-            req.CmExePath = _settings.CmExePath;
             req.CmUserId = _settings.CmUserId;
             req.CmPasswordPlain = SettingsService.UnprotectString(_settings.CmPasswordEnc);
             req.DoGeneral = doGeneral;
@@ -1587,7 +1638,6 @@ namespace CmOxeProvisioner.Views
             Action<string> onControlLine)
         {
             SetCmButtonsEnabled(false);
-            BtnConnectCm.Content = busyMsg;
             bool psErrorAudited = false;
             string lastPsErr = null;
             string opLabel = "Person:" + ((req != null && !string.IsNullOrWhiteSpace(req.Action)) ? req.Action : "Worker");
@@ -1624,7 +1674,7 @@ namespace CmOxeProvisioner.Views
                 {
                     AuditLogService.AppendError(
                         _auditLogDir,
-                        "CM",
+                        "Config",
                         opLabel,
                         !string.IsNullOrWhiteSpace(lastPsErr) ? lastPsErr : string.Format("Person 작업 비정상 종료 (exit={0})", exit),
                         req != null ? req.CustomerName : null);
@@ -1635,14 +1685,13 @@ namespace CmOxeProvisioner.Views
             {
                 if (!psErrorAudited)
                 {
-                    AuditLogService.AppendError(_auditLogDir, "CM", opLabel, ex.Message, req != null ? req.CustomerName : null);
+                    AuditLogService.AppendError(_auditLogDir, "Config", opLabel, ex.Message, req != null ? req.CustomerName : null);
                 }
                 throw;
             }
             finally
             {
                 SetCmButtonsEnabled(true);
-                SetCmConnState(_isCmConnected);
             }
         }
 
@@ -1667,10 +1716,10 @@ namespace CmOxeProvisioner.Views
             if (customer == null) throw new InvalidOperationException("대상 센터를 선택하세요.");
 
             CmPersonWorkerRequest req = BuildPersonWorkerRequest("FetchAvailableLogins", customer, null, false, false);
-            PersonTabControl.AppendExternalLog(string.Format("[조회 시작] '{0}' CM Agent Login 조회 중...", customer.name));
+            PersonTabControl.AppendExternalLog(string.Format("[조회 시작] '{0}' Config Agent Login 조회 중...", customer.name));
 
             string jsonRaw = null;
-            int exit = await ExecutePersonWorkerAsync(req, "CM Login 조회 중...", delegate(string line)
+            int exit = await ExecutePersonWorkerAsync(req, "Config Login 조회 중...", delegate(string line)
             {
                 if (line.StartsWith("##PERSON_LOGINS_JSON##", StringComparison.Ordinal))
                 {
@@ -1680,16 +1729,14 @@ namespace CmOxeProvisioner.Views
 
             if (exit != 0)
             {
-                SetCmConnState(false);
-                throw new InvalidOperationException("CM Agent Login 조회에 실패했습니다. Log를 확인하세요.");
+                throw new InvalidOperationException("Config Agent Login 조회에 실패했습니다. Log를 확인하세요.");
             }
-            SetCmConnState(true);
 
             PersonLoginPoolResponse resp = DeserializeJsonPayload<PersonLoginPoolResponse>(jsonRaw);
             if (resp == null || resp.items == null)
             {
-                AuditLogService.AppendError(_auditLogDir, "CM", "Person:FetchAvailableLogins", "CM Agent Login 조회 응답을 파싱할 수 없습니다.", customer.name);
-                throw new InvalidOperationException("CM Agent Login 조회 응답을 파싱할 수 없습니다.");
+                AuditLogService.AppendError(_auditLogDir, "Config", "Person:FetchAvailableLogins", "Config Agent Login 조회 응답을 파싱할 수 없습니다.", customer.name);
+                throw new InvalidOperationException("Config Agent Login 조회 응답을 파싱할 수 없습니다.");
             }
 
             List<AgentLoginPoolItem> result = new List<AgentLoginPoolItem>(resp.items.Count);
@@ -1729,7 +1776,7 @@ namespace CmOxeProvisioner.Views
         {
             EnsureCmReadyForPerson();
             CmPersonWorkerRequest req = BuildPersonWorkerRequest("CheckPersons", customer, rows, false, false);
-            PersonTabControl.AppendExternalLog(string.Format("[중복체크] CM 전체 Person 검색 시작 (대상 {0}명)...", rows.Count));
+            PersonTabControl.AppendExternalLog(string.Format("[중복체크] Config 전체 Person 검색 시작 (대상 {0}명)...", rows.Count));
 
             string jsonRaw = null;
             int exit = await ExecutePersonWorkerAsync(req, "Person 중복체크 중...", delegate(string line)
@@ -1742,16 +1789,14 @@ namespace CmOxeProvisioner.Views
 
             if (exit != 0)
             {
-                SetCmConnState(false);
-                throw new InvalidOperationException("CM Person 중복체크에 실패했습니다. Log를 확인하세요.");
+                throw new InvalidOperationException("Config Person 중복체크에 실패했습니다. Log를 확인하세요.");
             }
-            SetCmConnState(true);
 
             PersonCheckSummary summary = DeserializeJsonPayload<PersonCheckSummary>(jsonRaw);
             if (summary == null)
             {
-                AuditLogService.AppendError(_auditLogDir, "CM", "Person:CheckPersons", "CM Person 중복체크 결과를 파싱할 수 없습니다.", customer != null ? customer.name : null);
-                throw new InvalidOperationException("CM Person 중복체크 결과를 파싱할 수 없습니다.");
+                AuditLogService.AppendError(_auditLogDir, "Config", "Person:CheckPersons", "Config Person 중복체크 결과를 파싱할 수 없습니다.", customer != null ? customer.name : null);
+                throw new InvalidOperationException("Config Person 중복체크 결과를 파싱할 수 없습니다.");
             }
 
             HashSet<string> dupEmpSet = new HashSet<string>(summary.dupEmpIds ?? new List<string>(), StringComparer.OrdinalIgnoreCase);
@@ -1782,7 +1827,7 @@ namespace CmOxeProvisioner.Views
                 customer.name, rows.Count, doGeneral, doAgentLogin));
 
             string jsonRaw = null;
-            int exit = await ExecutePersonWorkerAsync(req, "CM Person 생성 중...", delegate(string line)
+            int exit = await ExecutePersonWorkerAsync(req, "Config Person 생성 중...", delegate(string line)
             {
                 if (line.StartsWith("##PERSON_CREATE_JSON##", StringComparison.Ordinal))
                 {
@@ -1792,16 +1837,14 @@ namespace CmOxeProvisioner.Views
 
             if (exit != 0)
             {
-                SetCmConnState(false);
-                throw new InvalidOperationException("CM Person 일괄 생성 중 오류가 발생했습니다. Log를 확인하세요.");
+                throw new InvalidOperationException("Config Person 일괄 생성 중 오류가 발생했습니다. Log를 확인하세요.");
             }
-            SetCmConnState(true);
 
             PersonCreateSummary summary = DeserializeJsonPayload<PersonCreateSummary>(jsonRaw);
             if (summary == null)
             {
-                AuditLogService.AppendError(_auditLogDir, "CM", "Person:Create", "CM Person 생성 결과 요약을 파싱할 수 없습니다.", customer.name);
-                throw new InvalidOperationException("CM Person 생성 결과 요약을 파싱할 수 없습니다.");
+                AuditLogService.AppendError(_auditLogDir, "Config", "Person:Create", "Config Person 생성 결과 요약을 파싱할 수 없습니다.", customer.name);
+                throw new InvalidOperationException("Config Person 생성 결과 요약을 파싱할 수 없습니다.");
             }
 
             HashSet<string> createdSet = new HashSet<string>(summary.createdEmpIds ?? new List<string>(), StringComparer.OrdinalIgnoreCase);
@@ -1812,7 +1855,7 @@ namespace CmOxeProvisioner.Views
             int failCnt = summary.failed != null ? summary.failed.Count : 0;
 
             bool isSuccess = (failCnt == 0);
-            string title = isSuccess ? "CM Person 일괄 생성 완료" : "CM Person 일괄 생성 부분 완료 (오류 확인)";
+            string title = isSuccess ? "Config Person 일괄 생성 완료" : "Config Person 일괄 생성 부분 완료 (오류 확인)";
             string msg = string.Format("대상 폴더: {0}\n생성 완료: {1}건  |  중복 건너뜀: {2}건  |  실패: {3}건  (소요 {4:N1}초)",
                 string.IsNullOrEmpty(summary.folderPath) ? customer.name : summary.folderPath,
                 okCnt, skipCnt, failCnt, summary.elapsedSeconds);
@@ -1829,7 +1872,6 @@ namespace CmOxeProvisioner.Views
             CmPersonWorkerRequest req = new CmPersonWorkerRequest();
             req.Action = action;
             req.CustomerName = (customer != null) ? customer.name : "";
-            req.CmExePath = _settings.CmExePath;
             req.CmUserId = _settings.CmUserId;
             req.CmPasswordPlain = SettingsService.UnprotectString(_settings.CmPasswordEnc);
             if (rows != null)
@@ -1861,10 +1903,10 @@ namespace CmOxeProvisioner.Views
             if (customer == null) throw new InvalidOperationException("대상 센터를 선택하세요.");
 
             CmPersonWorkerRequest req = BuildPersonManageWorkerRequest("FetchPersonsInFolder", customer, null);
-            PersonTabControl.AppendExternalLog(string.Format("[목록 조회] '{0}' CM Persons 폴더 조회 중...", customer.name));
+            PersonTabControl.AppendExternalLog(string.Format("[목록 조회] '{0}' Config Persons 폴더 조회 중...", customer.name));
 
             string jsonRaw = null;
-            int exit = await ExecutePersonWorkerAsync(req, "CM Person 목록 조회 중...", delegate(string line)
+            int exit = await ExecutePersonWorkerAsync(req, "Config Person 목록 조회 중...", delegate(string line)
             {
                 if (line.StartsWith("##PERSON_LIST_JSON##", StringComparison.Ordinal))
                 {
@@ -1874,22 +1916,20 @@ namespace CmOxeProvisioner.Views
 
             if (exit != 0)
             {
-                SetCmConnState(false);
-                throw new InvalidOperationException("CM Person 목록 조회에 실패했습니다. Log를 확인하세요.");
+                throw new InvalidOperationException("Config Person 목록 조회에 실패했습니다. Log를 확인하세요.");
             }
-            SetCmConnState(true);
 
             PersonManageListResponse resp = DeserializeJsonPayload<PersonManageListResponse>(jsonRaw);
             if (resp == null || resp.items == null)
             {
-                AuditLogService.AppendError(_auditLogDir, "CM", "Person:FetchPersonsInFolder", "CM Person 목록 조회 응답을 파싱할 수 없습니다.", customer.name);
-                throw new InvalidOperationException("CM Person 목록 조회 응답을 파싱할 수 없습니다.");
+                AuditLogService.AppendError(_auditLogDir, "Config", "Person:FetchPersonsInFolder", "Config Person 목록 조회 응답을 파싱할 수 없습니다.", customer.name);
+                throw new InvalidOperationException("Config Person 목록 조회 응답을 파싱할 수 없습니다.");
             }
 
             PopupDialogs.ShowSyntaxToast(
                 this,
                 true,
-                "CM Person 목록 조회 완료",
+                "Config Person 목록 조회 완료",
                 string.Format("폴더: {0}\n총 {1}명의 Person을 불러왔습니다. (소요 {2:N1}초)",
                     string.IsNullOrEmpty(resp.folderPath) ? customer.name : resp.folderPath,
                     resp.totalCount,
@@ -1906,7 +1946,7 @@ namespace CmOxeProvisioner.Views
             PersonTabControl.AppendExternalLog(string.Format("[Person 수정] '{0}' {1}명 반영 시작...", customer.name, rows.Count));
 
             string jsonRaw = null;
-            int exit = await ExecutePersonWorkerAsync(req, "CM Person 수정 중...", delegate(string line)
+            int exit = await ExecutePersonWorkerAsync(req, "Config Person 수정 중...", delegate(string line)
             {
                 if (line.StartsWith("##PERSON_UPDATE_JSON##", StringComparison.Ordinal))
                 {
@@ -1916,16 +1956,14 @@ namespace CmOxeProvisioner.Views
 
             if (exit != 0)
             {
-                SetCmConnState(false);
-                throw new InvalidOperationException("CM Person 수정 반영 중 오류가 발생했습니다. Log를 확인하세요.");
+                throw new InvalidOperationException("Config Person 수정 반영 중 오류가 발생했습니다. Log를 확인하세요.");
             }
-            SetCmConnState(true);
 
             PersonUpdateSummary summary = DeserializeJsonPayload<PersonUpdateSummary>(jsonRaw);
             if (summary == null)
             {
-                AuditLogService.AppendError(_auditLogDir, "CM", "Person:Update", "CM Person 수정 결과 요약을 파싱할 수 없습니다.", customer.name);
-                throw new InvalidOperationException("CM Person 수정 결과 요약을 파싱할 수 없습니다.");
+                AuditLogService.AppendError(_auditLogDir, "Config", "Person:Update", "Config Person 수정 결과 요약을 파싱할 수 없습니다.", customer.name);
+                throw new InvalidOperationException("Config Person 수정 결과 요약을 파싱할 수 없습니다.");
             }
 
             PersonTabControl.ApplyUpdatedManageRows(summary);
@@ -1939,7 +1977,7 @@ namespace CmOxeProvisioner.Views
             {
                 msg += "\n첫 번째 오류: " + summary.failed[0].reason;
             }
-            PopupDialogs.ShowSyntaxToast(this, isSuccess, isSuccess ? "CM Person 수정 반영 완료" : "CM Person 수정 부분 완료", msg);
+            PopupDialogs.ShowSyntaxToast(this, isSuccess, isSuccess ? "Config Person 수정 반영 완료" : "Config Person 수정 부분 완료", msg);
             return isSuccess && okCnt > 0;
         }
 
@@ -1967,11 +2005,11 @@ namespace CmOxeProvisioner.Views
             targetDetail.Append("대상 목록: " + string.Join(", ", preview.ToArray()) + (delNames.Count > 6 ? string.Format(" 외 {0}명", delNames.Count - 6) : ""));
 
             string personDeleteWarning =
-                "의도하지 않은 CM Person 삭제 시 상담원 로그인 및 센터 운영에 문제가 생길 수 있습니다.\n" +
+                "의도하지 않은 Config Person 삭제 시 상담원 로그인 및 센터 운영에 문제가 생길 수 있습니다.\n" +
                 "연결된 Agent Login은 먼저 Delete ID로 해제 적용한 뒤 Person만 삭제합니다.\n\n" +
                 "정말 삭제하시려면 '삭제한다' 를 입력해 주십시오.";
 
-            if (!PopupDialogs.ConfirmDelete(this, "CM Person 삭제 확인", "CM Person 선택 삭제 확인", targetDetail.ToString(), personDeleteWarning))
+            if (!PopupDialogs.ConfirmDelete(this, "Config Person 삭제 확인", "Config Person 선택 삭제 확인", targetDetail.ToString(), personDeleteWarning))
             {
                 PersonTabControl.AppendExternalLog("[Person 삭제] 사용자에 의해 취소되었습니다.");
                 return false;
@@ -1981,7 +2019,7 @@ namespace CmOxeProvisioner.Views
             PersonTabControl.AppendExternalLog(string.Format("[Person 삭제] '{0}' {1}명 삭제 시작 (Agent Login 연결 해제 우선 진행)...", customer.name, rows.Count));
 
             string jsonRaw = null;
-            int exit = await ExecutePersonWorkerAsync(req, "CM Person 삭제 중...", delegate(string line)
+            int exit = await ExecutePersonWorkerAsync(req, "Config Person 삭제 중...", delegate(string line)
             {
                 if (line.StartsWith("##PERSON_DELETE_JSON##", StringComparison.Ordinal))
                 {
@@ -1991,16 +2029,14 @@ namespace CmOxeProvisioner.Views
 
             if (exit != 0)
             {
-                SetCmConnState(false);
-                throw new InvalidOperationException("CM Person 삭제 중 오류가 발생했습니다. Log를 확인하세요.");
+                throw new InvalidOperationException("Config Person 삭제 중 오류가 발생했습니다. Log를 확인하세요.");
             }
-            SetCmConnState(true);
 
             PersonDeleteSummary summary = DeserializeJsonPayload<PersonDeleteSummary>(jsonRaw);
             if (summary == null)
             {
-                AuditLogService.AppendError(_auditLogDir, "CM", "Person:Delete", "CM Person 삭제 결과 요약을 파싱할 수 없습니다.", customer.name);
-                throw new InvalidOperationException("CM Person 삭제 결과 요약을 파싱할 수 없습니다.");
+                AuditLogService.AppendError(_auditLogDir, "Config", "Person:Delete", "Config Person 삭제 결과 요약을 파싱할 수 없습니다.", customer.name);
+                throw new InvalidOperationException("Config Person 삭제 결과 요약을 파싱할 수 없습니다.");
             }
 
             PersonTabControl.ApplyDeletedManageRows(summary);
@@ -2015,7 +2051,7 @@ namespace CmOxeProvisioner.Views
             {
                 msg += "\n첫 번째 오류: " + summary.failed[0].reason;
             }
-            PopupDialogs.ShowSyntaxToast(this, isSuccess, isSuccess ? "CM Person 삭제 완료" : "CM Person 삭제 부분 완료", msg);
+            PopupDialogs.ShowSyntaxToast(this, isSuccess, isSuccess ? "Config Person 삭제 완료" : "Config Person 삭제 부분 완료", msg);
             return isSuccess && delCnt > 0;
         }
 
@@ -2024,12 +2060,7 @@ namespace CmOxeProvisioner.Views
         {
             if (_isCmBusy)
             {
-                throw new InvalidOperationException("다른 CM 작업이 진행 중입니다. 완료 후 다시 시도하세요.");
-            }
-            if (string.IsNullOrWhiteSpace(_settings.CmExePath) || !File.Exists(_settings.CmExePath))
-            {
-                AuditLogService.AppendError(_auditLogDir, "CM", "Center", "Settings에서 유효한 sce.exe 경로를 먼저 설정하세요.");
-                throw new InvalidOperationException("Settings에서 유효한 sce.exe 경로를 먼저 설정하세요.");
+                throw new InvalidOperationException("다른 Config 작업이 진행 중입니다. 완료 후 다시 시도하세요.");
             }
         }
 
@@ -2039,7 +2070,6 @@ namespace CmOxeProvisioner.Views
             req.Action = action;
             req.CenterName = centerName ?? "";
             req.Location = location ?? "";
-            req.CmExePath = _settings.CmExePath;
             req.CmUserId = _settings.CmUserId;
             req.CmPasswordPlain = SettingsService.UnprotectString(_settings.CmPasswordEnc);
             return req;
@@ -2052,7 +2082,6 @@ namespace CmOxeProvisioner.Views
             Action<string> onControlLine)
         {
             SetCmButtonsEnabled(false);
-            BtnConnectCm.Content = busyMsg;
             bool psErrorAudited = false;
             string lastPsErr = null;
             string opLabel = "Center:" + ((req != null && !string.IsNullOrWhiteSpace(req.Action)) ? req.Action : "Worker");
@@ -2101,9 +2130,9 @@ namespace CmOxeProvisioner.Views
                 {
                     AuditLogService.AppendError(
                         _auditLogDir,
-                        "CM",
+                        "Config",
                         opLabel,
-                        !string.IsNullOrWhiteSpace(lastPsErr) ? lastPsErr : string.Format("센터 CM 작업 비정상 종료 (exit={0})", exit),
+                        !string.IsNullOrWhiteSpace(lastPsErr) ? lastPsErr : string.Format("센터 Config 작업 비정상 종료 (exit={0})", exit),
                         req != null ? req.CenterName : null);
                 }
                 return exit;
@@ -2112,14 +2141,13 @@ namespace CmOxeProvisioner.Views
             {
                 if (!psErrorAudited)
                 {
-                    AuditLogService.AppendError(_auditLogDir, "CM", opLabel, ex.Message, req != null ? req.CenterName : null);
+                    AuditLogService.AppendError(_auditLogDir, "Config", opLabel, ex.Message, req != null ? req.CenterName : null);
                 }
                 throw;
             }
             finally
             {
                 SetCmButtonsEnabled(true);
-                SetCmConnState(_isCmConnected);
             }
         }
 
@@ -2154,7 +2182,7 @@ namespace CmOxeProvisioner.Views
             req.UseIvr = input.UseIvr;
 
             if (_activeCenterAddPopupView != null)
-                _activeCenterAddPopupView.AppendExternalLog(string.Format("[CM 사전 점검] '{0}' 시작...", input.CenterName));
+                _activeCenterAddPopupView.AppendExternalLog(string.Format("[Config 사전 점검] '{0}' 시작...", input.CenterName));
             string jsonRaw = null;
             int exit = await ExecuteCenterWorkerAsync(req, "센터 사전 점검 중...", true, delegate(string line)
             {
@@ -2166,15 +2194,13 @@ namespace CmOxeProvisioner.Views
 
             if (exit != 0)
             {
-                SetCmConnState(false);
-                throw new InvalidOperationException("CM 사전 점검 중 오류가 발생했습니다. 작업 Log를 확인하세요.");
+                throw new InvalidOperationException("Config 사전 점검 중 오류가 발생했습니다. 작업 Log를 확인하세요.");
             }
-            SetCmConnState(true);
 
             CmCenterCheckResponse res = DeserializeJsonPayload<CmCenterCheckResponse>(jsonRaw);
             if (res == null)
             {
-                throw new InvalidOperationException("CM 사전 점검 응답을 파싱할 수 없습니다.");
+                throw new InvalidOperationException("Config 사전 점검 응답을 파싱할 수 없습니다.");
             }
             return res;
         }
@@ -2187,9 +2213,9 @@ namespace CmOxeProvisioner.Views
             req.UseIvr = input.UseIvr;
 
             if (_activeCenterAddPopupView != null)
-                _activeCenterAddPopupView.AppendExternalLog(string.Format("[CM 센터 생성] '{0}' 실행 시작...", input.CenterName));
+                _activeCenterAddPopupView.AppendExternalLog(string.Format("[Config 센터 생성] '{0}' 실행 시작...", input.CenterName));
             string jsonRaw = null;
-            int exit = await ExecuteCenterWorkerAsync(req, "센터 CM 생성 중...", true, delegate(string line)
+            int exit = await ExecuteCenterWorkerAsync(req, "센터 Config 생성 중...", true, delegate(string line)
             {
                 if (line.StartsWith("##CENTER_CREATE_JSON##", StringComparison.Ordinal))
                 {
@@ -2200,10 +2226,8 @@ namespace CmOxeProvisioner.Views
             CmCenterCreateResponse cmRes = DeserializeJsonPayload<CmCenterCreateResponse>(jsonRaw);
             if (exit != 0 && cmRes == null)
             {
-                SetCmConnState(false);
-                throw new InvalidOperationException("센터 CM 생성 중 오류가 발생했습니다. 작업 Log를 확인하세요.");
+                throw new InvalidOperationException("센터 Config 생성 중 오류가 발생했습니다. 작업 Log를 확인하세요.");
             }
-            SetCmConnState(exit == 0);
 
             CenterSaveOutcome outcome = new CenterSaveOutcome();
             outcome.CmResponse = cmRes;
@@ -2299,7 +2323,7 @@ namespace CmOxeProvisioner.Views
                     _activeCenterAddPopupView.AppendExternalLog(string.Format("[저장 완료] cm_customers.json & dialplan_db.json {0} ('{1}')",
                         outcome.UpdatedExistingJson ? "업데이트" : "신규 등록", input.CenterName));
                 }
-                AppendLog("OK", string.Format("[센터 추가] '{0}' {1} 완료 (CM/JSON/선번장 반영)",
+                AppendLog("OK", string.Format("[센터 추가] '{0}' {1} 완료 (Config/JSON/선번장 반영)",
                     input.CenterName, outcome.UpdatedExistingJson ? "보완" : "등록"));
             }
 
@@ -2311,6 +2335,42 @@ namespace CmOxeProvisioner.Views
             FilterCustomers(TxtSearch.Text);
             if (PersonTabControl != null) PersonTabControl.SetCustomers(_allCustomers);
             if (_activeCenterAddPopupView != null) _activeCenterAddPopupView.SetCustomers(_allCustomers);
+            if (UnifiedLookupTabControl != null) UnifiedLookupTabControl.RefreshCustomers();
+            if (SnapshotDiffTabControl != null) SnapshotDiffTabControl.RefreshCustomers();
+        }
+
+        private void NavigateToExtCtiFromLookup(string customerName, string dnSpec, string ctiSpec)
+        {
+            OpenOrActivateTab("extcti");
+            if (TxtSearch != null && !string.IsNullOrEmpty(TxtSearch.Text))
+            {
+                TxtSearch.Text = string.Empty;
+            }
+            if (!string.IsNullOrWhiteSpace(customerName) && _allCustomers != null)
+            {
+                for (int i = 0; i < _allCustomers.Count; i++)
+                {
+                    if (string.Equals(_allCustomers[i].name, customerName.Trim(), StringComparison.OrdinalIgnoreCase))
+                    {
+                        CmbCustomer.SelectedItem = _allCustomers[i];
+                        break;
+                    }
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(dnSpec)) TxtDn.Text = dnSpec.Trim();
+            if (!string.IsNullOrWhiteSpace(ctiSpec)) TxtCti.Text = ctiSpec.Trim();
+            AppendLog("INFO", string.Format("[통합 조회 → 내선·CTI 이동] 센터='{0}', 내선='{1}', CTI='{2}'",
+                customerName ?? "-", dnSpec ?? "-", ctiSpec ?? "-"));
+        }
+
+        private void NavigateToPersonFromLookup(string customerName)
+        {
+            OpenOrActivateTab("person");
+            if (PersonTabControl != null && !string.IsNullOrWhiteSpace(customerName))
+            {
+                PersonTabControl.SelectCustomerByName(customerName, true);
+            }
+            AppendLog("INFO", string.Format("[통합 조회 → Person 관리 이동] 센터='{0}'", customerName ?? "-"));
         }
 
         private void NavigateToExtCtiFromDialPlan(DialPlanCenter center)
@@ -2363,13 +2423,13 @@ namespace CmOxeProvisioner.Views
                         }
                     }
                 }
-                AppendLog("INFO", string.Format("[선번장 → 개통 전환] '{0}' (CM '{1}') 선택됨", center.project, match.name));
+                AppendLog("INFO", string.Format("[선번장 → 개통 전환] '{0}' (Config '{1}') 선택됨", center.project, match.name));
                 PopupDialogs.ShowSyntaxToast(this, true, "개통 탭 전환", "'" + match.name + "' 센터가 내선·CTI 탭에 선택되었습니다.");
             }
             else
             {
-                AppendLog("WARN", string.Format("[선번장 → 개통 전환] '{0}'에 연결된 CM 고객사 없음", center.project));
-                PopupDialogs.ShowSyntaxToast(this, false, "CM 연동 없음", "연결된 CM 고객사가 없습니다. '+ 센터 추가' 또는 CM연동명을 먼저 확인하세요.");
+                AppendLog("WARN", string.Format("[선번장 → 개통 전환] '{0}'에 연결된 Config 고객사 없음", center.project));
+                PopupDialogs.ShowSyntaxToast(this, false, "Config 연동 없음", "연결된 Config 고객사가 없습니다. '+ 센터 추가' 또는 Config연동명을 먼저 확인하세요.");
             }
         }
 
@@ -2385,7 +2445,7 @@ namespace CmOxeProvisioner.Views
             req.DeleteLocationIfSpecified = false;
 
             string jsonRaw = null;
-            int exit = await ExecuteCenterWorkerAsync(req, string.Format("CM '{0}' 센터 폴더 삭제 중...", targetName), false, delegate(string line)
+            int exit = await ExecuteCenterWorkerAsync(req, string.Format("Config '{0}' 센터 폴더 삭제 중...", targetName), false, delegate(string line)
             {
                 if (line.StartsWith("##CENTER_DELETE_JSON##", StringComparison.Ordinal))
                 {
@@ -2396,15 +2456,13 @@ namespace CmOxeProvisioner.Views
             CmCenterDeleteResponse delRes = DeserializeJsonPayload<CmCenterDeleteResponse>(jsonRaw);
             if (exit != 0 && delRes == null)
             {
-                SetCmConnState(false);
                 result.Success = false;
                 result.CmExecuted = true;
-                result.Message = "CM 센터 아티팩트 삭제 중 오류가 발생했습니다. 로그를 확인하세요.";
-                AppendLog("ERR", string.Format("[완전 삭제 실패] '{0}' CM Worker 종료코드 {1}", targetName, exit));
+                result.Message = "Config 센터 아티팩트 삭제 중 오류가 발생했습니다. 로그를 확인하세요.";
+                AppendLog("ERR", string.Format("[완전 삭제 실패] '{0}' Config Worker 종료코드 {1}", targetName, exit));
                 return result;
             }
 
-            SetCmConnState(true);
             result.CmExecuted = true;
             if (delRes != null)
             {
@@ -2413,13 +2471,13 @@ namespace CmOxeProvisioner.Views
                 if (delRes.failedCount > 0)
                 {
                     result.Success = false;
-                    result.Message = string.Format("CM 일부 항목 삭제 실패 (삭제 {0}건 / 실패 {1}건). JSON 유지됨.", delRes.deletedCount, delRes.failedCount);
+                    result.Message = string.Format("Config 일부 항목 삭제 실패 (삭제 {0}건 / 실패 {1}건). JSON 유지됨.", delRes.deletedCount, delRes.failedCount);
                     AppendLog("ERR", "[완전 삭제 중단] " + result.Message);
                     return result;
                 }
             }
 
-            AppendLog("OK", string.Format("[완전 삭제] '{0}' CM 삭제 완료 (삭제 {1}건)", targetName, result.CmDeletedCount));
+            AppendLog("OK", string.Format("[완전 삭제] '{0}' Config 삭제 완료 (삭제 {1}건)", targetName, result.CmDeletedCount));
             return result;
         }
 
@@ -2438,7 +2496,7 @@ namespace CmOxeProvisioner.Views
         {
             CmCenterWorkerRequest req = BuildCenterWorkerRequest("CheckCenterOptions", cust.name, cust.floor);
             string jsonRaw = null;
-            int exit = await ExecuteCenterWorkerAsync(req, "CM 옵션 조회 중...", false, delegate(string line)
+            int exit = await ExecuteCenterWorkerAsync(req, "Config 옵션 조회 중...", false, delegate(string line)
             {
                 if (line.StartsWith("##CENTER_STATUS_JSON##", StringComparison.Ordinal))
                 {
@@ -2448,14 +2506,12 @@ namespace CmOxeProvisioner.Views
 
             if (exit != 0)
             {
-                SetCmConnState(false);
-                throw new InvalidOperationException("CM VQueue / IVR 상태 조회 중 오류가 발생했습니다.");
+                throw new InvalidOperationException("Config VQueue / IVR 상태 조회 중 오류가 발생했습니다.");
             }
-            SetCmConnState(true);
             CmCenterStatusResponse st = DeserializeJsonPayload<CmCenterStatusResponse>(jsonRaw);
             if (st == null)
             {
-                throw new InvalidOperationException("CM VQueue / IVR 상태 응답을 파싱할 수 없습니다.");
+                throw new InvalidOperationException("Config VQueue / IVR 상태 응답을 파싱할 수 없습니다.");
             }
             return st;
         }
@@ -2480,16 +2536,16 @@ namespace CmOxeProvisioner.Views
                 ChkCenterIvr.IsChecked = st.ivrExists;
                 _isSyncingCenterOptChecks = false;
 
-                TxtCmOptionSyncState.Text = string.Format("CM 실물 확인 (VQ:{0} / IVR:{1})",
+                TxtCmOptionSyncState.Text = string.Format("Config 실물 확인 (VQ:{0} / IVR:{1})",
                     st.vqueueExists ? "존재" : "없음",
                     st.ivrExists ? "존재" : "없음");
-                AppendLog("INFO", string.Format("[CM 상태 조회] '{0}' -> VQueue={1}, IVR(Place Group)={2}",
+                AppendLog("INFO", string.Format("[Config 상태 조회] '{0}' -> VQueue={1}, IVR(Place Group)={2}",
                     cust.name, st.vqueueExists ? "존재" : "미생성", st.ivrExists ? "존재" : "미생성"));
             }
             catch (Exception ex)
             {
-                AppendLog("ERR", "[CM 옵션 조회 실패] " + ex.Message);
-                PopupDialogs.ShowSyntaxToast(this, false, "CM 상태 조회 오류", ex.Message);
+                AppendLog("ERR", "[Config 옵션 조회 실패] " + ex.Message);
+                PopupDialogs.ShowSyntaxToast(this, false, "Config 상태 조회 오류", ex.Message);
             }
         }
 
@@ -2553,11 +2609,11 @@ namespace CmOxeProvisioner.Views
                 {
                     _cmOptUserTouchedVq = false;
                     _cmOptUserTouchedIvr = false;
-                    TxtCmOptionSyncState.Text = string.Format("CM 일치 (VQ:{0} / IVR:{1})",
+                    TxtCmOptionSyncState.Text = string.Format("Config 일치 (VQ:{0} / IVR:{1})",
                         realVq ? "존재" : "없음", realIvr ? "존재" : "없음");
                     string note = (preserveNoticeVq || preserveNoticeIvr)
-                        ? "기존 CM에 존재하는 항목을 안전을 위해 유지 체크로 동기화했습니다.\n삭제하려면 체크 해제 후 다시 '적용하기'를 누르세요."
-                        : "현재 체크 상태와 실제 CM 구성이 이미 동일합니다.";
+                        ? "기존 Config에 존재하는 항목을 안전을 위해 유지 체크로 동기화했습니다.\n삭제하려면 체크 해제 후 다시 '적용하기'를 누르세요."
+                        : "현재 체크 상태와 실제 Config 구성이 이미 동일합니다.";
                     PopupDialogs.ShowSyntaxToast(this, true, "변경 사항 없음", note);
                     return;
                 }
@@ -2568,26 +2624,26 @@ namespace CmOxeProvisioner.Views
                 if (applyVq)
                 {
                     plan.AppendLine(string.Format("• VQueue 폴더: {0} ({1})",
-                        wantVq ? "신규 생성" : "CM에서 삭제", live.vqueuePath));
+                        wantVq ? "신규 생성" : "Config에서 삭제", live.vqueuePath));
                 }
                 if (applyIvr)
                 {
                     plan.AppendLine(string.Format("• IVR Place Group: {0} ({1})",
-                        wantIvr ? "신규 생성" : "CM에서 삭제", live.ivrPath));
+                        wantIvr ? "신규 생성" : "Config에서 삭제", live.ivrPath));
                 }
                 if (preserveNoticeVq || preserveNoticeIvr)
                 {
-                    plan.AppendLine("※ 기존 CM에 이미 있던 미선택 항목은 안전상 유지됩니다.");
+                    plan.AppendLine("※ 기존 Config에 이미 있던 미선택 항목은 안전상 유지됩니다.");
                 }
 
                 bool confirmed = hasDelete
-                    ? PopupDialogs.ConfirmDelete(this, "CM 선택 구성 삭제 포함 적용", "CM VQueue / Place Group 변경 적용", plan.ToString().TrimEnd(),
-                        "체크 해제된 항목을 CM에서 삭제합니다. 내부에 하위 오브젝트(Virtual Queue 등)가 남아 있으면 삭제가 거부될 수 있습니다.\n\n진행하려면 '삭제한다' 를 입력하세요.")
-                    : PopupDialogs.ConfirmAction(this, "CM 선택 구성 적용 확인", "CM VQueue / Place Group 생성 적용", plan.ToString().TrimEnd(), "적용하기");
+                    ? PopupDialogs.ConfirmDelete(this, "Config 선택 구성 삭제 포함 적용", "Config VQueue / Place Group 변경 적용", plan.ToString().TrimEnd(),
+                        "체크 해제된 항목을 Config에서 삭제합니다. 내부에 하위 오브젝트(Virtual Queue 등)가 남아 있으면 삭제가 거부될 수 있습니다.\n\n진행하려면 '삭제한다' 를 입력하세요.")
+                    : PopupDialogs.ConfirmAction(this, "Config 선택 구성 적용 확인", "Config VQueue / Place Group 생성 적용", plan.ToString().TrimEnd(), "적용하기");
 
                 if (!confirmed)
                 {
-                    AppendLog("WARN", "[CM 옵션 적용] 사용자에 의해 취소되었습니다.");
+                    AppendLog("WARN", "[Config 옵션 적용] 사용자에 의해 취소되었습니다.");
                     return;
                 }
 
@@ -2598,7 +2654,7 @@ namespace CmOxeProvisioner.Views
                 applyReq.WantIvr = wantIvr;
 
                 string applyJsonRaw = null;
-                int exit = await ExecuteCenterWorkerAsync(applyReq, "CM 옵션 적용 중...", false, delegate(string line)
+                int exit = await ExecuteCenterWorkerAsync(applyReq, "Config 옵션 적용 중...", false, delegate(string line)
                 {
                     if (line.StartsWith("##CENTER_APPLY_JSON##", StringComparison.Ordinal))
                     {
@@ -2609,11 +2665,9 @@ namespace CmOxeProvisioner.Views
                 CmCenterApplyResponse applyRes = DeserializeJsonPayload<CmCenterApplyResponse>(applyJsonRaw);
                 if (exit != 0 && applyRes == null)
                 {
-                    SetCmConnState(false);
-                    PopupDialogs.ShowSyntaxToast(this, false, "CM 옵션 적용 오류", "Log의 오류 내용을 확인하세요.");
+                    PopupDialogs.ShowSyntaxToast(this, false, "Config 옵션 적용 오류", "Log의 오류 내용을 확인하세요.");
                     return;
                 }
-                SetCmConnState(true);
 
                 if (applyRes != null)
                 {
@@ -2636,18 +2690,18 @@ namespace CmOxeProvisioner.Views
                     SaveCustomersToDiskAndRefreshAll(cust.name);
 
                     string toastMsg = string.Format("VQueue: {0}  |  IVR(Place Group): {1}{2}",
-                        applyRes.vqueueExists ? "사용중(CM 존재)" : "미사용",
-                        applyRes.ivrExists ? "사용중(CM 존재)" : "미사용",
+                        applyRes.vqueueExists ? "사용중(Config 존재)" : "미사용",
+                        applyRes.ivrExists ? "사용중(Config 존재)" : "미사용",
                         applyRes.failedCount > 0 ? string.Format("\n실패 {0}건 (Log 확인)", applyRes.failedCount) : "");
                     PopupDialogs.ShowSyntaxToast(this, applyRes.failedCount == 0,
-                        applyRes.failedCount == 0 ? "CM 구성 적용 완료" : "CM 구성 일부 실패",
+                        applyRes.failedCount == 0 ? "Config 구성 적용 완료" : "Config 구성 일부 실패",
                         toastMsg);
                 }
             }
             catch (Exception ex)
             {
-                AppendLog("ERR", "[CM 옵션 적용 실패] " + ex.Message);
-                PopupDialogs.ShowSyntaxToast(this, false, "CM 옵션 적용 오류", ex.Message);
+                AppendLog("ERR", "[Config 옵션 적용 실패] " + ex.Message);
+                PopupDialogs.ShowSyntaxToast(this, false, "Config 옵션 적용 오류", ex.Message);
             }
         }
 
@@ -2668,9 +2722,13 @@ namespace CmOxeProvisioner.Views
                 TxtNavExtCtiLabel.Visibility = Visibility.Collapsed;
                 TxtNavPersonLabel.Visibility = Visibility.Collapsed;
                 TxtNavDialPlanLabel.Visibility = Visibility.Collapsed;
+                TxtNavLookupLabel.Visibility = Visibility.Collapsed;
+                TxtNavSnapshotLabel.Visibility = Visibility.Collapsed;
                 DotNavExtCti.Visibility = Visibility.Collapsed;
                 DotNavPerson.Visibility = Visibility.Collapsed;
                 DotNavDialPlan.Visibility = Visibility.Collapsed;
+                DotNavLookup.Visibility = Visibility.Collapsed;
+                DotNavSnapshot.Visibility = Visibility.Collapsed;
                 TxtSidebarToggleGlyph.Text = "»";
             }
             else
@@ -2681,6 +2739,8 @@ namespace CmOxeProvisioner.Views
                 TxtNavExtCtiLabel.Visibility = Visibility.Visible;
                 TxtNavPersonLabel.Visibility = Visibility.Visible;
                 TxtNavDialPlanLabel.Visibility = Visibility.Visible;
+                TxtNavLookupLabel.Visibility = Visibility.Visible;
+                TxtNavSnapshotLabel.Visibility = Visibility.Visible;
                 TxtSidebarToggleGlyph.Text = "«";
                 SyncSidebarDots();
             }
@@ -2693,11 +2753,15 @@ namespace CmOxeProvisioner.Views
                 DotNavExtCti.Visibility = Visibility.Collapsed;
                 DotNavPerson.Visibility = Visibility.Collapsed;
                 DotNavDialPlan.Visibility = Visibility.Collapsed;
+                DotNavLookup.Visibility = Visibility.Collapsed;
+                DotNavSnapshot.Visibility = Visibility.Collapsed;
                 return;
             }
             DotNavExtCti.Visibility = _openTabs.Contains("extcti") ? Visibility.Visible : Visibility.Collapsed;
             DotNavPerson.Visibility = _openTabs.Contains("person") ? Visibility.Visible : Visibility.Collapsed;
             DotNavDialPlan.Visibility = _openTabs.Contains("dialplan") ? Visibility.Visible : Visibility.Collapsed;
+            DotNavLookup.Visibility = _openTabs.Contains("lookup") ? Visibility.Visible : Visibility.Collapsed;
+            DotNavSnapshot.Visibility = _openTabs.Contains("snapshot") ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void BtnNavExtCti_Click(object sender, RoutedEventArgs e)
@@ -2715,6 +2779,16 @@ namespace CmOxeProvisioner.Views
             OpenOrActivateTab("dialplan");
         }
 
+        private void BtnNavLookup_Click(object sender, RoutedEventArgs e)
+        {
+            OpenOrActivateTab("lookup");
+        }
+
+        private void BtnNavSnapshot_Click(object sender, RoutedEventArgs e)
+        {
+            OpenOrActivateTab("snapshot");
+        }
+
         private void OpenOrActivateTab(string tabKey)
         {
             if (string.IsNullOrEmpty(tabKey)) return;
@@ -2724,6 +2798,10 @@ namespace CmOxeProvisioner.Views
             }
             _activeTabKey = tabKey;
             SyncTabAndSidebarVisuals();
+            if (tabKey == "snapshot" && SnapshotDiffTabControl != null)
+            {
+                SnapshotDiffTabControl.EnsureInitialListLoaded();
+            }
         }
 
         private void CloseTab(string tabKey)
@@ -2759,10 +2837,14 @@ namespace CmOxeProvisioner.Views
             bool showExtCti = hasTabs && _activeTabKey == "extcti";
             bool showPerson = hasTabs && _activeTabKey == "person";
             bool showDialPlan = hasTabs && _activeTabKey == "dialplan";
+            bool showLookup = hasTabs && _activeTabKey == "lookup";
+            bool showSnapshot = hasTabs && _activeTabKey == "snapshot";
 
             ExtCtiTabRoot.Visibility = showExtCti ? Visibility.Visible : Visibility.Collapsed;
             PersonTabRoot.Visibility = showPerson ? Visibility.Visible : Visibility.Collapsed;
             DialPlanTabRoot.Visibility = showDialPlan ? Visibility.Visible : Visibility.Collapsed;
+            LookupTabRoot.Visibility = showLookup ? Visibility.Visible : Visibility.Collapsed;
+            SnapshotTabRoot.Visibility = showSnapshot ? Visibility.Visible : Visibility.Collapsed;
             EmptyTabsRoot.Visibility = hasTabs ? Visibility.Collapsed : Visibility.Visible;
 
             if (showExtCti)
@@ -2777,6 +2859,8 @@ namespace CmOxeProvisioner.Views
             UpdateSidebarItemStyle(BtnNavExtCti, showExtCti, _openTabs.Contains("extcti"));
             UpdateSidebarItemStyle(BtnNavPerson, showPerson, _openTabs.Contains("person"));
             UpdateSidebarItemStyle(BtnNavDialPlan, showDialPlan, _openTabs.Contains("dialplan"));
+            UpdateSidebarItemStyle(BtnNavLookup, showLookup, _openTabs.Contains("lookup"));
+            UpdateSidebarItemStyle(BtnNavSnapshot, showSnapshot, _openTabs.Contains("snapshot"));
             SyncSidebarDots();
             RenderBrowserTabs();
         }
@@ -2821,10 +2905,12 @@ namespace CmOxeProvisioner.Views
 
         private UIElement BuildBrowserTabElement(string tabKey, bool isActive)
         {
-            string title = (tabKey == "person") ? "Person 관리"
-                : ((tabKey == "dialplan") ? "선번장 · 센터" : "내선 · CTI");
-            string dotBrushKey = (tabKey == "person") ? "OxeBrush"
-                : ((tabKey == "dialplan") ? "OkFgBrush" : "PrimaryBrush");
+            string title = "내선 · CTI";
+            string dotBrushKey = "PrimaryBrush";
+            if (tabKey == "person") { title = "Person 관리"; dotBrushKey = "OxeBrush"; }
+            else if (tabKey == "dialplan") { title = "선번장 · 센터"; dotBrushKey = "OkFgBrush"; }
+            else if (tabKey == "lookup") { title = "통합 조회"; dotBrushKey = "ChipFgBrush"; }
+            else if (tabKey == "snapshot") { title = "스냅샷 · 복구"; dotBrushKey = "WarnFgBrush"; }
 
             Border tabBd = new Border();
             tabBd.CornerRadius = new CornerRadius(7, 7, 0, 0);

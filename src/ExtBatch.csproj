@@ -93,6 +93,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\UnifiedLookupTabView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SnapshotDiffTabView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\AgentLoginPickerWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -109,6 +117,7 @@
     <Compile Include="Models\AppSettings.cs" />
     <Compile Include="Models\CustomerModels.cs" />
     <Compile Include="Models\DialPlanModels.cs" />
+    <Compile Include="Models\Phase3Models.cs" />
     <Compile Include="Services\SettingsService.cs" />
     <Compile Include="Services\CustomerRepository.cs" />
     <Compile Include="Services\ExcelWorkbookCodec.cs" />
@@ -118,6 +127,7 @@
     <Compile Include="Services\ThemeService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\OxeScriptService.cs" />
+    <Compile Include="Services\BackendProcessService.cs" />
     <Compile Include="Services\CmWorkerService.cs" />
     <Compile Include="Services\AuditLogService.cs" />
     <Compile Include="Views\PopupDialogs.cs" />
@@ -135,6 +145,12 @@
     </Compile>
     <Compile Include="Views\DialPlanTabView.xaml.cs">
       <DependentUpon>DialPlanTabView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UnifiedLookupTabView.xaml.cs">
+      <DependentUpon>UnifiedLookupTabView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SnapshotDiffTabView.xaml.cs">
+      <DependentUpon>SnapshotDiffTabView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\AgentLoginPickerWindow.xaml.cs">
       <DependentUpon>AgentLoginPickerWindow.xaml</DependentUpon>

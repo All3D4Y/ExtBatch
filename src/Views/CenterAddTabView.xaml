@@ -19,7 +19,7 @@
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Left">
           <Border Style="{StaticResource BlockTitleAccentStyle}" />
           <TextBlock Text="신규 센터 추가" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" />
-          <TextBlock Text="CM 폴더 · Place Group 생성 및 선번장 · 프리셋 등록" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" Margin="10,0,0,0" />
+          <TextBlock Text="Config 폴더 · Place Group 생성 및 선번장 · 프리셋 등록" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" Margin="10,0,0,0" />
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Right">
@@ -84,7 +84,7 @@
                       Padding="10,8"
                       Margin="0,0,0,10">
                 <StackPanel>
-                  <TextBlock Text="선택 CM 구성 옵션" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" Margin="0,0,0,6" />
+                  <TextBlock Text="선택 Config 구성 옵션" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" Margin="0,0,0,6" />
                   <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <CheckBox x:Name="ChkUseVQueue" Content="VQueue 사용 (DNs\VQueue 폴더)" Checked="InputField_Changed" Unchecked="InputField_Changed" Style="{StaticResource ModernCheckBox}" Margin="0,2,16,2" />
                     <CheckBox x:Name="ChkUseIvr" Content="IVR 사용 (Place Groups 오브젝트)" Checked="InputField_Changed" Unchecked="InputField_Changed" Style="{StaticResource ModernCheckBox}" Margin="0,2,0,2" />
@@ -93,8 +93,8 @@
               </Border>
 
               <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <Button x:Name="BtnCenterPrecheck" Content="CM 사전 점검" Click="BtnCenterPrecheck_Click" Style="{StaticResource BaseBtn}" Margin="0,2,8,2" />
-                <Button x:Name="BtnCenterCreate" Content="CM 생성 + 센터 저장" Click="BtnCenterCreate_Click" Style="{StaticResource PrimaryBtn}" Margin="0,2,0,2" />
+                <Button x:Name="BtnCenterPrecheck" Content="Config 사전 점검" Click="BtnCenterPrecheck_Click" Style="{StaticResource BaseBtn}" Margin="0,2,8,2" />
+                <Button x:Name="BtnCenterCreate" Content="Config 생성 + 센터 저장" Click="BtnCenterCreate_Click" Style="{StaticResource PrimaryBtn}" Margin="0,2,0,2" />
               </WrapPanel>
             </StackPanel>
           </Border>
@@ -166,7 +166,7 @@
             <DockPanel Grid.Row="0" LastChildFill="False" Margin="0,0,0,9">
               <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Left">
                 <Border Style="{StaticResource BlockTitleAccentStyle}" />
-                <TextBlock Text="생성 대상 CM 경로 미리보기" Style="{StaticResource BlockTitleTextStyle}" />
+                <TextBlock Text="생성 대상 Config 경로 미리보기" Style="{StaticResource BlockTitleTextStyle}" />
               </StackPanel>
               <Border Background="{DynamicResource ChipBgBrush}" CornerRadius="10" Padding="10,3" VerticalAlignment="Center" DockPanel.Dock="Right">
                 <TextBlock x:Name="TxtTargetSummary" Text="총 0건" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource ChipFgBrush}" />
@@ -182,7 +182,7 @@
               <DataGrid.Columns>
                 <DataGridTextColumn Header="항목" Binding="{Binding Label}" Width="165" />
                 <DataGridTextColumn Header="유형" Binding="{Binding TypeDisplay}" Width="88" />
-                <DataGridTextColumn Header="예정 CM 경로" Binding="{Binding PathDisplay}" Width="*" />
+                <DataGridTextColumn Header="예정 Config 경로" Binding="{Binding PathDisplay}" Width="*" />
                 <DataGridTextColumn Header="상태" Binding="{Binding StatusText}" Width="128" />
               </DataGrid.Columns>
             </DataGrid>

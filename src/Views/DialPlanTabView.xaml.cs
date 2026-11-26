@@ -1872,7 +1872,7 @@ namespace CmOxeProvisioner.Views
                 Window.GetWindow(this),
                 verb + " 확인",
                 "'" + center.project + "' → " + DialPlanStatus.ToDisplay(nextStatus),
-                "이 작업은 선번 데이터와 CM 폴더를 삭제하지 않으며 언제든 상태를 되돌릴 수 있습니다.",
+                "이 작업은 선번 데이터와 Config 폴더를 삭제하지 않으며 언제든 상태를 되돌릴 수 있습니다.",
                 verb))
             {
                 return;
@@ -1912,15 +1912,15 @@ namespace CmOxeProvisioner.Views
 
             var btn = sender as Button;
             string cmTargetDesc = target.HasCmLink
-                ? ("CM 고객사 연동 대상: '" + target.cmCustomerName + "' (위치 폴더 '" + target.LocationDisplay + "'는 보존되고 센터 폴더·Place Group·Script만 삭제)")
-                : "CM 연동 정보 없음 (선번장 JSON DB에서만 영구 삭제)";
+                ? ("Config 고객사 연동 대상: '" + target.cmCustomerName + "' (위치 폴더 '" + target.LocationDisplay + "'는 보존되고 센터 폴더·Place Group·Script만 삭제)")
+                : "Config 연동 정보 없음 (선번장 JSON DB에서만 영구 삭제)";
 
             if (!PopupDialogs.ConfirmDelete(
                 Window.GetWindow(this),
-                "완전 삭제 확인 (JSON + CM)",
+                "완전 삭제 확인 (JSON + Config)",
                 "'" + target.project + "' (" + target.LocationDisplay + ") 영구 삭제",
                 "단순 종료 처리는 '업무 종료로 이동' 버튼을 권장합니다.",
-                "선번장 데이터(dialplan_db.json) 및 연결된 CM 센터 구조가 영구 삭제됩니다.\n\n" +
+                "선번장 데이터(dialplan_db.json) 및 연결된 Config 센터 구조가 영구 삭제됩니다.\n\n" +
                 "• 대상 센터: " + target.project + " (" + target.LocationDisplay + ")\n" +
                 "• 선번 라인: " + target.LineCount + "행\n" +
                 "• " + cmTargetDesc))
@@ -1938,7 +1938,7 @@ namespace CmOxeProvisioner.Views
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("CM 완전 삭제 실행 중 오류: " + ex.Message, "삭제 오류", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Config 완전 삭제 실행 중 오류: " + ex.Message, "삭제 오류", MessageBoxButton.OK, MessageBoxImage.Error);
                     if (btn != null) btn.IsEnabled = true;
                     return;
                 }
@@ -1949,7 +1949,7 @@ namespace CmOxeProvisioner.Views
 
                 if (outcome != null && !outcome.Success)
                 {
-                    MessageBox.Show(outcome.Message ?? "CM 삭제에 실패해 JSON 삭제를 중단했습니다.", "삭제 실패", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(outcome.Message ?? "Config 삭제에 실패해 JSON 삭제를 중단했습니다.", "삭제 실패", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
             }
@@ -1987,7 +1987,7 @@ namespace CmOxeProvisioner.Views
             if (_onDatabaseOrCustomerChanged != null) _onDatabaseOrCustomerChanged();
 
             string extra = (outcome != null && outcome.CmExecuted)
-                ? (" · CM 삭제 " + outcome.CmDeletedCount + "건 (실패 " + outcome.CmFailedCount + "건)")
+                ? (" · Config 삭제 " + outcome.CmDeletedCount + "건 (실패 " + outcome.CmFailedCount + "건)")
                 : string.Empty;
             WriteAudit("선번장 완전삭제", "Center=" + target.project + extra);
             Toast(true, "완전 삭제 완료", "'" + target.project + "' 완전 삭제 완료" + extra);
@@ -2218,7 +2218,7 @@ namespace CmOxeProvisioner.Views
                         "대표번호 명의", "착신번호", "인입 RSI", "IVR (PDS) 채널", "IVR-Fw Pilot",
                         "상담연결 RSI", "Agent Pilot", "Agent Queue", "Agent PG", "Phone 내선",
                         "Login-ID", "Call Type", "Entity NO", "Trunk 그룹 NO", "테스트 IVR DN",
-                        "CM연동", "VQueue", "IVR사용", "비고", "AP URL"
+                        "Config연동", "VQueue", "IVR사용", "비고", "AP URL"
                     };
                     var rows = new List<IList<string>>();
                     foreach (var c in _db.centers)

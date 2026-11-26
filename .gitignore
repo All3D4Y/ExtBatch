@@ -1,7 +1,9 @@
-# Visual Studio / MSBuild 산출물 및 캐시
+# Visual Studio / MSBuild / Java 백엔드 산출물 및 캐시
 .vs/
 src/bin/
 src/obj/
+backend/out/
+/backend/extbatch-backend.jar
 *.user
 *.suo
 *.cache
@@ -11,9 +13,10 @@ src/obj/
 /ExtBatch.exe
 /ExtBatch.pdb
 
-# 런타임 일일 로그 및 자동 백업/임시 파일
+# 런타임 일일 로그 및 자동 백업/스냅샷/임시 파일
 logs/
 backups/
+snapshots/
 *.log
 *.tmp
 *.bak

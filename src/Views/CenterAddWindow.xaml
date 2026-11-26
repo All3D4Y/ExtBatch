@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         xmlns:views="clr-namespace:CmOxeProvisioner.Views"
-        Title="신규 센터 추가 · CM / 선번장 연동"
+        Title="신규 센터 추가 · Config / 선번장 연동"
         Width="1060" Height="760"
         MinWidth="820" MinHeight="600"
         WindowStartupLocation="CenterOwner"
@@ -39,7 +39,7 @@
 
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
                         <Border Background="{StaticResource ChipBgBrush}" CornerRadius="4" Padding="7,2" Margin="0,0,10,0">
-                            <TextBlock Text="CM · 선번장" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource ChipFgBrush}"/>
+                            <TextBlock Text="Config · 선번장" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource ChipFgBrush}"/>
                         </Border>
                         <TextBlock Text="신규 센터 추가" FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center"/>
                         <TextBlock Text="Configuration\Environment 폴더 · Place Group · 선번장 등록"
@@ -64,7 +64,7 @@
                                VerticalAlignment="Center"
                                FontSize="12"
                                Foreground="{StaticResource MutedBrush}"
-                               Text="센터 생성 시 선번장(dialplan_db.json) 및 CM 고객사 프리셋(cm_customers.json)에 함께 반영됩니다."/>
+                               Text="센터 생성 시 선번장(dialplan_db.json) 및 Config 고객사 프리셋(cm_customers.json)에 함께 반영됩니다."/>
                 </DockPanel>
             </Border>
         </Grid>

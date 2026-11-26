@@ -5,9 +5,14 @@ namespace CmOxeProvisioner.Models
     public class AppSettings
     {
         public string ThemeKey { get; set; }
-        public string CmExePath { get; set; }
+        public string CmPrimaryHost { get; set; }
+        public int CmPrimaryPort { get; set; }
+        public string CmBackupHost { get; set; }
+        public int CmBackupPort { get; set; }
+        public string CmClientName { get; set; }
         public string CmUserId { get; set; }
         public string CmPasswordEnc { get; set; }
+        public int BackendPort { get; set; }
 
         public string EmsUrl { get; set; }
         public string EmsServerKeyword { get; set; }
@@ -25,9 +30,14 @@ namespace CmOxeProvisioner.Models
         {
             AppSettings s = new AppSettings();
             s.ThemeKey = "antigravity-light";
-            s.CmExePath = @"C:\GCTI\Configuration Manager\sce.exe";
-            s.CmUserId = "";
+            s.CmPrimaryHost = "10.62.130.67";
+            s.CmPrimaryPort = 2020;
+            s.CmBackupHost = "10.62.130.68";
+            s.CmBackupPort = 2020;
+            s.CmClientName = "default";
+            s.CmUserId = "default";
             s.CmPasswordEnc = "";
+            s.BackendPort = 18080;
 
             s.EmsUrl = "https://lightgate.lbucess.com/terminal";
             s.EmsServerKeyword = "9. PBX_A";

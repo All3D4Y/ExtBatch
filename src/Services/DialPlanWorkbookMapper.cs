@@ -156,7 +156,7 @@ namespace CmOxeProvisioner.Services
             int closedCnt = db.centers.Count(c => c.status == DialPlanStatus.Closed);
             reportSummary = string.Format(
                 CultureInfo.InvariantCulture,
-                "시트 {0}개 파싱 완료 -> 센터 {1}개 (운영 {2}, 테스트 {3}, 종료 {4}; 종료시트→운영 복원 {5}, CM신규보충 {6}), PRI {7}건, Entity {8}건, IP IVR {9}건, GPA {10}건, 멘트 {11}건, PBX보드 {12}건, MDF {13}행",
+                "시트 {0}개 파싱 완료 -> 센터 {1}개 (운영 {2}, 테스트 {3}, 종료 {4}; 종료시트→운영 복원 {5}, Config신규보충 {6}), PRI {7}건, Entity {8}건, IP IVR {9}건, GPA {10}건, 멘트 {11}건, PBX보드 {12}건, MDF {13}행",
                 sheets.Count,
                 db.centers.Count,
                 activeCnt,
@@ -242,7 +242,9 @@ namespace CmOxeProvisioner.Services
                             status = status,
                             location = loc.Trim(),
                             project = proj.Trim(),
-                            cmCustomerName = GetCsvMapped(row, colMap, "CM연동", -1).Trim(),
+                            cmCustomerName = !string.IsNullOrEmpty(GetCsvMapped(row, colMap, "Config연동", -1))
+                                ? GetCsvMapped(row, colMap, "Config연동", -1).Trim()
+                                : GetCsvMapped(row, colMap, "CM연동", -1).Trim(),
                             apUrl = GetCsvMapped(row, colMap, "AP URL", -1).Trim(),
                             useVQueue = ParseBoolLoose(GetCsvMapped(row, colMap, "VQueue", -1)),
                             useIvr = ParseBoolLoose(GetCsvMapped(row, colMap, "IVR사용", -1)),
@@ -297,7 +299,7 @@ namespace CmOxeProvisioner.Services
                 "대표번호 명의", "착신번호", "인입 RSI", "IVR (PDS) 채널", "IVR-Fw Pilot",
                 "상담연결 RSI", "Agent Pilot", "Agent Queue", "Agent PG", "Phone 내선",
                 "Login-ID", "Call Type", "Entity NO", "Trunk 그룹 NO", "테스트 IVR DN",
-                "CM연동", "VQueue", "IVR사용", "비고",
+                "Config연동", "VQueue", "IVR사용", "비고",
                 "구_IVR_RSI", "구_IVR_Pilot", "구_IVR_Queue", "구_IVR_PG", "구_RSI특징", "AP URL"
             };
 
@@ -1217,9 +1219,9 @@ namespace CmOxeProvisioner.Services
                         if (string.IsNullOrWhiteSpace(center.location) && !string.IsNullOrWhiteSpace(matched.floor))
                             center.location = matched.floor;
                         if (string.IsNullOrWhiteSpace(center.notes))
-                            center.notes = "종료센터 시트 → CM 운영 대조 후 운영 중으로 복원";
+                            center.notes = "종료센터 시트 → Config 운영 대조 후 운영 중으로 복원";
                         else if (!center.notes.Contains("복원"))
-                            center.notes += " (CM 운영 확인 → 복원)";
+                            center.notes += " (Config 운영 확인 → 복원)";
                     }
 
                     linkedActiveCmNames.Add(matched.name);
@@ -1250,8 +1252,8 @@ namespace CmOxeProvisioner.Services
                     cmCustomerName = cust.name,
                     useVQueue = cust.useVQueue == true,
                     useIvr = cust.useIvr == true,
-                    sourceSheet = "CM",
-                    notes = string.IsNullOrWhiteSpace(cust.note) ? "CM 고객사 기준 자동 보충" : cust.note
+                    sourceSheet = "Config",
+                    notes = string.IsNullOrWhiteSpace(cust.note) ? "Config 고객사 기준 자동 보충" : cust.note
                 };
 
                 if (cust.oxePresets != null && cust.oxePresets.Count > 0)

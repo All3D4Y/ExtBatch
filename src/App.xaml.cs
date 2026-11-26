@@ -43,5 +43,17 @@ namespace CmOxeProvisioner
             this.MainWindow = main;
             main.Show();
         }
+        protected override void OnExit(ExitEventArgs e)
+        {
+            try
+            {
+                MainWindow mw = this.MainWindow as MainWindow;
+                if (mw != null) mw.ShutdownBackend();
+            }
+            catch
+            {
+            }
+            base.OnExit(e);
+        }
     }
 }

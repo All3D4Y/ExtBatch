@@ -368,7 +368,7 @@ namespace CmOxeProvisioner.Models
             {
                 return "위치: " + LocationDisplay +
                        " · 라인 " + LineCount + "건" +
-                       " · CM 연동: " + CmLinkedSummary;
+                       " · Config 연동: " + CmLinkedSummary;
             }
         }
 

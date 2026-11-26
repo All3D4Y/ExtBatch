@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         xmlns:views="clr-namespace:CmOxeProvisioner.Views"
-        Title="ExtBatch — Genesys CM · Alcatel OXE · Person 통합 관리"
+        Title="ExtBatch — Genesys Config · Alcatel OXE · Person 통합 관리"
         Icon="pack://application:,,,/ExtBatch;component/icon.ico"
         Width="1480" Height="850"
         MinWidth="1040" MinHeight="650"
@@ -46,7 +46,7 @@
             <TextBlock Text="ExtBatch" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" />
             <TextBlock x:Name="TxtAppVersion" Text="v1.0.0" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" Margin="6,1,0,0" />
             <Border Background="{DynamicResource ChipBgBrush}" CornerRadius="4" Padding="6,2" Margin="8,0,0,0" VerticalAlignment="Center">
-              <TextBlock Text="CM · OXE · Person" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource ChipFgBrush}" />
+              <TextBlock Text="Config · OXE · Person" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource ChipFgBrush}" />
             </Border>
             <TextBlock Text="통합 프로비저닝 관리" FontSize="12" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" Margin="8,0,0,0" />
           </StackPanel>
@@ -54,15 +54,8 @@
           <!-- Center: Clean Drag Area -->
           <Border Grid.Column="1" Background="Transparent" />
 
-          <!-- Right: Unified CM Toggle Pill + Gear Settings Icon Button + Caption Buttons -->
+          <!-- Right: Gear Settings Icon Button + Caption Buttons -->
           <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-            <Button x:Name="BtnConnectCm"
-                    Content="CM 미연결"
-                    Tag="Connect"
-                    Click="BtnConnectCm_Click"
-                    Style="{StaticResource CmTogglePillStyle}"
-                    Margin="0,0,6,0" />
-
             <Button x:Name="BtnSettings"
                     Click="BtnSettings_Click"
                     Style="{StaticResource BaseBtn}"
@@ -143,7 +136,7 @@
                       Cursor="Hand"
                       HorizontalContentAlignment="Stretch"
                       BorderThickness="1"
-                      ToolTip="내선 · CTI 일괄 생성/삭제 및 LightGate 터미널">
+                      ToolTip="내선 · CTI Object 생성/삭제 및 LightGate 터미널">
                 <Button.Template>
                   <ControlTemplate TargetType="Button">
                     <Border x:Name="NavBd"
@@ -186,7 +179,7 @@
                       Cursor="Hand"
                       HorizontalContentAlignment="Stretch"
                       BorderThickness="1"
-                      ToolTip="CM 상담사(Person) 일괄 생성 · 관리">
+                      ToolTip="Config 상담사(Person) 일괄 생성 · 관리">
                 <Button.Template>
                   <ControlTemplate TargetType="Button">
                     <Border x:Name="NavBd"
@@ -263,6 +256,92 @@
                   <Ellipse x:Name="DotNavDialPlan" Grid.Column="2" Width="6" Height="6" Fill="{DynamicResource PrimaryBrush}" VerticalAlignment="Center" Visibility="Collapsed" />
                 </Grid>
               </Button>
+
+              <Button x:Name="BtnNavLookup"
+                      Click="BtnNavLookup_Click"
+                      Height="38"
+                      Padding="10,0"
+                      Margin="0,0,0,5"
+                      Cursor="Hand"
+                      HorizontalContentAlignment="Stretch"
+                      BorderThickness="1"
+                      ToolTip="Config 실서버 · 선번장 DB 통합 조회 및 센터 정합성 감사">
+                <Button.Template>
+                  <ControlTemplate TargetType="Button">
+                    <Border x:Name="NavBd"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="7"
+                            Padding="{TemplateBinding Padding}">
+                      <ContentPresenter VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                      <Trigger Property="IsMouseOver" Value="True">
+                        <Setter TargetName="NavBd" Property="Opacity" Value="0.88" />
+                      </Trigger>
+                    </ControlTemplate.Triggers>
+                  </ControlTemplate>
+                </Button.Template>
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                  </Grid.ColumnDefinitions>
+                  <Viewbox Grid.Column="0" Width="15" Height="15" VerticalAlignment="Center">
+                    <Canvas Width="24" Height="24">
+                      <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                            Data="M 15.5,14 H 14.71 L 14.43,13.73 C 15.41,12.59 16,11.11 16,9.5 C 16,5.91 13.09,3 9.5,3 C 5.91,3 3,5.91 3,9.5 C 3,13.09 5.91,16 9.5,16 C 11.11,16 12.59,15.41 13.73,14.43 L 14,14.71 V 15.5 L 19,20.49 L 20.49,19 L 15.5,14 Z M 9.5,14 C 7.01,14 5,11.99 5,9.5 C 5,7.01 7.01,5 9.5,5 C 11.99,5 14,7.01 14,9.5 C 14,11.99 11.99,14 9.5,14 Z" />
+                    </Canvas>
+                  </Viewbox>
+                  <TextBlock x:Name="TxtNavLookupLabel" Grid.Column="1" Text="통합 조회" FontSize="12.5" FontWeight="SemiBold" VerticalAlignment="Center" Margin="9,0,4,0" />
+                  <Ellipse x:Name="DotNavLookup" Grid.Column="2" Width="6" Height="6" Fill="{DynamicResource PrimaryBrush}" VerticalAlignment="Center" Visibility="Collapsed" />
+                </Grid>
+              </Button>
+
+              <Button x:Name="BtnNavSnapshot"
+                      Click="BtnNavSnapshot_Click"
+                      Height="38"
+                      Padding="10,0"
+                      Margin="0,0,0,5"
+                      Cursor="Hand"
+                      HorizontalContentAlignment="Stretch"
+                      BorderThickness="1"
+                      ToolTip="Config 스냅샷 저장 · 변경 내역 비교 및 실서버 복구">
+                <Button.Template>
+                  <ControlTemplate TargetType="Button">
+                    <Border x:Name="NavBd"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="7"
+                            Padding="{TemplateBinding Padding}">
+                      <ContentPresenter VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                      <Trigger Property="IsMouseOver" Value="True">
+                        <Setter TargetName="NavBd" Property="Opacity" Value="0.88" />
+                      </Trigger>
+                    </ControlTemplate.Triggers>
+                  </ControlTemplate>
+                </Button.Template>
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                  </Grid.ColumnDefinitions>
+                  <Viewbox Grid.Column="0" Width="15" Height="15" VerticalAlignment="Center">
+                    <Canvas Width="24" Height="24">
+                      <Path Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                            Data="M 10,3 H 5 C 3.9,3 3,3.9 3,5 V 19 C 3,20.1 3.9,21 5,21 H 10 V 23 H 12 V 1 H 10 V 3 Z M 10,18 H 5 L 10,12 V 18 Z M 19,3 H 14 V 5 H 19 V 18 L 14,12 V 21 H 19 C 20.1,21 21,20.1 21,19 V 5 C 21,3.9 20.1,3 19,3 Z" />
+                    </Canvas>
+                  </Viewbox>
+                  <TextBlock x:Name="TxtNavSnapshotLabel" Grid.Column="1" Text="스냅샷 · 복구" FontSize="12.5" FontWeight="SemiBold" VerticalAlignment="Center" Margin="9,0,4,0" />
+                  <Ellipse x:Name="DotNavSnapshot" Grid.Column="2" Width="6" Height="6" Fill="{DynamicResource PrimaryBrush}" VerticalAlignment="Center" Visibility="Collapsed" />
+                </Grid>
+              </Button>
             </StackPanel>
           </DockPanel>
         </Border>
@@ -303,7 +382,7 @@
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Left">
                     <Border Style="{StaticResource BlockTitleAccentStyle}" />
                     <TextBlock Text="내선 · CTI 관리" FontSize="13.5" FontWeight="Bold" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" />
-                    <TextBlock Text="CM (Agent DN · Place · Login · ACD) · PBX (LightGate)" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" Margin="9,0,0,0" />
+                    <TextBlock Text="Config (Agent DN · Place · Login · ACD) · PBX (LightGate)" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" Margin="9,0,0,0" />
                   </StackPanel>
 
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Right">
@@ -352,7 +431,7 @@
                     <Border x:Name="BdPathWarn" Visibility="Collapsed" Background="{DynamicResource WarnBgBrush}" BorderBrush="{DynamicResource WarnBorderBrush}" BorderThickness="1" CornerRadius="5" Height="26" Padding="8,0" Margin="0,0,6,0" VerticalAlignment="Center">
                       <TextBlock Text="경로 확인" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource WarnFgBrush}" VerticalAlignment="Center" />
                     </Border>
-                    <Button x:Name="BtnTogglePaths" Content="CM 경로 ▾" Click="BtnTogglePaths_Click" Style="{StaticResource BaseBtn}" Height="26" Padding="9,0" FontSize="11.5" />
+                    <Button x:Name="BtnTogglePaths" Content="Config 경로 ▾" Click="BtnTogglePaths_Click" Style="{StaticResource BaseBtn}" Height="26" Padding="9,0" FontSize="11.5" />
                   </StackPanel>
                 </DockPanel>
 
@@ -447,7 +526,7 @@
                     <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0" Margin="0,8,0,0" Padding="0,8,0,0">
                       <StackPanel>
                         <DockPanel LastChildFill="False" Margin="0,0,0,6">
-                          <TextBlock Text="선택 CM 구성 (VQueue · IVR)" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" DockPanel.Dock="Left" />
+                          <TextBlock Text="선택 Config 구성 (VQueue · IVR)" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" DockPanel.Dock="Left" />
                           <TextBlock x:Name="TxtCmOptionSyncState" Text="센터 미선택" FontSize="11" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" DockPanel.Dock="Right" />
                         </DockPanel>
                         <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
@@ -617,13 +696,13 @@
               </StackPanel>
             </Border>
 
-            <!-- BLOCK 4: CM -->
+            <!-- BLOCK 4: Config -->
             <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,10">
               <StackPanel>
                 <DockPanel LastChildFill="False" Margin="0,0,0,9">
                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Left">
                     <Border Style="{StaticResource BlockTitleAccentStyle}" />
-                    <TextBlock Text="CM" Style="{StaticResource BlockTitleTextStyle}" />
+                    <TextBlock Text="Config" Style="{StaticResource BlockTitleTextStyle}" />
                   </StackPanel>
                   <CheckBox x:Name="ChkCheckAll" Content="Check All" IsChecked="True" Checked="ChkMaster_Changed" Unchecked="ChkMaster_Changed" Style="{StaticResource ModernCheckBox}" FontWeight="SemiBold" DockPanel.Dock="Right" />
                 </DockPanel>
@@ -651,8 +730,8 @@
 
                 <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
                   <Button x:Name="BtnCmCheck" Content="내선/CTI ID 검색" Click="BtnCmCheck_Click" Style="{StaticResource BaseBtn}" Margin="0,2,6,2" />
-                  <Button x:Name="BtnCmCreate" Content="CM 일괄 생성" Click="BtnCmCreate_Click" Style="{StaticResource PrimaryBtn}" Margin="0,2,6,2" />
-                  <Button x:Name="BtnCmDelete" Content="CM 일괄 삭제" Click="BtnCmDelete_Click" Style="{StaticResource DangerBtn}" Margin="0,2,0,2" />
+                  <Button x:Name="BtnCmCreate" Content="Object 생성" Click="BtnCmCreate_Click" Style="{StaticResource PrimaryBtn}" Margin="0,2,6,2" />
+                  <Button x:Name="BtnCmDelete" Content="Object 삭제" Click="BtnCmDelete_Click" Style="{StaticResource DangerBtn}" Margin="0,2,0,2" />
                 </WrapPanel>
               </StackPanel>
             </Border>
@@ -748,21 +827,33 @@
               <views:DialPlanTabView x:Name="DialPlanTabControl" />
             </Grid>
 
+            <!-- TAB 4 ROOT: 통합 조회 -->
+            <Grid x:Name="LookupTabRoot" Visibility="Collapsed">
+              <views:UnifiedLookupTabView x:Name="UnifiedLookupTabControl" />
+            </Grid>
+
+            <!-- TAB 5 ROOT: 스냅샷 · 복구 -->
+            <Grid x:Name="SnapshotTabRoot" Visibility="Collapsed">
+              <views:SnapshotDiffTabView x:Name="SnapshotDiffTabControl" />
+            </Grid>
+
             <!-- EMPTY STATE WHEN ALL TABS CLOSED -->
             <Grid x:Name="EmptyTabsRoot" Visibility="Collapsed">
               <Border HorizontalAlignment="Center"
                       VerticalAlignment="Center"
-                      MaxWidth="520"
+                      MaxWidth="640"
                       Style="{StaticResource CardBorderStyle}"
                       Padding="28,24">
                 <StackPanel HorizontalAlignment="Center">
                   <TextBlock Text="열려 있는 작업 탭이 없습니다" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource TextBrush}" HorizontalAlignment="Center" Margin="0,0,0,6" />
                   <TextBlock Text="좌측 사이드바 메뉴 또는 아래 버튼을 눌러 원하는 기능을 탭으로 열 수 있습니다." FontSize="12" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" TextAlignment="Center" Margin="0,0,0,18" />
-                  <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Content="내선 · CTI 관리 열기" Click="BtnNavExtCti_Click" Style="{StaticResource PrimaryBtn}" Margin="0,0,8,0" />
-                    <Button Content="Person 관리 열기" Click="BtnNavPerson_Click" Style="{StaticResource BaseBtn}" Margin="0,0,8,0" />
-                    <Button Content="선번장 · 센터 열기" Click="BtnNavDialPlan_Click" Style="{StaticResource BaseBtn}" />
-                  </StackPanel>
+                  <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="내선 · CTI 관리 열기" Click="BtnNavExtCti_Click" Style="{StaticResource PrimaryBtn}" Margin="0,2,8,2" />
+                    <Button Content="Person 관리 열기" Click="BtnNavPerson_Click" Style="{StaticResource BaseBtn}" Margin="0,2,8,2" />
+                    <Button Content="선번장 · 센터 열기" Click="BtnNavDialPlan_Click" Style="{StaticResource BaseBtn}" Margin="0,2,8,2" />
+                    <Button Content="통합 조회 열기" Click="BtnNavLookup_Click" Style="{StaticResource BaseBtn}" Margin="0,2,8,2" />
+                    <Button Content="스냅샷 · 복구 열기" Click="BtnNavSnapshot_Click" Style="{StaticResource BaseBtn}" Margin="0,2,0,2" />
+                  </WrapPanel>
                 </StackPanel>
               </Border>
             </Grid>

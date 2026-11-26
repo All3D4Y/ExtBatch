@@ -235,7 +235,7 @@ namespace CmOxeProvisioner.Views
 
         private static string FormatMatchLocation(string rawMatch, string queryName)
         {
-            if (string.IsNullOrWhiteSpace(rawMatch)) return "위치 정보 없음 (CM 목록에 존재)";
+            if (string.IsNullOrWhiteSpace(rawMatch)) return "위치 정보 없음 (Config 목록에 존재)";
             string[] cols = rawMatch.Split('|');
             List<string> paths = new List<string>();
             List<string> extras = new List<string>();
@@ -375,8 +375,8 @@ namespace CmOxeProvisioner.Views
             int dupObjectCount = 0;
             StringBuilder copyText = new StringBuilder();
             copyText.AppendLine(string.IsNullOrWhiteSpace(summary.Customer)
-                ? "[CM 내선/CTI ID 검색 결과] CM 전역 검색"
-                : string.Format("[CM 내선/CTI ID 검색 결과] 고객사: {0}", summary.Customer));
+                ? "[Config 내선/CTI ID 검색 결과] Config 전역 검색"
+                : string.Format("[Config 내선/CTI ID 검색 결과] 고객사: {0}", summary.Customer));
 
             if (missingFolders.Count > 0)
             {
@@ -450,7 +450,7 @@ namespace CmOxeProvisioner.Views
                         if (matches.Count == 0)
                         {
                             TextBlock locFallback = new TextBlock();
-                            locFallback.Text = "위치: (CM 전역 검색 결과 존재)";
+                            locFallback.Text = "위치: (Config 전역 검색 결과 존재)";
                             locFallback.FontSize = 11.5;
                             locFallback.Foreground = ResBrush("TextBrush", Brushes.White);
                             locFallback.Margin = new Thickness(0, 2, 0, 0);
@@ -507,25 +507,25 @@ namespace CmOxeProvisioner.Views
             bool hasMissing = missingFolders.Count > 0;
             string statusTone = hasDups ? "Err" : (hasMissing ? "Warn" : "Ok");
             string winTitle = hasDups
-                ? "CM 내선/CTI ID 검색 결과 — 사용 중 발견"
-                : (hasMissing ? "CM 내선/CTI ID 검색 결과 — 폴더 확인 필요" : "CM 내선/CTI ID 검색 결과 — 사용 가능");
+                ? "Config 내선/CTI ID 검색 결과 — 사용 중 발견"
+                : (hasMissing ? "Config 내선/CTI ID 검색 결과 — 폴더 확인 필요" : "Config 내선/CTI ID 검색 결과 — 사용 가능");
             string headline;
             if (hasDups)
             {
                 headline = string.IsNullOrWhiteSpace(summary.Customer)
-                    ? string.Format("CM 전역 검색 — 사용 중 {0}개 번호 ({1}건) 발견", dupNumberCount, dupObjectCount)
+                    ? string.Format("Config 전역 검색 — 사용 중 {0}개 번호 ({1}건) 발견", dupNumberCount, dupObjectCount)
                     : string.Format("'{0}' — 사용 중 {1}개 번호 ({2}건) 발견", summary.Customer, dupNumberCount, dupObjectCount);
             }
             else if (hasMissing)
             {
                 headline = string.IsNullOrWhiteSpace(summary.Customer)
-                    ? "CM 대상 폴더 확인 필요"
-                    : string.Format("'{0}' — CM 대상 폴더 확인 필요", summary.Customer);
+                    ? "Config 대상 폴더 확인 필요"
+                    : string.Format("'{0}' — Config 대상 폴더 확인 필요", summary.Customer);
             }
             else
             {
                 headline = string.IsNullOrWhiteSpace(summary.Customer)
-                    ? "CM 전역 검색 — 전체 미사용 (사용 가능)"
+                    ? "Config 전역 검색 — 전체 미사용 (사용 가능)"
                     : string.Format("'{0}' — 전체 미사용 (사용 가능)", summary.Customer);
             }
 
@@ -543,7 +543,7 @@ namespace CmOxeProvisioner.Views
                 checkCti,
                 cleanDns,
                 cleanCtis,
-                missingFolders.Count > 0 ? "CM 대상 폴더 확인 필요" : null,
+                missingFolders.Count > 0 ? "Config 대상 폴더 확인 필요" : null,
                 missingFolders,
                 copyText.ToString());
         }
@@ -813,8 +813,8 @@ namespace CmOxeProvisioner.Views
             int totalDups = empDupCnt + userDupCnt;
             bool hasDups = dupCards.Count > 0;
             string statusTone = hasDups ? "Err" : "Ok";
-            string winTitle = hasDups ? "CM Person 중복체크 결과 — 중복 발견" : "CM Person 중복체크 결과 — 중복 없음";
-            string prefix = string.IsNullOrWhiteSpace(customerName) ? "CM 전역 검색" : string.Format("'{0}'", customerName);
+            string winTitle = hasDups ? "Config Person 중복체크 결과 — 중복 발견" : "Config Person 중복체크 결과 — 중복 없음";
+            string prefix = string.IsNullOrWhiteSpace(customerName) ? "Config 전역 검색" : string.Format("'{0}'", customerName);
             string headline = hasDups
                 ? string.Format("{0} — 중복 {1}건 발견 (EmpID {2} · UserName {3})", prefix, totalDups, empDupCnt, userDupCnt)
                 : string.Format("{0} — 중복 없음 (대상 {1}명 전체 사용 가능)", prefix, summary.totalChecked);
@@ -824,7 +824,7 @@ namespace CmOxeProvisioner.Views
                 winTitle,
                 statusTone,
                 headline,
-                string.Format("검사 대상: {0}명 (CM 전체 {1}명 조회)", summary.totalChecked, summary.globalPersonCount),
+                string.Format("검사 대상: {0}명 (Config 전체 {1}명 조회)", summary.totalChecked, summary.globalPersonCount),
                 totalDups,
                 string.Format("사용 가능: EmpID {0} · User {1}", cleanEmps.Count, cleanUsers.Count),
                 "중복 발견 항목 및 위치",

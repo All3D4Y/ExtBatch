@@ -1,5 +1,22 @@
 # 변경 이력 (CHANGELOG)
 
+## v2.0.0 (2026-11-26)
+- **Win32 `sce.exe` UI Automation 제거 및 Genesys Platform SDK(PSDK) 직접 연동 전환**:
+  - 기존 PowerShell Win32 제어 스크립트(`cm_batch_engine.ps1`, `cm_person_engine.ps1`, `cm_center_engine.ps1`, `cm_win32_lib.ps1`) 완전 제거.
+  - `backend/` 내 Java 8 + Spring Boot 2.7.5 + Genesys Platform SDK 9.0.001.07 로컬 REST 백엔드(`127.0.0.1:18080`, `euc-kr` 인코딩 + WarmStandby 이중화) 구축.
+  - WPF 앱(`BackendProcessService`, `CmWorkerService`)이 백엔드를 자동 기동/헬스체크하고 종료 시 Job Object + `/api/cm/disconnect`로 안전 정리.
+- **설정 구조 개편 및 독립 저장**:
+  - 설정 저장 경로를 `%LocalAppData%\ExtBatch_v2\settings.json`으로 분리(`ExtBatch` v1.2.1에서 LightGate/OXE/테마 설정 최초 1회 선택 이관).
+  - `SettingsWindow`에서 Config Server Primary/Backup Host·Port, Client Name, 계정, 로컬 백엔드 Port 설정 지원.
+- **UI 전면 개편 및 `CM` → `Config` 명칭 통일**:
+  - 상단 타이틀 바의 수동 `CM 연결/해제` 버튼 제거(앱 실행/설정 변경 시 백그라운드 Config Server 자동 연결 유지), `SettingsWindow` 및 전체 UI/로그/백엔드 표시 문자열을 `Config` 기준으로 통일(`Config 아이디`/`비밀번호`, `Config 경로 ▾`, `내선 · CTI` → `Config` 블록 및 `Object 생성`/`Object 삭제` 버튼).
+- **신규 `'통합 조회'` 탭 추가 (`UnifiedLookupTabView`, `LookupService`)**:
+  - Config 실서버(`DN`/`Place`/`Agent Login`/`ACD Position`/`Person`/`RSI`/`VQueue`/`Group`/`Script`)와 로컬 `dialplan_db.json`(`센터`/`세부라인`/`Entity`/`IP IVR`/`PRI`/`D.V.G`) 동시 검색(번호/범위`~`/이름/사번/폴더), 우측 연관 관계·선번장 교차 상세 패널 및 `내선·CTI`/`Person 관리` 바로가기 지원(`출처` 배지 `Config` / `선번장`).
+  - **센터 정합성 감사**: 전체 또는 단일 센터 대상 `Agent DN ↔ Place`, `Agent Login ↔ ACD Position ↔ Person`, 누락 폴더, 빈 Place, 복수 연결 등을 자동 탐지하고 CSV로 내보내기 가능.
+- **신규 `'스냅샷 · 복구'` 탭 추가 (`SnapshotDiffTabView`, `SnapshotService`, `SnapshotRestoreSupport`)**:
+  - 전체 Config 또는 고객사 단위 구성 스냅샷(`snapshots\snap_*.json`) 저장·관리, 두 스냅샷 간 또는 기준 스냅샷 ↔ 실시간 `LIVE` 변경 내역 비교(`+추가`/`-삭제`/`~변경`, `dbid` 자동 증가 차이 제외, 속성별 변경 상세) 및 비교 CSV/Markdown 리포트 저장 지원.
+  - **실서버 객체 복구(Restore)**: 기준 스냅샷 ↔ `LIVE` 비교 결과에서 복구할 항목을 체크해 **`↩ 선택 항목 복구`** 실행 가능(의존성 순서 기반 삭제 객체 재생성 · 변경 속성/연결 복원 · 선택적 `신규(+추가) 객체 삭제 포함` 역순 삭제 + 감사 로그 자동 기록).
+
 ## v1.2.1 (2026-11-25)
 - **선번장 행 인라인 펼치기 및 강조 테두리 UX 개선 (`DialPlanTabView`)**:
   - 기존 하단 분리 패널을 제거하고, `Dial-Plan (센터별)` 테이블 각 행 맨 끝 **`▾ 상세` / `▴ 접기`** 버튼(또는 행 더블클릭)을 누르면 **해당 행 바로 아래로(`RowDetailsTemplate`)** 센터 설정 및 21컬럼 세부 선번 편집기가 펼쳐지도록 개선 (`RowDetailsVisibilityMode="Visible"` + 행별 지연 `ContentTemplate` 바인딩)

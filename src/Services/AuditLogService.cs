@@ -122,7 +122,7 @@ namespace CmOxeProvisioner.Services
             catch
             {
                 isErrorEvent = trimmed.IndexOf("\"ERROR\"", StringComparison.OrdinalIgnoreCase) >= 0;
-                AppendLine(logDirPath, "[ERROR] [CM] [AuditParse] Raw=" + CleanOneLine(json));
+                AppendLine(logDirPath, "[ERROR] [Config] [AuditParse] Raw=" + CleanOneLine(json));
             }
             return true;
         }
@@ -186,7 +186,7 @@ namespace CmOxeProvisioner.Services
         {
             if (dto == null) return "";
             string action = string.IsNullOrWhiteSpace(dto.Action) ? "INFO" : dto.Action.Trim().ToUpperInvariant();
-            string target = string.IsNullOrWhiteSpace(dto.Target) ? "CM" : dto.Target.Trim().ToUpperInvariant();
+            string target = string.IsNullOrWhiteSpace(dto.Target) ? "Config" : dto.Target.Trim();
 
             if (action == "ERROR")
             {

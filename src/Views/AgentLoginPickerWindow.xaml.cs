@@ -246,7 +246,7 @@ namespace CmOxeProvisioner.Views
             }
             if (_fetchHandler == null)
             {
-                PopupDialogs.ShowSyntaxToast(this, false, "기능 미연결", "CM Agent Login 조회 핸들러가 연결되지 않았습니다.");
+                PopupDialogs.ShowSyntaxToast(this, false, "기능 미연결", "Config Agent Login 조회 핸들러가 연결되지 않았습니다.");
                 return;
             }
 
@@ -610,7 +610,7 @@ namespace CmOxeProvisioner.Views
         {
             if (_allTiles.Count == 0)
             {
-                PopupDialogs.ShowSyntaxToast(this, false, "목록 미조회", "먼저 [사용 가능 Login 조회]를 눌러 CM에서 목록을 불러오세요.");
+                PopupDialogs.ShowSyntaxToast(this, false, "목록 미조회", "먼저 [사용 가능 Login 조회]를 눌러 Config에서 목록을 불러오세요.");
                 return;
             }
 

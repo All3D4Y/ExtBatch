@@ -195,7 +195,7 @@
                                     </Button>
                                     <Button Style="{StaticResource DangerBtn}"
                                             IsEnabled="{Binding IsEditMode, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                            Content="완전 삭제 (JSON+CM)"
+                                            Content="완전 삭제 (JSON+Config)"
                                             Height="27" Padding="10,0" Margin="0,0,6,0"
                                             Tag="{Binding}"
                                             Click="BtnInlineFullDelete_Click"/>
@@ -234,7 +234,7 @@
                                     <Button Style="{StaticResource BaseBtn}" Content="선택 라인 삭제" Height="27" Padding="9,0" Margin="0,0,6,0"
                                             IsEnabled="{Binding IsEditMode, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                             Tag="{Binding}" Click="BtnInlineRemoveLine_Click"/>
-                                    <Button Style="{StaticResource PrimaryBtn}" Content="변경 저장 (DB + CM 프리셋)" Height="27" Padding="12,0"
+                                    <Button Style="{StaticResource PrimaryBtn}" Content="변경 저장 (DB + Config 프리셋)" Height="27" Padding="12,0"
                                             IsEnabled="{Binding IsEditMode, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                             Tag="{Binding}" Click="BtnInlineSaveCenter_Click"/>
                                 </StackPanel>
@@ -267,7 +267,7 @@
                                         <ComboBoxItem Content="업무 종료" Tag="closed"/>
                                     </ComboBox>
 
-                                    <TextBlock Text="CM연동명" FontSize="11" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                    <TextBlock Text="Config연동명" FontSize="11" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,4,0"/>
                                     <TextBox Style="{StaticResource DialPlanMetaTextBox}"
                                              IsReadOnly="{Binding IsViewMode, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                              Text="{Binding cmCustomerName, UpdateSourceTrigger=PropertyChanged}"
@@ -286,11 +286,11 @@
                                     <CheckBox Style="{StaticResource ModernCheckBox}" Content="VQueue" IsChecked="{Binding useVQueue, Mode=TwoWay}"
                                               IsEnabled="{Binding IsEditMode, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                               Click="InlineHeaderCheckBox_Click" VerticalAlignment="Center" Margin="0,0,8,0"
-                                              ToolTip="실제 CM VQueue 폴더 생성/삭제는 내선·CTI → CM 경로 ▾ → 적용하기에서도 실행 가능합니다."/>
+                                              ToolTip="실제 Config VQueue 폴더 생성/삭제는 내선·CTI → Config 경로 ▾ → 적용하기에서도 실행 가능합니다."/>
                                     <CheckBox Style="{StaticResource ModernCheckBox}" Content="IVR(PG)" IsChecked="{Binding useIvr, Mode=TwoWay}"
                                               IsEnabled="{Binding IsEditMode, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                               Click="InlineHeaderCheckBox_Click" VerticalAlignment="Center" Margin="0,0,8,0"
-                                              ToolTip="실제 CM Place Group 생성/삭제는 내선·CTI → CM 경로 ▾ → 적용하기에서도 실행 가능합니다."/>
+                                              ToolTip="실제 Config Place Group 생성/삭제는 내선·CTI → Config 경로 ▾ → 적용하기에서도 실행 가능합니다."/>
 
                                     <TextBlock Text="메모" FontSize="11" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,4,0"/>
                                     <TextBox Style="{StaticResource DialPlanMetaTextBox}"
@@ -707,7 +707,7 @@
                             <DataGridTextColumn Header="Phone 내선" Binding="{Binding ExtRangeSummary}" Width="1.05*" MinWidth="112" ElementStyle="{StaticResource DialPlanNumericTextStyle}"/>
                             <DataGridTextColumn Header="Login-ID" Binding="{Binding LoginRangeSummary}" Width="1.05*" MinWidth="112" ElementStyle="{StaticResource DialPlanNumericTextStyle}"/>
                             <DataGridTextColumn Header="라인" Binding="{Binding LineCount}" Width="48" ElementStyle="{StaticResource DialPlanNumericTextStyle}"/>
-                            <DataGridTemplateColumn Header="CM 연동" Width="1.05*" MinWidth="112" SortMemberPath="CmLinkedSummary">
+                            <DataGridTemplateColumn Header="Config 연동" Width="1.05*" MinWidth="112" SortMemberPath="CmLinkedSummary">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2,0">

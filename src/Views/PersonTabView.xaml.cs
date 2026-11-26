@@ -592,6 +592,33 @@ namespace CmOxeProvisioner.Views
             CmbManageCustomer.ItemsSource = _allCustomers;
         }
 
+        public void SelectCustomerByName(string customerName, bool switchToManage)
+        {
+            if (string.IsNullOrWhiteSpace(customerName) || _allCustomers == null) return;
+            string target = customerName.Trim();
+            CustomerInfo found = null;
+            for (int i = 0; i < _allCustomers.Count; i++)
+            {
+                if (string.Equals(_allCustomers[i].name, target, StringComparison.OrdinalIgnoreCase))
+                {
+                    found = _allCustomers[i];
+                    break;
+                }
+            }
+            if (found == null) return;
+
+            if (switchToManage)
+            {
+                BtnSubModeManage_Click(null, null);
+                CmbManageCustomer.SelectedItem = found;
+            }
+            else
+            {
+                BtnSubModeCreate_Click(null, null);
+                CmbPersonCustomer.SelectedItem = found;
+            }
+        }
+
         public void SetExtCtiContextProvider(Func<ExtCtiImportContext> provider)
         {
             _extCtiContextProvider = provider;
@@ -1304,7 +1331,7 @@ namespace CmOxeProvisioner.Views
             }
             if (FetchLoginPoolAsyncHandler == null)
             {
-                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "기능 미연결", "CM 조회 핸들러가 연결되지 않았습니다.");
+                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "기능 미연결", "Config 조회 핸들러가 연결되지 않았습니다.");
                 return;
             }
 
@@ -1577,7 +1604,7 @@ namespace CmOxeProvisioner.Views
         {
             if (_allLoginTiles.Count == 0)
             {
-                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "목록 미조회", "먼저 [사용 가능 Login 조회] 버튼을 눌러 CM에서 목록을 불러오세요.");
+                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "목록 미조회", "먼저 [사용 가능 Login 조회] 버튼을 눌러 Config에서 목록을 불러오세요.");
                 return;
             }
             for (int i = 0; i < _visibleLoginTiles.Count; i++)
@@ -1684,7 +1711,7 @@ namespace CmOxeProvisioner.Views
         {
             if (_allLoginTiles.Count == 0)
             {
-                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "목록 미조회", "먼저 [사용 가능 Login 조회] 버튼으로 CM의 Agent Login 목록을 불러오세요.");
+                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "목록 미조회", "먼저 [사용 가능 Login 조회] 버튼으로 Config의 Agent Login 목록을 불러오세요.");
                 return;
             }
 
@@ -1951,7 +1978,7 @@ namespace CmOxeProvisioner.Views
             if (r == null && _rows.Count > 0) r = _rows[0];
             if (r == null)
             {
-                TxtSelectedCmPreview.Text = "[CM 입력 미리보기] 행을 선택하면 General / Agent Login 매핑 값이 표시됩니다.";
+                TxtSelectedCmPreview.Text = "[Config 입력 미리보기] 행을 선택하면 General / Agent Login 매핑 값이 표시됩니다.";
                 return;
             }
 
@@ -1962,7 +1989,7 @@ namespace CmOxeProvisioner.Views
             string login = string.IsNullOrEmpty(r.AgentLoginId) ? "(미연결)" : r.AgentLoginId;
 
             TxtSelectedCmPreview.Text = string.Format(
-                "[CM 미리보기] General -> UserName: {0} | First: {1} | Last: {2} | EmpID: {3}   ||   Agent Info -> IsAgent: {4} | Agent Login: {5}",
+                "[Config 미리보기] General -> UserName: {0} | First: {1} | Last: {2} | EmpID: {3}   ||   Agent Info -> IsAgent: {4} | Agent Login: {5}",
                 user, first, last, emp, r.IsAgent ? "Y" : "N", login);
         }
 
@@ -2037,7 +2064,7 @@ namespace CmOxeProvisioner.Views
 
             if (DuplicateCheckAsyncHandler == null)
             {
-                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "기능 미연결", "CM 중복 체크 핸들러가 연결되지 않았습니다.");
+                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "기능 미연결", "Config 중복 체크 핸들러가 연결되지 않았습니다.");
                 return;
             }
 
@@ -2093,19 +2120,19 @@ namespace CmOxeProvisioner.Views
             PersonPreviewRow last = targets[targets.Count - 1];
             detail.AppendLine(string.Format("• 범위 요약: {0} ({1}) ~ {2} ({3})",
                 first.EmployeeId, first.UserName, last.EmployeeId, last.UserName));
-            detail.Append("• Password: 공란 (CM 기본값 자동 설정)");
+            detail.Append("• Password: 공란 (Config 기본값 자동 설정)");
 
             bool confirmed = PopupDialogs.ConfirmAction(
                 Window.GetWindow(this),
-                "CM Person 일괄 생성 확인",
-                string.Format("미리보기 목록 {0}명으로 CM Person을 생성하시겠습니까?", targets.Count),
+                "Config Person 일괄 생성 확인",
+                string.Format("미리보기 목록 {0}명으로 Config Person을 생성하시겠습니까?", targets.Count),
                 detail.ToString(),
                 "일괄 생성 실행");
             if (!confirmed) return;
 
             if (CreatePersonsAsyncHandler == null)
             {
-                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "기능 미연결", "CM 생성 핸들러가 연결되지 않았습니다.");
+                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "기능 미연결", "Config 생성 핸들러가 연결되지 않았습니다.");
                 return;
             }
 
@@ -2116,8 +2143,8 @@ namespace CmOxeProvisioner.Views
             }
             catch (Exception ex)
             {
-                AppendPersonLog("ERR", "CM Person 일괄 생성 실패: " + ex.Message);
-                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "CM Person 일괄 생성 실패", ex.Message);
+                AppendPersonLog("ERR", "Config Person 일괄 생성 실패: " + ex.Message);
+                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "Config Person 일괄 생성 실패", ex.Message);
             }
             finally
             {
@@ -2202,7 +2229,7 @@ namespace CmOxeProvisioner.Views
             }
             if (FetchManagePersonsAsyncHandler == null)
             {
-                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "기능 미연결", "CM Person 조회 핸들러가 연결되지 않았습니다.");
+                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "기능 미연결", "Config Person 조회 핸들러가 연결되지 않았습니다.");
                 return;
             }
 
@@ -2214,8 +2241,8 @@ namespace CmOxeProvisioner.Views
             }
             catch (Exception ex)
             {
-                AppendPersonLog("ERR", "CM Person 목록 조회 실패: " + ex.Message);
-                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "CM Person 조회 실패", ex.Message);
+                AppendPersonLog("ERR", "Config Person 목록 조회 실패: " + ex.Message);
+                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "Config Person 조회 실패", ex.Message);
             }
             finally
             {
@@ -2403,7 +2430,7 @@ namespace CmOxeProvisioner.Views
             if (ok == true)
             {
                 RefreshManageSummary();
-                AppendPersonLog("INFO", string.Format("Agent Login 변경 임시 적용 완료 (대상 {0}명 · 대상 체크 후 [수정 반영] 시 CM 저장)", targets.Count));
+                AppendPersonLog("INFO", string.Format("Agent Login 변경 임시 적용 완료 (대상 {0}명 · 대상 체크 후 [수정 반영] 시 Config 저장)", targets.Count));
             }
         }
 
@@ -2559,7 +2586,7 @@ namespace CmOxeProvisioner.Views
             CustomerInfo targetCust = _loadedManageCustomer ?? ResolveManageTargetCustomer();
             if (targetCust == null || _allManageRows.Count == 0)
             {
-                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "대상 없음", "먼저 [CM Person 목록 조회]로 Person 목록을 조회하세요.");
+                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "대상 없음", "먼저 [Config Person 목록 조회]로 Person 목록을 조회하세요.");
                 return;
             }
 
@@ -2631,7 +2658,7 @@ namespace CmOxeProvisioner.Views
 
             if (UpdateManagePersonsAsyncHandler == null)
             {
-                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "기능 미연결", "CM 수정 반영 핸들러가 연결되지 않았습니다.");
+                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "기능 미연결", "Config 수정 반영 핸들러가 연결되지 않았습니다.");
                 return;
             }
 
@@ -2648,8 +2675,8 @@ namespace CmOxeProvisioner.Views
 
             bool confirmed = PopupDialogs.ConfirmAction(
                 Window.GetWindow(this),
-                "CM Person 수정 반영 확인",
-                string.Format("수정된 {0}명의 정보를 CM에 반영하시겠습니까?", targets.Count),
+                "Config Person 수정 반영 확인",
+                string.Format("수정된 {0}명의 정보를 Config에 반영하시겠습니까?", targets.Count),
                 detail.ToString(),
                 "수정 반영 실행");
             if (!confirmed) return;
@@ -2661,8 +2688,8 @@ namespace CmOxeProvisioner.Views
             }
             catch (Exception ex)
             {
-                AppendPersonLog("ERR", "CM Person 수정 반영 실패: " + ex.Message);
-                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "CM Person 수정 실패", ex.Message);
+                AppendPersonLog("ERR", "Config Person 수정 반영 실패: " + ex.Message);
+                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "Config Person 수정 실패", ex.Message);
             }
             finally
             {
@@ -2679,7 +2706,7 @@ namespace CmOxeProvisioner.Views
             CustomerInfo targetCust = _loadedManageCustomer ?? ResolveManageTargetCustomer();
             if (targetCust == null || _allManageRows.Count == 0)
             {
-                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "대상 없음", "먼저 [CM Person 목록 조회]로 Person 목록을 조회하세요.");
+                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "대상 없음", "먼저 [Config Person 목록 조회]로 Person 목록을 조회하세요.");
                 return;
             }
 
@@ -2696,7 +2723,7 @@ namespace CmOxeProvisioner.Views
 
             if (DeleteManagePersonsAsyncHandler == null)
             {
-                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "기능 미연결", "CM Person 삭제 핸들러가 연결되지 않았습니다.");
+                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "기능 미연결", "Config Person 삭제 핸들러가 연결되지 않았습니다.");
                 return;
             }
 
@@ -2707,8 +2734,8 @@ namespace CmOxeProvisioner.Views
             }
             catch (Exception ex)
             {
-                AppendPersonLog("ERR", "CM Person 삭제 실패: " + ex.Message);
-                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "CM Person 삭제 실패", ex.Message);
+                AppendPersonLog("ERR", "Config Person 삭제 실패: " + ex.Message);
+                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "Config Person 삭제 실패", ex.Message);
             }
             finally
             {

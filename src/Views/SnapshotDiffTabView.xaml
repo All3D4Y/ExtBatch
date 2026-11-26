@@ -1,0 +1,325 @@
+<UserControl x:Class="CmOxeProvisioner.Views.SnapshotDiffTabView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="Transparent"
+             Foreground="{DynamicResource TextBrush}">
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <!-- SUB-HEADER BAR -->
+    <Border Grid.Row="0"
+            Background="{DynamicResource SurfaceBrush}"
+            BorderBrush="{DynamicResource BorderBrush}"
+            BorderThickness="0,0,0,1"
+            Padding="14,8">
+      <DockPanel LastChildFill="False">
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Left">
+          <Border Style="{StaticResource BlockTitleAccentStyle}" />
+          <TextBlock Text="Config 스냅샷 · 복구" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" />
+          <TextBlock Text="Genesys Config Server 스냅샷 저장 · 변경 내역 비교 · 실서버 복구" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" Margin="8,1,0,0" />
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Right">
+          <Button x:Name="BtnRefreshSnapshots" Content="↻ 목록 새로고침" Click="BtnRefreshSnapshots_Click" Style="{StaticResource BaseBtn}" Height="28" Padding="11,0" FontSize="11.5" Margin="0,0,6,0" />
+          <Button x:Name="BtnExportDiffCsv" Content="비교 CSV 저장" Click="BtnExportDiffCsv_Click" Style="{StaticResource BaseBtn}" Height="28" Padding="11,0" FontSize="11.5" Margin="0,0,6,0" />
+          <Button x:Name="BtnExportDiffMd" Content="비교 리포트(.md)" Click="BtnExportDiffMd_Click" Style="{StaticResource BaseBtn}" Height="28" Padding="11,0" FontSize="11.5" />
+        </StackPanel>
+      </DockPanel>
+    </Border>
+
+    <Grid Grid.Row="1" Margin="14">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
+
+      <!-- TOP CARD: SNAPSHOT CAPTURE LEFT + SAVED SNAPSHOTS RIGHT -->
+      <Border Grid.Row="0" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,10">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="340" />
+            <ColumnDefinition Width="14" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+
+          <!-- Capture Controls -->
+          <StackPanel Grid.Column="0">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+              <Border Style="{StaticResource BlockTitleAccentStyle}" />
+              <TextBlock Text="새 Config 스냅샷 저장" Style="{StaticResource BlockTitleTextStyle}" />
+            </StackPanel>
+
+            <TextBlock Text="스냅샷 라벨 / 메모" Style="{StaticResource FieldLabelStyle}" />
+            <TextBox x:Name="TxtSnapLabel" Style="{StaticResource ModernTextBox}" Margin="0,0,0,8" ToolTip="예: 작업 전 백업, 하이프라자 개통 전" />
+
+            <TextBlock Text="저장 범위 (전체 또는 특정 센터)" Style="{StaticResource FieldLabelStyle}" />
+            <ComboBox x:Name="CmbSnapScope" Style="{StaticResource ModernComboBox}" Height="34" DisplayMemberPath="Label" SelectedValuePath="Value" Margin="0,0,0,8" />
+
+            <DockPanel LastChildFill="False" Margin="0,2,0,0">
+              <CheckBox x:Name="ChkSnapIncludeGS" Content="Groups · Scripts 포함" IsChecked="True" Style="{StaticResource ModernCheckBox}" VerticalAlignment="Center" DockPanel.Dock="Left" />
+              <Button x:Name="BtnCaptureSnapshot" Content="스냅샷 저장" Click="BtnCaptureSnapshot_Click" Style="{StaticResource PrimaryBtn}" Height="32" Padding="14,0" DockPanel.Dock="Right" />
+            </DockPanel>
+            <TextBlock x:Name="TxtSnapshotStatus" Text="저장 경로: snapshots\snap_*.json" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextTrimming="CharacterEllipsis" Margin="0,8,0,0" />
+          </StackPanel>
+
+          <Border Grid.Column="1" Width="1" HorizontalAlignment="Center" Background="{DynamicResource BorderBrush}" />
+
+          <!-- Saved Snapshots Table -->
+          <DockPanel Grid.Column="2" LastChildFill="True">
+            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,6" LastChildFill="False">
+              <TextBlock Text="저장된 스냅샷 목록" FontSize="12.5" FontWeight="Bold" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" DockPanel.Dock="Left" />
+              <TextBlock x:Name="TxtSnapshotCountBadge" Text="0개" FontSize="11.5" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" DockPanel.Dock="Right" />
+            </DockPanel>
+
+            <DataGrid x:Name="DgSnapshots"
+                      Style="{StaticResource ModernDataGrid}"
+                      IsReadOnly="True"
+                      AutoGenerateColumns="False"
+                      MaxHeight="165"
+                      MinHeight="135">
+              <DataGrid.Columns>
+                <DataGridTextColumn Header="생성 시각" Binding="{Binding createdAt}" Width="140" FontFamily="Consolas" />
+                <DataGridTextColumn Header="라벨" Binding="{Binding label}" Width="*" FontWeight="SemiBold" />
+                <DataGridTextColumn Header="범위" Binding="{Binding customerScope}" Width="120" />
+                <DataGridTextColumn Header="객체" Binding="{Binding totalObjects}" Width="66" FontFamily="Consolas" />
+                <DataGridTextColumn Header="크기" Binding="{Binding SizeKbText}" Width="78" FontFamily="Consolas" />
+                <DataGridTemplateColumn Header="선택 / 관리" Width="148">
+                  <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                      <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Content="기준" Click="BtnPickLeft_Click" Tag="{Binding}" Style="{StaticResource BaseBtn}" Height="22" Padding="7,0" FontSize="10.5" Margin="0,0,3,0" ToolTip="기준 스냅샷(복구 목표 상태)으로 지정" />
+                        <Button Content="비교" Click="BtnPickRight_Click" Tag="{Binding}" Style="{StaticResource BaseBtn}" Height="22" Padding="7,0" FontSize="10.5" Margin="0,0,3,0" ToolTip="비교 대상으로 지정" />
+                        <Button Content="삭제" Click="BtnDeleteSnapshot_Click" Tag="{Binding}" Style="{StaticResource DangerBtn}" Height="22" Padding="7,0" FontSize="10.5" />
+                      </StackPanel>
+                    </DataTemplate>
+                  </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+              </DataGrid.Columns>
+            </DataGrid>
+          </DockPanel>
+        </Grid>
+      </Border>
+
+      <!-- MIDDLE CARD: COMPARISON CONTROLS & KPI SUMMARY -->
+      <Border Grid.Row="1" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,10">
+        <StackPanel>
+          <Grid Margin="0,0,0,8">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="1.45*" />
+              <ColumnDefinition Width="26" />
+              <ColumnDefinition Width="1.45*" />
+              <ColumnDefinition Width="10" />
+              <ColumnDefinition Width="125" />
+              <ColumnDefinition Width="10" />
+              <ColumnDefinition Width="145" />
+              <ColumnDefinition Width="10" />
+              <ColumnDefinition Width="155" />
+              <ColumnDefinition Width="10" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0">
+              <TextBlock Text="기준 스냅샷 (복구 목표 상태)" Style="{StaticResource FieldLabelStyle}" />
+              <ComboBox x:Name="CmbDiffLeft" Style="{StaticResource ModernComboBox}" Height="34" DisplayMemberPath="DisplayOptionLabel" SelectedValuePath="id" />
+            </StackPanel>
+
+            <TextBlock Grid.Column="1" Text="↔" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource MutedBrush}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,7" />
+
+            <StackPanel Grid.Column="2">
+              <TextBlock Text="비교 대상 (LIVE 선택 시 실서버와 비교 · 복구 가능)" Style="{StaticResource FieldLabelStyle}" />
+              <ComboBox x:Name="CmbDiffRight" Style="{StaticResource ModernComboBox}" Height="34" DisplayMemberPath="DisplayOptionLabel" SelectedValuePath="id" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="4">
+              <TextBlock Text="객체 유형" Style="{StaticResource FieldLabelStyle}" />
+              <ComboBox x:Name="CmbDiffCategory" Style="{StaticResource ModernComboBox}" Height="34" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="6">
+              <TextBlock Text="센터 / 고객사" Style="{StaticResource FieldLabelStyle}" />
+              <ComboBox x:Name="CmbDiffCustomer" Style="{StaticResource ModernComboBox}" Height="34" DisplayMemberPath="Label" SelectedValuePath="Value" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="8">
+              <TextBlock Text="결과 내 검색" Style="{StaticResource FieldLabelStyle}" />
+              <TextBox x:Name="TxtDiffSearch" Style="{StaticResource ModernTextBox}" Height="34" KeyDown="TxtDiffSearch_KeyDown" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="10" Orientation="Horizontal" VerticalAlignment="Bottom">
+              <CheckBox x:Name="ChkDiffOnlyChanged" Content="변경 항목만" IsChecked="True" Style="{StaticResource ModernCheckBox}" Margin="0,0,10,0" VerticalAlignment="Center" />
+              <Button x:Name="BtnRunDiff" Content="⚡ 변경 비교" Click="BtnRunDiff_Click" Style="{StaticResource PrimaryBtn}" Height="34" Padding="15,0" />
+            </StackPanel>
+          </Grid>
+
+          <DockPanel LastChildFill="False">
+            <WrapPanel x:Name="DiffSummaryChips" Orientation="Horizontal" DockPanel.Dock="Left" />
+            <TextBlock x:Name="TxtDiffStatus" Text="기준 스냅샷과 비교 대상(LIVE 또는 다른 스냅샷)을 선택한 뒤 [변경 비교]를 클릭하세요." FontSize="11.5" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" DockPanel.Dock="Right" />
+          </DockPanel>
+        </StackPanel>
+      </Border>
+
+      <!-- BOTTOM WORKSPACE: COMPARISON & RESTORE TABLE LEFT + FIELD INSPECTOR RIGHT -->
+      <Grid Grid.Row="2">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" MinWidth="460" />
+          <ColumnDefinition Width="8" />
+          <ColumnDefinition Width="410" MinWidth="320" MaxWidth="540" />
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" Style="{StaticResource CardBorderStyle}" Padding="0">
+          <DockPanel LastChildFill="True">
+            <!-- Restore Action Toolbar -->
+            <Border DockPanel.Dock="Top"
+                    Background="{DynamicResource SurfaceAltBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="0,0,0,1"
+                    Padding="10,6">
+              <DockPanel LastChildFill="False">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Left">
+                  <TextBlock Text="복구 대상 선택:" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                  <Button x:Name="BtnSelectAllDiff" Content="전체 선택" Click="BtnSelectAllDiff_Click" Style="{StaticResource BaseBtn}" Height="24" Padding="8,0" FontSize="11" Margin="0,0,4,0" />
+                  <Button x:Name="BtnSelectRestorable" Content="삭제/변경만" Click="BtnSelectRestorable_Click" Style="{StaticResource BaseBtn}" Height="24" Padding="8,0" FontSize="11" Margin="0,0,4,0" ToolTip="스냅샷 대비 삭제되었거나 변경된 항목만 빠르게 선택합니다." />
+                  <Button x:Name="BtnClearDiffSelection" Content="선택 해제" Click="BtnClearDiffSelection_Click" Style="{StaticResource BaseBtn}" Height="24" Padding="8,0" FontSize="11" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Right">
+                  <CheckBox x:Name="ChkRestoreDeleteAdded"
+                            Content="신규(+추가) 객체 삭제 포함"
+                            IsChecked="False"
+                            Style="{StaticResource ModernCheckBox}"
+                            FontSize="11.5"
+                            Margin="0,0,10,0"
+                            VerticalAlignment="Center"
+                            ToolTip="체크 시 스냅샷 이후 실서버에 추가(+ 추가)된 체크 항목도 복구 시 실서버에서 삭제합니다." />
+                  <Button x:Name="BtnRestoreSelected"
+                          Content="↩ 선택 항목 복구"
+                          Click="BtnRestoreSelected_Click"
+                          Style="{StaticResource OxeBtn}"
+                          Height="26"
+                          Padding="12,0"
+                          FontSize="11.5"
+                          IsEnabled="False"
+                          ToolTip="기준에 저장된 스냅샷, 비교 대상에 LIVE를 선택한 상태에서 체크한 항목을 실서버에 복구합니다." />
+                </StackPanel>
+              </DockPanel>
+            </Border>
+
+            <DataGrid x:Name="DgDiffEntries"
+                      Style="{StaticResource ModernDataGrid}"
+                      AutoGenerateColumns="False"
+                      SelectionChanged="DgDiffEntries_SelectionChanged">
+              <DataGrid.Columns>
+                <DataGridTemplateColumn Width="40" MinWidth="40" CanUserResize="False">
+                  <DataGridTemplateColumn.HeaderStyle>
+                    <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource ModernDataGridColumnHeader}">
+                      <Setter Property="Padding" Value="0" />
+                      <Setter Property="HorizontalContentAlignment" Value="Center" />
+                    </Style>
+                  </DataGridTemplateColumn.HeaderStyle>
+                  <DataGridTemplateColumn.Header>
+                    <CheckBox x:Name="ChkHeaderSelectDiff"
+                              Click="ChkHeaderSelectDiff_Click"
+                              Style="{StaticResource CompactCheckBox}"
+                              ToolTip="전체 선택 / 해제" />
+                  </DataGridTemplateColumn.Header>
+                  <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                      <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                Style="{StaticResource CompactCheckBox}"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center" />
+                    </DataTemplate>
+                  </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="상태" Width="74">
+                  <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                      <Border CornerRadius="4" Padding="6,2" HorizontalAlignment="Center">
+                        <Border.Style>
+                          <Style TargetType="Border">
+                            <Setter Property="Background" Value="{DynamicResource SurfaceAltBrush}" />
+                            <Style.Triggers>
+                              <DataTrigger Binding="{Binding diffType}" Value="ADDED">
+                                <Setter Property="Background" Value="{DynamicResource OkBgBrush}" />
+                              </DataTrigger>
+                              <DataTrigger Binding="{Binding diffType}" Value="REMOVED">
+                                <Setter Property="Background" Value="{DynamicResource ErrBgBrush}" />
+                              </DataTrigger>
+                              <DataTrigger Binding="{Binding diffType}" Value="MODIFIED">
+                                <Setter Property="Background" Value="{DynamicResource WarnBgBrush}" />
+                              </DataTrigger>
+                            </Style.Triggers>
+                          </Style>
+                        </Border.Style>
+                        <TextBlock Text="{Binding DiffBadgeText}" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center">
+                          <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                              <Setter Property="Foreground" Value="{DynamicResource MutedBrush}" />
+                              <Style.Triggers>
+                                <DataTrigger Binding="{Binding diffType}" Value="ADDED">
+                                  <Setter Property="Foreground" Value="{DynamicResource OkFgBrush}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding diffType}" Value="REMOVED">
+                                  <Setter Property="Foreground" Value="{DynamicResource ErrFgBrush}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding diffType}" Value="MODIFIED">
+                                  <Setter Property="Foreground" Value="{DynamicResource WarnFgBrush}" />
+                                </DataTrigger>
+                              </Style.Triggers>
+                            </Style>
+                          </TextBlock.Style>
+                        </TextBlock>
+                      </Border>
+                    </DataTemplate>
+                  </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="유형" Binding="{Binding category}" Width="100" IsReadOnly="True" />
+                <DataGridTextColumn Header="식별 키" Binding="{Binding naturalKey}" Width="130" FontFamily="Consolas" FontWeight="SemiBold" IsReadOnly="True" />
+                <DataGridTextColumn Header="이름" Binding="{Binding name}" Width="140" IsReadOnly="True" />
+                <DataGridTextColumn Header="센터(추정)" Binding="{Binding customerInferred}" Width="130" IsReadOnly="True" />
+                <DataGridTextColumn Header="변경 요약" Binding="{Binding summary}" Width="280" IsReadOnly="True" />
+                <DataGridTextColumn Header="기준 경로 (스냅샷)" Binding="{Binding beforeFolderPath}" Width="220" FontFamily="Consolas" IsReadOnly="True" />
+                <DataGridTextColumn Header="비교 경로 (대상)" Binding="{Binding afterFolderPath}" Width="220" FontFamily="Consolas" IsReadOnly="True" />
+              </DataGrid.Columns>
+            </DataGrid>
+          </DockPanel>
+        </Border>
+
+        <GridSplitter Grid.Column="1" Width="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" />
+
+        <!-- Field-Level Change Inspector -->
+        <Border Grid.Column="2" Style="{StaticResource CardBorderStyle}">
+          <DockPanel LastChildFill="True">
+            <StackPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+              <DockPanel LastChildFill="False" Margin="0,0,0,4">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Left">
+                  <Border Style="{StaticResource BlockTitleAccentStyle}" />
+                  <TextBlock Text="속성별 변경 상세" Style="{StaticResource BlockTitleTextStyle}" />
+                </StackPanel>
+                <Button x:Name="BtnCopyDiffDetail" Content="복사" Click="BtnCopyDiffDetail_Click" Style="{StaticResource BaseBtn}" Height="24" Padding="9,0" FontSize="11" DockPanel.Dock="Right" IsEnabled="False" />
+              </DockPanel>
+
+              <TextBlock x:Name="TxtDiffInspectorTitle" Text="좌측 표에서 항목을 선택하면 기준(스냅샷) → 비교 대상 속성 변경 내역이 표시됩니다." FontSize="12.5" FontWeight="Bold" Foreground="{DynamicResource TextBrush}" TextWrapping="Wrap" />
+              <TextBlock x:Name="TxtDiffInspectorPaths" Text="" FontFamily="Consolas" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" Margin="0,3,0,0" />
+            </StackPanel>
+
+            <DataGrid x:Name="DgFieldDiffs"
+                      Style="{StaticResource ModernDataGrid}"
+                      IsReadOnly="True"
+                      AutoGenerateColumns="False">
+              <DataGrid.Columns>
+                <DataGridTextColumn Header="속성" Binding="{Binding field}" Width="115" FontWeight="SemiBold" />
+                <DataGridTextColumn Header="기준 값" Binding="{Binding beforeVal}" Width="*" FontFamily="Consolas" />
+                <DataGridTextColumn Header="비교 값" Binding="{Binding afterVal}" Width="*" FontFamily="Consolas" />
+              </DataGrid.Columns>
+            </DataGrid>
+          </DockPanel>
+        </Border>
+      </Grid>
+    </Grid>
+  </Grid>
+</UserControl>

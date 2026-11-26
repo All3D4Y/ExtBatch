@@ -196,7 +196,7 @@
                   </ScrollViewer>
 
                   <StackPanel x:Name="PnlEmptyGalleryHint" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False">
-                    <TextBlock Text="상단 [사용 가능 Login 조회]를 누르면 CM에서 미사용 Agent Login 목록을 불러와 클릭·드래그로 선택하고 분배할 수 있습니다." FontSize="11.5" Foreground="{DynamicResource MutedBrush}" TextAlignment="Center" TextWrapping="Wrap" Margin="14,0" />
+                    <TextBlock Text="상단 [사용 가능 Login 조회]를 누르면 Config에서 미사용 Agent Login 목록을 불러와 클릭·드래그로 선택하고 분배할 수 있습니다." FontSize="11.5" Foreground="{DynamicResource MutedBrush}" TextAlignment="Center" TextWrapping="Wrap" Margin="14,0" />
                   </StackPanel>
                 </Grid>
               </Border>
@@ -352,7 +352,7 @@
               BorderThickness="0,1,0,0"
               Padding="14,10">
         <DockPanel LastChildFill="False">
-          <TextBlock Text="※ [적용] 시 목록에 임시 반영되며, 하단 [수정 반영] 실행 시 CM Agent Info(Add ID / Delete ID)에 최종 저장됩니다."
+          <TextBlock Text="※ [적용] 시 목록에 임시 반영되며, 하단 [수정 반영] 실행 시 Config Agent Info(Add ID / Delete ID)에 최종 저장됩니다."
                      FontSize="11"
                      Foreground="{DynamicResource MutedBrush}"
                      VerticalAlignment="Center"

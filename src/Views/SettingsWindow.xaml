@@ -1,7 +1,7 @@
 <Window x:Class="CmOxeProvisioner.Views.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="ExtBatch 환경 설정 · CM / LightGate 계정 및 기본값"
+        Title="ExtBatch 환경 설정 · Config / LightGate 계정 및 기본값"
         Icon="pack://application:,,,/ExtBatch;component/icon.ico"
         Width="560" Height="710"
         WindowStartupLocation="CenterOwner"
@@ -28,7 +28,7 @@
         <DockPanel LastChildFill="False">
           <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0" DockPanel.Dock="Left">
             <Image Source="pack://application:,,,/ExtBatch;component/icon.ico" Width="16" Height="16" RenderOptions.BitmapScalingMode="HighQuality" Margin="0,0,8,0" VerticalAlignment="Center" />
-            <TextBlock Text="ExtBatch 환경 설정 · CM / LightGate 계정 및 기본값" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" />
+            <TextBlock Text="ExtBatch 환경 설정 · Config / LightGate 계정 및 기본값" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" />
           </StackPanel>
 
           <Button Click="BtnCancel_Click" Style="{StaticResource CaptionCloseBtn}" DockPanel.Dock="Right" HorizontalAlignment="Right" ToolTip="닫기">
@@ -46,7 +46,7 @@
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0"
-                   Text="CM·EMS 접속 계정과 비밀번호는 현재 Windows 사용자 계정 전용(DPAPI)으로 암호화 저장됩니다."
+                   Text="Config·EMS 접속 계정과 비밀번호는 현재 Windows 사용자 계정 전용(DPAPI)으로 암호화 저장됩니다."
                    FontSize="12" Foreground="{DynamicResource MutedBrush}" Margin="0,0,0,12" TextWrapping="Wrap" />
 
         <!-- Scrollable Form -->
@@ -55,31 +55,61 @@
             <!-- Section 1: CM Settings -->
             <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,12">
               <StackPanel>
-                <TextBlock Text="Genesys Configuration Manager (CM)" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextBrush}" Margin="0,0,0,10" />
+                <TextBlock Text="Genesys Config Server (Platform SDK Direct)" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextBrush}" Margin="0,0,0,10" />
 
-                <TextBlock Text="CM 실행 파일 (sce.exe 경로)" Style="{StaticResource FieldLabelStyle}" />
                 <Grid Margin="0,0,0,10">
                   <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="82" />
+                    <ColumnDefinition Width="12" />
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="82" />
                   </Grid.ColumnDefinitions>
-                  <TextBox x:Name="TxtCmExePath" Grid.Column="0" Style="{StaticResource ModernTextBox}" FontFamily="Consolas" />
-                  <Button Grid.Column="1" Content="찾아보기" Click="BtnBrowseCm_Click" Style="{StaticResource BaseBtn}" Margin="8,0,0,0" />
+                  <StackPanel Grid.Column="0">
+                    <TextBlock Text="Primary Host" Style="{StaticResource FieldLabelStyle}" />
+                    <TextBox x:Name="TxtCmPrimaryHost" Style="{StaticResource ModernTextBox}" FontFamily="Consolas" />
+                  </StackPanel>
+                  <StackPanel Grid.Column="2">
+                    <TextBlock Text="Port" Style="{StaticResource FieldLabelStyle}" />
+                    <TextBox x:Name="TxtCmPrimaryPort" Style="{StaticResource ModernTextBox}" FontFamily="Consolas" />
+                  </StackPanel>
+                  <StackPanel Grid.Column="4">
+                    <TextBlock Text="Backup Host" Style="{StaticResource FieldLabelStyle}" />
+                    <TextBox x:Name="TxtCmBackupHost" Style="{StaticResource ModernTextBox}" FontFamily="Consolas" />
+                  </StackPanel>
+                  <StackPanel Grid.Column="6">
+                    <TextBlock Text="Port" Style="{StaticResource FieldLabelStyle}" />
+                    <TextBox x:Name="TxtCmBackupPort" Style="{StaticResource ModernTextBox}" FontFamily="Consolas" />
+                  </StackPanel>
                 </Grid>
 
                 <Grid>
                   <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="12" />
+                    <ColumnDefinition Width="10" />
                     <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="92" />
                   </Grid.ColumnDefinitions>
                   <StackPanel Grid.Column="0">
-                    <TextBlock Text="CM 아이디 (비워두면 기존 입력값 유지)" Style="{StaticResource FieldLabelStyle}" />
-                    <TextBox x:Name="TxtCmUserId" Style="{StaticResource ModernTextBox}" />
+                    <TextBlock Text="Client Name" Style="{StaticResource FieldLabelStyle}" />
+                    <TextBox x:Name="TxtCmClientName" Style="{StaticResource ModernTextBox}" FontFamily="Consolas" />
                   </StackPanel>
                   <StackPanel Grid.Column="2">
-                    <TextBlock Text="CM 비밀번호" Style="{StaticResource FieldLabelStyle}" />
+                    <TextBlock Text="Config 아이디" Style="{StaticResource FieldLabelStyle}" />
+                    <TextBox x:Name="TxtCmUserId" Style="{StaticResource ModernTextBox}" />
+                  </StackPanel>
+                  <StackPanel Grid.Column="4">
+                    <TextBlock Text="Config 비밀번호" Style="{StaticResource FieldLabelStyle}" />
                     <PasswordBox x:Name="PwdCmPassword" Style="{StaticResource ModernPasswordBox}" />
+                  </StackPanel>
+                  <StackPanel Grid.Column="6">
+                    <TextBlock Text="백엔드 Port" Style="{StaticResource FieldLabelStyle}" />
+                    <TextBox x:Name="TxtBackendPort" Style="{StaticResource ModernTextBox}" FontFamily="Consolas" />
                   </StackPanel>
                 </Grid>
               </StackPanel>

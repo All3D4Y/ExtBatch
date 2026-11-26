@@ -1,18 +1,16 @@
 {
     "version": "1.2.0",
     "sourceFile": "media_1795591358961_75554407.xlsx",
-    "updatedAt": "2026-11-25 17:06:29",
+    "updatedAt": "2026-11-26 16:57:22",
     "centers": [
         {
-            "id": "코카콜라",
             "status": "active",
-            "location": "안양센터",
             "project": "코카콜라",
+            "location": "안양센터",
             "cmCustomerName": "코카콜라",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -327,18 +325,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "코카콜라",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "농어촌희망재단",
             "status": "active",
-            "location": "26층",
             "project": "농어촌희망재단",
+            "location": "26층",
             "cmCustomerName": "농어촌희망재단",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -367,18 +366,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "농어촌희망재단",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "수능_UHD",
             "status": "active",
-            "location": "26층",
             "project": "수능_UHD",
+            "location": "26층",
             "cmCustomerName": "한국교육과정평가원",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "https://kice-ap.lbucess.com/login",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -407,18 +407,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "수능_UHD",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "전자세금_계산서",
             "status": "active",
-            "location": "25층",
             "project": "전자세금 계산서",
+            "location": "25층",
             "cmCustomerName": "전자세금계산서",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "https://etax-ap.lbucess.com/login",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -603,18 +604,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "전자세금_계산서",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "세종텔레콤",
             "status": "active",
-            "location": "25층",
             "project": "세종텔레콤",
+            "location": "25층",
             "cmCustomerName": "세종텔레콤",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "http://10.62.130.220:12311/login",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -981,18 +983,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "세종텔레콤",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "세종텔레콤_CCTV",
             "status": "active",
-            "location": "25층",
             "project": "세종텔레콤 (CCTV)",
+            "location": "25층",
             "cmCustomerName": "세종텔레콤_CCTV",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -1073,18 +1076,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "세종텔레콤_CCTV",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "LG하우시스_그린리모델링_센터",
             "status": "active",
-            "location": "24F",
             "project": "LG하우시스-그린리모델링 센터",
+            "location": "24F",
             "cmCustomerName": "LG하우시스_그린리모델링",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -1139,18 +1143,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "LG하우시스_그린리모델링_센터",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "LG전자_IT_업무지원",
             "status": "active",
-            "location": "24F",
             "project": "LG전자 IT 업무지원",
+            "location": "24F",
             "cmCustomerName": "LGEIT",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -1283,18 +1288,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "LG전자_IT_업무지원",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "하이프라자_개통실",
             "status": "active",
-            "location": "24F",
             "project": "하이프라자 개통실",
+            "location": "24F",
             "cmCustomerName": "하이프라자_개통센터",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "https://hiplaza-ap.lbucess.com/login",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -1765,18 +1771,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "하이프라자_개통실",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "더본_코리아",
             "status": "active",
-            "location": "23층",
             "project": "더본 코리아",
+            "location": "23층",
             "cmCustomerName": "더본코리아",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "https://theborn-ap.lbucess.com/login",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -2013,18 +2020,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "더본_코리아",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "워커힐",
             "status": "active",
-            "location": "23층",
             "project": "워커힐",
+            "location": "23층",
             "cmCustomerName": "워커힐",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "https://walkerhill-ap.lbucess.com/",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -2495,18 +2503,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "워커힐",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "유니브스토어",
             "status": "active",
-            "location": "23층",
             "project": "유니브스토어",
+            "location": "23층",
             "cmCustomerName": "유니브스토어",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "http://10.62.130.220:12251/login",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -2535,18 +2544,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "유니브스토어",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "볼트테크_코리아",
             "status": "active",
-            "location": "23층",
             "project": "볼트테크 코리아",
+            "location": "23층",
             "cmCustomerName": "볼트테크코리아",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -2731,18 +2741,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "볼트테크_코리아",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "바바패션_A_S",
             "status": "active",
-            "location": "23층",
             "project": "바바패션 A/S",
+            "location": "23층",
             "cmCustomerName": "바바패션AS",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "http://10.62.130.220:12801/login",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -2979,18 +2990,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "바바패션_A_S",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "GS리테일",
             "status": "active",
-            "location": "LB휴넷 18층",
             "project": "GS리테일",
+            "location": "LB휴넷 18층",
             "cmCustomerName": "GS리테일",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -3097,18 +3109,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "GS리테일",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "GS네트윅스",
             "status": "active",
-            "location": "LB휴넷 18층",
             "project": "GS네트윅스",
+            "location": "LB휴넷 18층",
             "cmCustomerName": "GS네트웍스",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "https://gsnws-ap.lbucess.com/login",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -3553,18 +3566,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "GS네트윅스",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "현대_홈쇼핑_PDS",
             "status": "active",
-            "location": "LB휴넷 18층",
             "project": "현대 홈쇼핑 PDS",
+            "location": "LB휴넷 18층",
             "cmCustomerName": "현대홈쇼핑CIC",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -3593,18 +3607,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "현대_홈쇼핑_PDS",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "크리스몰",
             "status": "active",
-            "location": "LB휴넷 18층",
             "project": "크리스몰",
+            "location": "LB휴넷 18층",
             "cmCustomerName": "크리스몰",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -3763,18 +3778,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "크리스몰",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "LG_라이프케어_포탈",
             "status": "active",
-            "location": "마곡 LG사이언스 파크",
             "project": "LG 라이프케어 포탈",
+            "location": "마곡 LG사이언스 파크",
             "cmCustomerName": "LG라이프케어",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "https://lglifecare-ap.lbucess.com/login",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -4245,18 +4261,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "LG_라이프케어_포탈",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "LG_ID",
             "status": "active",
-            "location": "마곡 LG사이언스 파크",
             "project": "LG ID",
+            "location": "마곡 LG사이언스 파크",
             "cmCustomerName": "LG통합ID",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "https://mylgid-ap.lbucess.com/login",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -4415,18 +4432,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "LG_ID",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "LG_하우시스_알루미늄_센터",
             "status": "active",
-            "location": "충정로",
             "project": "LG 하우시스-알루미늄 센터",
+            "location": "충정로",
             "cmCustomerName": "LG하우시스_알루미늄",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -4455,18 +4473,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "LG_하우시스_알루미늄_센터",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "LX_하우시스_지인_해피콜_센터",
             "status": "active",
-            "location": "충정로",
             "project": "LX 하우시스 지인 해피콜 센터",
+            "location": "충정로",
             "cmCustomerName": "LG하우시스_지인_해피콜",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "http://10.62.130.220:12331/login",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -4521,18 +4540,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "LX_하우시스_지인_해피콜_센터",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "LX_하우시스_한샘견적_지원센터",
             "status": "active",
-            "location": "충정로",
             "project": "LX 하우시스 한샘견적 지원센터",
+            "location": "충정로",
             "cmCustomerName": "LX하우시스_한샘견적_지원센터",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -4561,18 +4581,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "LX_하우시스_한샘견적_지원센터",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "LX하우시스_통합지원_센터",
             "status": "active",
-            "location": "충정로",
             "project": "LX하우시스 통합지원 센터",
+            "location": "충정로",
             "cmCustomerName": "LX하우시스_인테리어",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -4653,18 +4674,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "LX하우시스_통합지원_센터",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "LX하우시스_제휴영업_견적지원센터",
             "status": "active",
-            "location": "충정로",
             "project": "LX하우시스 제휴영업 견적지원센터",
+            "location": "충정로",
             "cmCustomerName": "LX하우시스_영업지점견적센터",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "https://lxhausys-affiliate-ap.lbucess.com/login",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -4693,18 +4715,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "LX하우시스_제휴영업_견적지원센터",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "메가박스",
             "status": "active",
-            "location": "구로",
             "project": "메가박스",
+            "location": "구로",
             "cmCustomerName": "메가박스",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "https://megabox-ap.lbucess.com/login",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -5097,18 +5120,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "메가박스",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "서브웨이",
             "status": "active",
-            "location": "25층",
             "project": "서브웨이",
+            "location": "25층",
             "cmCustomerName": "서브웨이",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "http://10.62.130.220:12101/login",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -5215,18 +5239,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "서브웨이",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "롯데GFR_AS",
             "status": "active",
-            "location": "LB휴넷18층",
             "project": "롯데GFR AS",
+            "location": "LB휴넷18층",
             "cmCustomerName": "롯데GFR_AS",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "http://10.62.130.220:12151/login",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -5359,18 +5384,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "롯데GFR_AS",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "롯데GFR_CS",
             "status": "active",
-            "location": "LB휴넷18층",
             "project": "롯데GFR CS",
+            "location": "LB휴넷18층",
             "cmCustomerName": "롯데GFR_CS",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "http://10.62.130.220:12161/login",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -5503,18 +5529,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "롯데GFR_CS",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "주영앤에스",
             "status": "active",
-            "location": "25층",
             "project": "주영앤에스",
+            "location": "25층",
             "cmCustomerName": "주영앤에스",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "http://10.62.130.220:12181/login",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -5621,18 +5648,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "주영앤에스",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "교육시설안전원",
             "status": "active",
-            "location": "25층",
             "project": "교육시설안전원",
+            "location": "25층",
             "cmCustomerName": "교육시설안전원",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "https://koies-efma-ap.lbucess.com/login",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -5687,18 +5715,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "교육시설안전원",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "엘비그룹_헬프데스크",
             "status": "active",
-            "location": "24층",
             "project": "엘비그룹 헬프데스크",
+            "location": "24층",
             "cmCustomerName": "LB헬프데스크",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "http://10.62.130.220:12261/login",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -5727,18 +5756,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "엘비그룹_헬프데스크",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "창업진흥원",
             "status": "active",
-            "location": "LB휴넷18층",
             "project": "창업진흥원",
+            "location": "LB휴넷18층",
             "cmCustomerName": "창업진흥원",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "http://10.62.130.220:12281/login",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -5793,18 +5823,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "창업진흥원",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "평생교육바우처",
             "status": "active",
-            "location": "LB휴넷18층",
             "project": "평생교육바우처",
+            "location": "LB휴넷18층",
             "cmCustomerName": "평생교육바우처",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "http://10.62.130.220:12291/login",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -6041,18 +6072,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "평생교육바우처",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "충남평생교육바우처",
             "status": "active",
-            "location": "LB휴넷18층",
             "project": "충남평생교육바우처",
+            "location": "LB휴넷18층",
             "cmCustomerName": "충남평생교육바우처",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -6185,18 +6217,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "충남평생교육바우처",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "경기도평생교육바우처",
             "status": "active",
-            "location": "24층",
             "project": "경기도평생교육바우처",
+            "location": "24층",
             "cmCustomerName": "경기평생교육바우처",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "https://gyeongginile-ap.lbucess.com/login",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -6355,18 +6388,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "경기도평생교육바우처",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "충북평생교육이용권센터",
             "status": "active",
-            "location": "24층",
             "project": "충북평생교육이용권센터",
+            "location": "24층",
             "cmCustomerName": "충북평생교육이용권",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -6395,18 +6429,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "충북평생교육이용권센터",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "기프티엘",
             "status": "active",
-            "location": "25층",
             "project": "기프티엘",
+            "location": "25층",
             "cmCustomerName": "기프티엘",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "https://giftiel-ap.lbucess.com/",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -6721,18 +6756,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "기프티엘",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "라이크와이즈",
             "status": "active",
-            "location": "25층",
             "project": "라이크와이즈",
+            "location": "25층",
             "cmCustomerName": "라이크와이즈",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "https://likewize-ap.lbucess.com/login",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -6865,18 +6901,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "라이크와이즈",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "라인프렌즈",
             "status": "active",
-            "location": "25층",
             "project": "라인프렌즈",
+            "location": "25층",
             "cmCustomerName": "라인프렌즈",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "https://linefriends-ap.lbucess.com/login",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -7243,18 +7280,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "라인프렌즈",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "KFC",
             "status": "active",
-            "location": "LB휴넷18층",
             "project": "KFC",
+            "location": "LB휴넷18층",
             "cmCustomerName": "KFC",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "https://kfc-ap.lbucess.com/login",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -7283,18 +7321,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "KFC",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "더원모바일",
             "status": "active",
-            "location": "23층",
             "project": "더원모바일",
+            "location": "23층",
             "cmCustomerName": "더원모바일",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "https://topf-ap.lbucess.com/login",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -7453,18 +7492,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "더원모바일",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "더원_플랫폼_알뜰폰_개통센터",
             "status": "active",
-            "location": "23층",
             "project": "더원 플랫폼 알뜰폰 개통센터",
+            "location": "23층",
             "cmCustomerName": "더원플랫폼_개통센터",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -7493,18 +7533,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "더원_플랫폼_알뜰폰_개통센터",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "교육시설안전원_공제가입_CS센터",
             "status": "active",
-            "location": "25층",
             "project": "교육시설안전원 공제가입 CS센터",
+            "location": "25층",
             "cmCustomerName": "교육시설안전원",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -7949,18 +7990,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "교육시설안전원_공제가입_CS센터",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "삼정회계법인",
             "status": "active",
-            "location": "외부",
             "project": "삼정회계법인",
+            "location": "외부",
             "cmCustomerName": "삼정회계법인",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "https://kpmg-ap.lbucess.com/login",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -8041,18 +8083,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "삼정회계법인",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "하이엠솔루텍OB_해피콜",
             "status": "active",
-            "location": "21층",
             "project": "하이엠솔루텍OB (해피콜)",
+            "location": "21층",
             "cmCustomerName": "하이엠솔루텍OB",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -8081,18 +8124,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "하이엠솔루텍OB_해피콜",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "스타벅스",
             "status": "active",
-            "location": "21층",
             "project": "스타벅스",
+            "location": "21층",
             "cmCustomerName": "스타벅스",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -8147,18 +8191,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "스타벅스",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "한국전기차충전서비스",
             "status": "active",
-            "location": "외부",
             "project": "한국전기차충전서비스",
+            "location": "외부",
             "cmCustomerName": "한국전기차충전서비스",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "https://kevcs-ap.lbucess.com/login",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -8655,18 +8700,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "한국전기차충전서비스",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "LGU_제휴센터",
             "status": "active",
-            "location": "유플러스 통합ASP (엘비휴넷)",
             "project": "LGU+ 제휴센터",
+            "location": "유플러스 통합ASP (엘비휴넷)",
             "cmCustomerName": "유플러스제휴센터",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "https://lgopen-ap.lbucess.com/login",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -8695,18 +8741,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "LGU_제휴센터",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "유플러스_오더",
             "status": "active",
-            "location": "유플러스 통합ASP (엘비휴넷)",
             "project": "유플러스 오더",
+            "location": "유플러스 통합ASP (엘비휴넷)",
             "cmCustomerName": "유플러스제휴센터",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "https://lgu-one-ap.lbucess.com/login",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -8735,18 +8782,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "유플러스_오더",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "LGU_EOS_서비스_안내센터",
             "status": "active",
-            "location": "유플러스 통합ASP (엘비휴넷)",
             "project": "LGU+ EOS 서비스 안내센터",
+            "location": "유플러스 통합ASP (엘비휴넷)",
             "cmCustomerName": "",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "https://lgu-one-ap.lbucess.com/login",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -8775,18 +8823,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "LGU_EOS_서비스_안내센터",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "요요몰",
             "status": "active",
-            "location": "유플러스 통합ASP (엘비휴넷)",
             "project": "요요몰",
+            "location": "유플러스 통합ASP (엘비휴넷)",
             "cmCustomerName": "",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "https://lgu-one-ap.lbucess.com/login",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -8815,18 +8864,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "요요몰",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "슈가모바일",
             "status": "active",
-            "location": "유플러스 통합ASP (엘비휴넷)",
             "project": "슈가모바일",
+            "location": "유플러스 통합ASP (엘비휴넷)",
             "cmCustomerName": "슈가모바일",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "https://sugarmobile-ap.lbucess.com/login",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -8881,18 +8931,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "슈가모바일",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "티켓플랫폼_고객센터",
             "status": "active",
-            "location": "유플러스 통합ASP (엘비휴넷)",
             "project": "티켓플랫폼 고객센터",
+            "location": "유플러스 통합ASP (엘비휴넷)",
             "cmCustomerName": "티켓플랫폼",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "https://dh-series-l-ap.lbucess.com/login",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -8921,18 +8972,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "티켓플랫폼_고객센터",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "T_server_Test_OB",
             "status": "test",
-            "location": "",
             "project": "T-server Test OB",
+            "location": "",
             "cmCustomerName": "",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -8961,18 +9013,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "T_server_Test_OB",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "테스트_Test_Test2_Test3",
             "status": "test",
-            "location": "TEST",
             "project": "테스트 (Test / Test2 / Test3)",
+            "location": "TEST",
             "cmCustomerName": "__TEST__ (테스트 폴더)",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -9131,18 +9184,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "테스트_Test_Test2_Test3",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "블랙_컨슈머",
             "status": "test",
-            "location": "테스트",
             "project": "블랙 컨슈머",
+            "location": "테스트",
             "cmCustomerName": "",
-            "sourceSheet": "Dial-Plan",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -9197,18 +9251,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "블랙_컨슈머",
+            "sourceSheet": "Dial-Plan",
+            "closedAt": ""
         },
         {
-            "id": "LG생건_직영몰",
             "status": "active",
-            "location": "24층/25층",
             "project": "LG생건 직영몰",
+            "location": "24층/25층",
             "cmCustomerName": "LG생활건강",
-            "sourceSheet": "Dial-Plan #2",
+            "apUrl": "https://lghnh.lbucess.com/login",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -9315,18 +9370,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "LG생건_직영몰",
+            "sourceSheet": "Dial-Plan #2",
+            "closedAt": ""
         },
         {
-            "id": "LG생건_외부몰",
             "status": "active",
-            "location": "24층",
             "project": "LG생건 외부몰",
+            "location": "24층",
             "cmCustomerName": "LG생활건강_외부몰",
-            "sourceSheet": "Dial-Plan #2",
+            "apUrl": "https://lghnh.lbucess.com/login",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -9459,18 +9515,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "LG생건_외부몰",
+            "sourceSheet": "Dial-Plan #2",
+            "closedAt": ""
         },
         {
-            "id": "LG생건_뷰티",
             "status": "active",
-            "location": "24층/25층",
             "project": "LG생건 뷰티",
+            "location": "24층/25층",
             "cmCustomerName": "LG생활건강",
-            "sourceSheet": "Dial-Plan #2",
+            "apUrl": "https://lghnh.lbucess.com/login",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -9785,18 +9842,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "LG생건_뷰티",
+            "sourceSheet": "Dial-Plan #2",
+            "closedAt": ""
         },
         {
-            "id": "더캐리",
             "status": "active",
-            "location": "24층",
             "project": "더캐리",
+            "location": "24층",
             "cmCustomerName": "더캐리",
-            "sourceSheet": "Dial-Plan #2",
+            "apUrl": "https://thekary.lbucess.com/login",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -9981,18 +10039,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "더캐리",
+            "sourceSheet": "Dial-Plan #2",
+            "closedAt": ""
         },
         {
-            "id": "더_페이스샵",
             "status": "closed",
-            "location": "",
             "project": "더 페이스샵",
+            "location": "",
             "cmCustomerName": "",
-            "sourceSheet": "종료센터",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "소속: LG생활건강",
             "lines": [
                 {
@@ -10021,18 +10080,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "더_페이스샵",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "GS건설_자이",
             "status": "closed",
-            "location": "",
             "project": "GS건설 자이",
+            "location": "",
             "cmCustomerName": "",
-            "sourceSheet": "종료센터",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "GS건설 프로젝트군",
             "lines": [
                 {
@@ -10347,18 +10407,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "GS건설_자이",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "LG하우시스_창호SCM",
             "status": "active",
-            "location": "충정로",
             "project": "LG하우시스-창호SCM",
+            "location": "충정로",
             "cmCustomerName": "LX하우시스_창호SCM",
-            "sourceSheet": "종료센터",
+            "apUrl": "https://lxhausys-scm-ap.lbucess.com/login",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "종료센터 시트 → CM 운영 대조 후 운영 중으로 복원",
             "lines": [
                 {
@@ -10465,18 +10526,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "LG하우시스_창호SCM",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "LG하우시스_인테리어",
             "status": "active",
-            "location": "충정로",
             "project": "LG하우시스-인테리어",
+            "location": "충정로",
             "cmCustomerName": "LX하우시스_인테리어",
-            "sourceSheet": "종료센터",
+            "apUrl": "https://lxhausys-scm-ap.lbucess.com/login",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "종료센터 시트 → CM 운영 대조 후 운영 중으로 복원",
             "lines": [
                 {
@@ -10635,18 +10697,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "LG하우시스_인테리어",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "롯데관광플러스",
             "status": "closed",
-            "location": "",
             "project": "롯데관광플러스",
+            "location": "",
             "cmCustomerName": "",
-            "sourceSheet": "종료센터",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -10987,18 +11050,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "롯데관광플러스",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "한국교육과정평가원",
             "status": "active",
-            "location": "26층",
             "project": "한국교육과정평가원",
+            "location": "26층",
             "cmCustomerName": "한국교육과정평가원",
-            "sourceSheet": "종료센터",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "종료센터 시트 → CM 운영 대조 후 운영 중으로 복원",
             "lines": [
                 {
@@ -11027,18 +11091,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "한국교육과정평가원",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "LG하우시스_신유통",
             "status": "active",
-            "location": "24F",
             "project": "LG하우시스-신유통",
+            "location": "24F",
             "cmCustomerName": "LG하우시스_신유통",
-            "sourceSheet": "종료센터",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "종료센터 시트 → CM 운영 대조 후 운영 중으로 복원",
             "lines": [
                 {
@@ -11067,18 +11132,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "LG하우시스_신유통",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "LX하우시스_지인몰",
             "status": "closed",
-            "location": "",
             "project": "LX하우시스-지인몰",
+            "location": "",
             "cmCustomerName": "",
-            "sourceSheet": "종료센터",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -11107,18 +11173,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "LX하우시스_지인몰",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "LG하우시스_커머셜_고객센터",
             "status": "active",
-            "location": "24층",
             "project": "LG하우시스-커머셜 고객센터",
+            "location": "24층",
             "cmCustomerName": "LG하우시스_커머셜",
-            "sourceSheet": "종료센터",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "종료센터 시트 → CM 운영 대조 후 운영 중으로 복원",
             "lines": [
                 {
@@ -11173,18 +11240,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "LG하우시스_커머셜_고객센터",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "LG_생활건강",
             "status": "active",
-            "location": "24층/25층",
             "project": "LG 생활건강",
+            "location": "24층/25층",
             "cmCustomerName": "LG생활건강",
-            "sourceSheet": "종료센터",
+            "apUrl": "https://lghnh.lbucess.com/login",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "종료센터 시트 → CM 운영 대조 후 운영 중으로 복원",
             "lines": [
                 {
@@ -11655,18 +11723,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "LG_생활건강",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "벤디트",
             "status": "active",
-            "location": "24층",
             "project": "벤디트",
+            "location": "24층",
             "cmCustomerName": "벤디트",
-            "sourceSheet": "종료센터",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "종료센터 시트 → CM 운영 대조 후 운영 중으로 복원",
             "lines": [
                 {
@@ -11695,18 +11764,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "벤디트",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "ABC마트",
             "status": "active",
-            "location": "23층",
             "project": "ABC마트",
+            "location": "23층",
             "cmCustomerName": "ABC마트",
-            "sourceSheet": "종료센터",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "종료센터 시트 → CM 운영 대조 후 운영 중으로 복원",
             "lines": [
                 {
@@ -11787,18 +11857,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "ABC마트",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "코트라",
             "status": "active",
-            "location": "26층",
             "project": "코트라",
+            "location": "26층",
             "cmCustomerName": "코트라",
-            "sourceSheet": "종료센터",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "종료센터 시트 → CM 운영 대조 후 운영 중으로 복원",
             "lines": [
                 {
@@ -12139,18 +12210,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "코트라",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "화물잇고",
             "status": "active",
-            "location": "25층",
             "project": "화물잇고",
+            "location": "25층",
             "cmCustomerName": "화물잇고",
-            "sourceSheet": "종료센터",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "종료센터 시트 → CM 운영 대조 후 운영 중으로 복원",
             "lines": [
                 {
@@ -12179,18 +12251,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "화물잇고",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "더블에이",
             "status": "closed",
-            "location": "",
             "project": "더블에이",
+            "location": "",
             "cmCustomerName": "",
-            "sourceSheet": "종료센터",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -12219,18 +12292,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "더블에이",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "더캐리_2",
             "status": "closed",
-            "location": "",
             "project": "더캐리",
+            "location": "",
             "cmCustomerName": "더캐리",
-            "sourceSheet": "종료센터",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "종료 이력 (동일 고객사 \u0027더캐리\u0027 운영 중)",
             "lines": [
                 {
@@ -12285,18 +12359,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "더캐리_2",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "AJ오토파킹시스템즈",
             "status": "active",
-            "location": "25층",
             "project": "AJ오토파킹시스템즈",
+            "location": "25층",
             "cmCustomerName": "AJ오토파킹",
-            "sourceSheet": "종료센터",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "종료센터 시트 → CM 운영 대조 후 운영 중으로 복원",
             "lines": [
                 {
@@ -12455,18 +12530,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "AJ오토파킹시스템즈",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "현대홈쇼핑_CIC",
             "status": "active",
-            "location": "LB휴넷18층",
             "project": "현대홈쇼핑 CIC",
+            "location": "LB휴넷18층",
             "cmCustomerName": "현대홈쇼핑CIC",
-            "sourceSheet": "종료센터",
+            "apUrl": "http://10.62.130.220:12701/login",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "종료센터 시트 → CM 운영 대조 후 운영 중으로 복원",
             "lines": [
                 {
@@ -12495,18 +12571,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "현대홈쇼핑_CIC",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "하루조각",
             "status": "active",
-            "location": "마곡LG사이언스파크",
             "project": "하루조각",
+            "location": "마곡LG사이언스파크",
             "cmCustomerName": "하루조각",
-            "sourceSheet": "종료센터",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "종료센터 시트 → CM 운영 대조 후 운영 중으로 복원",
             "lines": [
                 {
@@ -12561,18 +12638,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "하루조각",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "LX하우시스_B2C온라인_지원센터",
             "status": "active",
-            "location": "충정로",
             "project": "LX하우시스 B2C온라인 지원센터",
+            "location": "충정로",
             "cmCustomerName": "LX하우시스_B2C",
-            "sourceSheet": "종료센터",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "종료센터 시트 → CM 운영 대조 후 운영 중으로 복원",
             "lines": [
                 {
@@ -12601,18 +12679,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "LX하우시스_B2C온라인_지원센터",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "달콤한고래들",
             "status": "active",
-            "location": "24층",
             "project": "달콤한고래들",
+            "location": "24층",
             "cmCustomerName": "달콤한고래들",
-            "sourceSheet": "종료센터",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "종료센터 시트 → CM 운영 대조 후 운영 중으로 복원",
             "lines": [
                 {
@@ -12641,18 +12720,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "달콤한고래들",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "민팃_대표",
             "status": "active",
-            "location": "상암",
             "project": "민팃 (대표)",
+            "location": "상암",
             "cmCustomerName": "민팃",
-            "sourceSheet": "종료센터",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "종료센터 시트 → CM 운영 대조 후 운영 중으로 복원",
             "lines": [
                 {
@@ -12889,18 +12969,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "민팃_대표",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "민팃_KT",
             "status": "closed",
-            "location": "",
             "project": "민팃 (KT)",
+            "location": "",
             "cmCustomerName": "민팃",
-            "sourceSheet": "종료센터",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "종료 이력 (동일 고객사 \u0027민팃\u0027 운영 중)",
             "lines": [
                 {
@@ -13033,18 +13114,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "민팃_KT",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "민팃_LGU",
             "status": "closed",
-            "location": "",
             "project": "민팃 (LGU+)",
+            "location": "",
             "cmCustomerName": "민팃",
-            "sourceSheet": "종료센터",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "종료 이력 (동일 고객사 \u0027민팃\u0027 운영 중)",
             "lines": [
                 {
@@ -13177,18 +13259,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "민팃_LGU",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "민팃_안심거래_키오스크",
             "status": "active",
-            "location": "상암",
             "project": "민팃 (안심거래 키오스크)",
+            "location": "상암",
             "cmCustomerName": "민팃",
-            "sourceSheet": "종료센터",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "종료센터 시트 → CM 운영 대조 후 운영 중으로 복원",
             "lines": [
                 {
@@ -13347,18 +13430,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "민팃_안심거래_키오스크",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "민팃_관제센터",
             "status": "active",
-            "location": "상암",
             "project": "민팃 (관제센터)",
+            "location": "상암",
             "cmCustomerName": "민팃",
-            "sourceSheet": "종료센터",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "종료센터 시트 → CM 운영 대조 후 운영 중으로 복원",
             "lines": [
                 {
@@ -13387,18 +13471,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "민팃_관제센터",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "LG헬로비전",
             "status": "active",
-            "location": "마곡LG사이언스파크",
             "project": "LG헬로비전",
+            "location": "마곡LG사이언스파크",
             "cmCustomerName": "헬로비전",
-            "sourceSheet": "종료센터",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "종료센터 시트 → CM 운영 대조 후 운영 중으로 복원",
             "lines": [
                 {
@@ -13453,18 +13538,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "LG헬로비전",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "이랜드e몰",
             "status": "active",
-            "location": "25층",
             "project": "이랜드e몰",
+            "location": "25층",
             "cmCustomerName": "이랜드e몰",
-            "sourceSheet": "종료센터",
+            "apUrl": "http://10.62.130.220:12171/login",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "종료센터 시트 → CM 운영 대조 후 운영 중으로 복원",
             "lines": [
                 {
@@ -13519,18 +13605,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "이랜드e몰",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "허클베리프로",
             "status": "active",
-            "location": "외부",
             "project": "허클베리프로",
+            "location": "외부",
             "cmCustomerName": "허클베리프로",
-            "sourceSheet": "종료센터",
+            "apUrl": "https://hbp-ap.lbucess.com/login",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "종료센터 시트 → CM 운영 대조 후 운영 중으로 복원",
             "lines": [
                 {
@@ -13637,18 +13724,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "허클베리프로",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "우리은행_사전예약_센터",
             "status": "active",
-            "location": "LB휴넷18층",
             "project": "우리은행 사전예약 센터",
+            "location": "LB휴넷18층",
             "cmCustomerName": "우리은행예약센터",
-            "sourceSheet": "종료센터",
+            "apUrl": "https://woprc-ap.lbucess.com/login",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "종료센터 시트 → CM 운영 대조 후 운영 중으로 복원",
             "lines": [
                 {
@@ -13677,18 +13765,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "우리은행_사전예약_센터",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "MYLGID_통신_상담_센터",
             "status": "active",
-            "location": "LB휴넷18층",
             "project": "MYLGID 통신 상담 센터",
+            "location": "LB휴넷18층",
             "cmCustomerName": "MYLGID통신상담센터",
-            "sourceSheet": "종료센터",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "종료센터 시트 → CM 운영 대조 후 운영 중으로 복원",
             "lines": [
                 {
@@ -13795,18 +13884,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "MYLGID_통신_상담_센터",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "카닥",
             "status": "active",
-            "location": "24층",
             "project": "카닥",
+            "location": "24층",
             "cmCustomerName": "카닥",
-            "sourceSheet": "종료센터",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "종료센터 시트 → CM 운영 대조 후 운영 중으로 복원",
             "lines": [
                 {
@@ -14121,18 +14211,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "카닥",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "루프트",
             "status": "closed",
-            "location": "",
             "project": "루프트",
+            "location": "",
             "cmCustomerName": "",
-            "sourceSheet": "종료센터",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "",
             "lines": [
                 {
@@ -14161,18 +14252,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "루프트",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "아파트아이",
             "status": "active",
-            "location": "24층",
             "project": "아파트아이",
+            "location": "24층",
             "cmCustomerName": "아파트아이",
-            "sourceSheet": "종료센터",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": true,
-            "closedAt": "",
             "notes": "종료센터 시트 → CM 운영 대조 후 운영 중으로 복원",
             "lines": [
                 {
@@ -14669,18 +14761,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "아파트아이",
+            "sourceSheet": "종료센터",
+            "closedAt": ""
         },
         {
-            "id": "하이프라자_온라인몰",
             "status": "active",
-            "location": "24층",
             "project": "하이프라자_온라인몰",
+            "location": "24층",
             "cmCustomerName": "하이프라자_온라인몰",
-            "sourceSheet": "CM",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "언더스코어 유무 차이 자동 매핑",
             "lines": [
                 {
@@ -14787,18 +14880,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "하이프라자_온라인몰",
+            "sourceSheet": "CM",
+            "closedAt": ""
         },
         {
-            "id": "하이프라자개통_개통실",
             "status": "active",
-            "location": "24층",
             "project": "하이프라자개통_개통실",
+            "location": "24층",
             "cmCustomerName": "하이프라자개통_개통실",
-            "sourceSheet": "CM",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "AGENT_DN 및 Places에만 존재",
             "lines": [
                 {
@@ -14827,31 +14921,33 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "하이프라자개통_개통실",
+            "sourceSheet": "CM",
+            "closedAt": ""
         },
         {
-            "id": "더스윙",
             "status": "active",
-            "location": "25층",
             "project": "더스윙",
+            "location": "25층",
             "cmCustomerName": "더스윙",
-            "sourceSheet": "CM",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "AGENT_DN 및 Places에만 존재",
-            "lines": []
+            "lines": [],
+            "id": "더스윙",
+            "sourceSheet": "CM",
+            "closedAt": ""
         },
         {
-            "id": "버킷스토어",
             "status": "active",
-            "location": "25층",
             "project": "버킷스토어",
+            "location": "25층",
             "cmCustomerName": "버킷스토어",
-            "sourceSheet": "CM",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "AGENT_DN 및 Places에만 존재",
             "lines": [
                 {
@@ -14880,70 +14976,75 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "버킷스토어",
+            "sourceSheet": "CM",
+            "closedAt": ""
         },
         {
-            "id": "자몽컴퍼니",
             "status": "active",
-            "location": "25층",
             "project": "자몽컴퍼니",
+            "location": "25층",
             "cmCustomerName": "자몽컴퍼니",
-            "sourceSheet": "CM",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "Places에만 존재",
-            "lines": []
+            "lines": [],
+            "id": "자몽컴퍼니",
+            "sourceSheet": "CM",
+            "closedAt": ""
         },
         {
-            "id": "집꾸미기",
             "status": "active",
-            "location": "25층",
             "project": "집꾸미기",
+            "location": "25층",
             "cmCustomerName": "집꾸미기",
-            "sourceSheet": "CM",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "AGENT_DN 및 Places에만 존재",
-            "lines": []
+            "lines": [],
+            "id": "집꾸미기",
+            "sourceSheet": "CM",
+            "closedAt": ""
         },
         {
-            "id": "코트라IB",
             "status": "active",
-            "location": "25층",
             "project": "코트라IB",
-            "cmCustomerName": "코트라IB",
-            "sourceSheet": "CM",
-            "useVQueue": false,
-            "useIvr": false,
-            "closedAt": "",
-            "notes": "AGENT_DN 및 Places에만 존재 (AgentLogin/ACDPosition은 LB휴넷18층/코트라 확인 필요)",
-            "lines": []
-        },
-        {
-            "id": "코트라OB",
-            "status": "active",
             "location": "25층",
-            "project": "코트라OB",
-            "cmCustomerName": "코트라OB",
-            "sourceSheet": "CM",
+            "cmCustomerName": "코트라IB",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "AGENT_DN 및 Places에만 존재 (AgentLogin/ACDPosition은 LB휴넷18층/코트라 확인 필요)",
-            "lines": []
+            "lines": [],
+            "id": "코트라IB",
+            "sourceSheet": "CM",
+            "closedAt": ""
         },
         {
-            "id": "GS랄라블라",
             "status": "active",
-            "location": "LB휴넷18층",
-            "project": "GS랄라블라",
-            "cmCustomerName": "GS랄라블라",
-            "sourceSheet": "CM",
+            "project": "코트라OB",
+            "location": "25층",
+            "cmCustomerName": "코트라OB",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
+            "notes": "AGENT_DN 및 Places에만 존재 (AgentLogin/ACDPosition은 LB휴넷18층/코트라 확인 필요)",
+            "lines": [],
+            "id": "코트라OB",
+            "sourceSheet": "CM",
+            "closedAt": ""
+        },
+        {
+            "status": "active",
+            "project": "GS랄라블라",
+            "location": "LB휴넷18층",
+            "cmCustomerName": "GS랄라블라",
+            "apUrl": "",
+            "useVQueue": false,
+            "useIvr": false,
             "notes": "AgentLogin/ACDPosition에만 존재",
             "lines": [
                 {
@@ -14972,18 +15073,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "GS랄라블라",
+            "sourceSheet": "CM",
+            "closedAt": ""
         },
         {
-            "id": "GS수퍼",
             "status": "active",
-            "location": "LB휴넷18층",
             "project": "GS수퍼",
+            "location": "LB휴넷18층",
             "cmCustomerName": "GS수퍼",
-            "sourceSheet": "CM",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "AgentLogin/ACDPosition에만 존재",
             "lines": [
                 {
@@ -15012,18 +15114,19 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "GS수퍼",
+            "sourceSheet": "CM",
+            "closedAt": ""
         },
         {
-            "id": "엘칸토",
             "status": "active",
-            "location": "LB휴넷18층",
             "project": "엘칸토",
+            "location": "LB휴넷18층",
             "cmCustomerName": "엘칸토",
-            "sourceSheet": "CM",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
             "notes": "AGENT_DN/Places에만 존재",
             "lines": [
                 {
@@ -15052,44 +15155,47 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "엘칸토",
+            "sourceSheet": "CM",
+            "closedAt": ""
         },
         {
-            "id": "마마카사르",
             "status": "active",
-            "location": "대치동",
             "project": "마마카사르",
-            "cmCustomerName": "마마카사르",
-            "sourceSheet": "CM",
-            "useVQueue": false,
-            "useIvr": false,
-            "closedAt": "",
-            "notes": "AgentLogin에만 존재 (ACDPosition에 대치동 폴더 없음)",
-            "lines": []
-        },
-        {
-            "id": "아몬즈",
-            "status": "active",
             "location": "대치동",
-            "project": "아몬즈",
-            "cmCustomerName": "아몬즈",
-            "sourceSheet": "CM",
+            "cmCustomerName": "마마카사르",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
-            "notes": "ACDPosition에 대치동 폴더 없음",
-            "lines": []
+            "notes": "AgentLogin에만 존재 (ACDPosition에 대치동 폴더 없음)",
+            "lines": [],
+            "id": "마마카사르",
+            "sourceSheet": "CM",
+            "closedAt": ""
         },
         {
-            "id": "재택",
             "status": "active",
-            "location": "재택",
-            "project": "재택",
-            "cmCustomerName": "재택",
-            "sourceSheet": "CM",
+            "project": "아몬즈",
+            "location": "대치동",
+            "cmCustomerName": "아몬즈",
+            "apUrl": "",
             "useVQueue": false,
             "useIvr": false,
-            "closedAt": "",
+            "notes": "ACDPosition에 대치동 폴더 없음",
+            "lines": [],
+            "id": "아몬즈",
+            "sourceSheet": "CM",
+            "closedAt": ""
+        },
+        {
+            "status": "active",
+            "project": "재택",
+            "location": "재택",
+            "cmCustomerName": "재택",
+            "apUrl": "",
+            "useVQueue": false,
+            "useIvr": false,
             "notes": "AGENT_DN 및 Places에만 존재",
             "lines": [
                 {
@@ -15118,7 +15224,10 @@
                     "legacyIvrPg": "",
                     "legacyRsiNote": ""
                 }
-            ]
+            ],
+            "id": "재택",
+            "sourceSheet": "CM",
+            "closedAt": ""
         }
     ],
     "priTrunks": [

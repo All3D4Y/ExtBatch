@@ -495,13 +495,13 @@ namespace CmOxeProvisioner.Views
                         createCnt,
                         existsCnt,
                         errCnt > 0 ? string.Format(" / 상위 경로 오류 {0}건", errCnt) : "");
-                    PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), errCnt == 0, "CM 사전 점검 완료", msg);
+                    PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), errCnt == 0, "Config 사전 점검 완료", msg);
                 }
             }
             catch (Exception ex)
             {
                 AppendExternalLog("[사전 점검 오류] " + ex.Message);
-                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "CM 사전 점검 오류", ex.Message);
+                PopupDialogs.ShowSyntaxToast(Window.GetWindow(this), false, "Config 사전 점검 오류", ex.Message);
             }
         }
 
@@ -529,18 +529,18 @@ namespace CmOxeProvisioner.Views
 
             StringBuilder detail = new StringBuilder();
             detail.AppendLine(string.Format("• 센터명: {0} (위치: {1})", input.CenterName, string.IsNullOrEmpty(input.Location) ? "(위치 없음)" : input.Location));
-            detail.AppendLine(string.Format("• CM 생성 대상: 총 {0}곳 (VQueue={1}, IVR Place Group={2})",
+            detail.AppendLine(string.Format("• Config 생성 대상: 총 {0}곳 (VQueue={1}, IVR Place Group={2})",
                 _targetRows.Count, input.UseVQueue ? "사용" : "미사용", input.UseIvr ? "사용" : "미사용"));
             detail.AppendLine(string.Format("• OXE 프리셋 · 선번장 등록: {0}건", input.Presets.Count));
             if (isExistingCenter)
             {
-                detail.AppendLine("※ 동일 이름의 센터가 이미 목록에 있습니다. CM 누락 경로 보완 및 선번장/프리셋 정보를 업데이트합니다.");
+                detail.AppendLine("※ 동일 이름의 센터가 이미 목록에 있습니다. Config 누락 경로 보완 및 선번장/프리셋 정보를 업데이트합니다.");
             }
 
             if (!PopupDialogs.ConfirmAction(
                 Window.GetWindow(this),
-                "센터 CM 생성 및 등록 확인",
-                isExistingCenter ? "기존 센터 CM 보완 생성 및 설정 업데이트" : "신규 센터 CM 경로 일괄 생성 및 등록",
+                "센터 Config 생성 및 등록 확인",
+                isExistingCenter ? "기존 센터 Config 보완 생성 및 설정 업데이트" : "신규 센터 Config 경로 일괄 생성 및 등록",
                 detail.ToString().TrimEnd(),
                 "생성 실행"))
             {
@@ -554,7 +554,7 @@ namespace CmOxeProvisioner.Views
                 {
                     ApplyStatusMapFromResults(outcome.CmResponse.items, false);
                     string summary = string.Format(
-                        "CM 생성 {0}건 / 건너뜀 {1}건 / 실패 {2}건 ({3:N1}초)\ncm_customers.json {4}",
+                        "Config 생성 {0}건 / 건너뜀 {1}건 / 실패 {2}건 ({3:N1}초)\ncm_customers.json {4}",
                         outcome.CmResponse.createdCount,
                         outcome.CmResponse.skippedCount,
                         outcome.CmResponse.failedCount,

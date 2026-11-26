@@ -3,7 +3,6 @@ using System.Windows;
 using System.Windows.Controls;
 using CmOxeProvisioner.Models;
 using CmOxeProvisioner.Services;
-using Microsoft.Win32;
 
 namespace CmOxeProvisioner.Views
 {
@@ -44,9 +43,14 @@ namespace CmOxeProvisioner.Views
             if (src == null) return AppSettings.CreateDefault();
             AppSettings c = new AppSettings();
             c.ThemeKey = src.ThemeKey;
-            c.CmExePath = src.CmExePath;
+            c.CmPrimaryHost = src.CmPrimaryHost;
+            c.CmPrimaryPort = src.CmPrimaryPort;
+            c.CmBackupHost = src.CmBackupHost;
+            c.CmBackupPort = src.CmBackupPort;
+            c.CmClientName = src.CmClientName;
             c.CmUserId = src.CmUserId;
             c.CmPasswordEnc = src.CmPasswordEnc;
+            c.BackendPort = src.BackendPort;
             c.EmsUrl = src.EmsUrl;
             c.EmsServerKeyword = src.EmsServerKeyword;
             c.EmsUserId = src.EmsUserId;
@@ -62,9 +66,19 @@ namespace CmOxeProvisioner.Views
 
         private void LoadFields(AppSettings s)
         {
-            TxtCmExePath.Text = s.CmExePath ?? "";
-            TxtCmUserId.Text = s.CmUserId ?? "";
-            PwdCmPassword.Password = SettingsService.UnprotectString(s.CmPasswordEnc);
+            TxtCmPrimaryHost.Text = s.CmPrimaryHost ?? "10.62.130.67";
+            TxtCmPrimaryPort.Text = (s.CmPrimaryPort > 0 ? s.CmPrimaryPort : 2020).ToString();
+            TxtCmBackupHost.Text = s.CmBackupHost ?? "10.62.130.68";
+            TxtCmBackupPort.Text = (s.CmBackupPort > 0 ? s.CmBackupPort : 2020).ToString();
+            TxtCmClientName.Text = string.IsNullOrEmpty(s.CmClientName) ? "default" : s.CmClientName;
+            TxtCmUserId.Text = string.IsNullOrEmpty(s.CmUserId) ? "default" : s.CmUserId;
+            string plainPass = SettingsService.UnprotectString(s.CmPasswordEnc);
+            if (string.IsNullOrEmpty(s.CmPasswordEnc) && string.Equals(TxtCmUserId.Text, "default", StringComparison.OrdinalIgnoreCase))
+            {
+                plainPass = "password";
+            }
+            PwdCmPassword.Password = plainPass;
+            TxtBackendPort.Text = (s.BackendPort > 0 ? s.BackendPort : 18080).ToString();
 
             TxtEmsUrl.Text = s.EmsUrl ?? "https://lightgate.lbucess.com/terminal";
             TxtEmsServerKeyword.Text = s.EmsServerKeyword ?? "9. PBX_A";
@@ -90,17 +104,6 @@ namespace CmOxeProvisioner.Views
             }
         }
 
-        private void BtnBrowseCm_Click(object sender, RoutedEventArgs e)
-        {
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Filter = "Configuration Manager (sce.exe)|sce.exe|Executable Files (*.exe)|*.exe|All Files (*.*)|*.*";
-            ofd.Title = "Configuration Manager (sce.exe) 위치 선택";
-            if (ofd.ShowDialog(this) == true)
-            {
-                TxtCmExePath.Text = ofd.FileName;
-            }
-        }
-
         private void BtnReset_Click(object sender, RoutedEventArgs e)
         {
             AppSettings defs = AppSettings.CreateDefault();
@@ -117,6 +120,40 @@ namespace CmOxeProvisioner.Views
 
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
+            string primaryHost = TxtCmPrimaryHost.Text.Trim();
+            if (string.IsNullOrWhiteSpace(primaryHost))
+            {
+                MessageBox.Show(this, "Primary Config Server Host를 입력하세요.", "입력 확인", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            int primaryPort;
+            if (!int.TryParse(TxtCmPrimaryPort.Text.Trim(), out primaryPort) || primaryPort <= 0 || primaryPort > 65535)
+            {
+                MessageBox.Show(this, "Primary Port는 1~65535 사이의 숫자여야 합니다.", "입력 확인", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            string backupHost = TxtCmBackupHost.Text.Trim();
+            int backupPort = 2020;
+            if (!string.IsNullOrEmpty(backupHost))
+            {
+                if (!int.TryParse(TxtCmBackupPort.Text.Trim(), out backupPort) || backupPort <= 0 || backupPort > 65535)
+                {
+                    MessageBox.Show(this, "Backup Port는 1~65535 사이의 숫자여야 합니다.", "입력 확인", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+            }
+            else if (!int.TryParse(TxtCmBackupPort.Text.Trim(), out backupPort) || backupPort <= 0 || backupPort > 65535)
+            {
+                backupPort = 2020;
+            }
+
+            int backendPort;
+            if (!int.TryParse(TxtBackendPort.Text.Trim(), out backendPort) || backendPort <= 0 || backendPort > 65535)
+            {
+                MessageBox.Show(this, "백엔드 Port는 1~65535 사이의 숫자여야 합니다.", "입력 확인", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             int nodeNum;
             if (!int.TryParse(TxtNodeNumber.Text.Trim(), out nodeNum) || nodeNum <= 0)
             {
@@ -130,9 +167,14 @@ namespace CmOxeProvisioner.Views
                 return;
             }
 
-            _workingSettings.CmExePath = TxtCmExePath.Text.Trim();
-            _workingSettings.CmUserId = TxtCmUserId.Text.Trim();
+            _workingSettings.CmPrimaryHost = primaryHost;
+            _workingSettings.CmPrimaryPort = primaryPort;
+            _workingSettings.CmBackupHost = backupHost;
+            _workingSettings.CmBackupPort = backupPort;
+            _workingSettings.CmClientName = string.IsNullOrWhiteSpace(TxtCmClientName.Text) ? "default" : TxtCmClientName.Text.Trim();
+            _workingSettings.CmUserId = string.IsNullOrWhiteSpace(TxtCmUserId.Text) ? "default" : TxtCmUserId.Text.Trim();
             _workingSettings.CmPasswordEnc = SettingsService.ProtectString(PwdCmPassword.Password);
+            _workingSettings.BackendPort = backendPort;
 
             _workingSettings.EmsUrl = TxtEmsUrl.Text.Trim();
             _workingSettings.EmsServerKeyword = TxtEmsServerKeyword.Text.Trim();
