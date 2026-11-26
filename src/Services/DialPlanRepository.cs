@@ -26,11 +26,175 @@ namespace CmOxeProvisioner.Services
         }
     }
 
+    public class DialPlanBackupEntry
+    {
+        public string FilePath { get; set; }
+        public string FileName { get; set; }
+        public DateTime SavedAt { get; set; }
+        public long SizeBytes { get; set; }
+        public string DisplayLabel
+        {
+            get
+            {
+                double kb = SizeBytes / 1024.0;
+                return string.Format("{0:yyyy-MM-dd HH:mm:ss}  ({1:0.0} KB)  -  {2}", SavedAt, kb, FileName);
+            }
+        }
+    }
+
     /// <summary>
     /// Persistence, preset synchronization, and free-resource finder for dialplan_db.json.
     /// </summary>
     public static class DialPlanRepository
     {
+        private const int MaxAutoBackups = 20;
+
+        public static string SerializeSnapshot(DialPlanDatabase db)
+        {
+            if (db == null) db = new DialPlanDatabase();
+            db.EnsureLists();
+            var ser = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
+            string rawJson = ser.Serialize(db);
+            object tree = ser.DeserializeObject(rawJson);
+            var sb = new StringBuilder(rawJson.Length);
+            AppendCanonicalJsonValue(sb, tree, ser);
+            return sb.ToString();
+        }
+
+        private static void AppendCanonicalJsonValue(StringBuilder sb, object node, JavaScriptSerializer ser)
+        {
+            if (node == null)
+            {
+                sb.Append("null");
+                return;
+            }
+
+            var dict = node as IDictionary<string, object>;
+            if (dict != null)
+            {
+                sb.Append('{');
+                var keys = new List<string>(dict.Keys);
+                keys.Sort(StringComparer.Ordinal);
+                for (int i = 0; i < keys.Count; i++)
+                {
+                    if (i > 0) sb.Append(',');
+                    string key = keys[i];
+                    sb.Append(ser.Serialize(key));
+                    sb.Append(':');
+                    AppendCanonicalJsonValue(sb, dict[key], ser);
+                }
+                sb.Append('}');
+                return;
+            }
+
+            if (node is string)
+            {
+                sb.Append(ser.Serialize(node));
+                return;
+            }
+
+            var list = node as System.Collections.IEnumerable;
+            if (list != null)
+            {
+                sb.Append('[');
+                bool first = true;
+                foreach (object item in list)
+                {
+                    if (!first) sb.Append(',');
+                    first = false;
+                    AppendCanonicalJsonValue(sb, item, ser);
+                }
+                sb.Append(']');
+                return;
+            }
+
+            sb.Append(ser.Serialize(node));
+        }
+
+        public static DialPlanDatabase DeserializeSnapshot(string snapshotJson)
+        {
+            if (string.IsNullOrWhiteSpace(snapshotJson)) return new DialPlanDatabase();
+            var ser = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
+            var db = ser.Deserialize<DialPlanDatabase>(snapshotJson) ?? new DialPlanDatabase();
+            db.EnsureLists();
+            foreach (var c in db.centers)
+            {
+                if (string.IsNullOrWhiteSpace(c.id))
+                    c.id = DialPlanWorkbookMapper.BuildCenterId(c.project, db.centers);
+            }
+            return db;
+        }
+
+        public static List<DialPlanBackupEntry> ListBackups(string dbPath)
+        {
+            var result = new List<DialPlanBackupEntry>();
+            if (string.IsNullOrWhiteSpace(dbPath)) return result;
+            string dir = Path.GetDirectoryName(dbPath);
+            if (string.IsNullOrWhiteSpace(dir)) return result;
+            string backupDir = Path.Combine(dir, "backups");
+            if (!Directory.Exists(backupDir)) return result;
+
+            foreach (string fp in Directory.GetFiles(backupDir, "dialplan_db_*.json"))
+            {
+                try
+                {
+                    var fi = new FileInfo(fp);
+                    result.Add(new DialPlanBackupEntry
+                    {
+                        FilePath = fp,
+                        FileName = fi.Name,
+                        SavedAt = fi.LastWriteTime,
+                        SizeBytes = fi.Length
+                    });
+                }
+                catch
+                {
+                }
+            }
+            return result.OrderByDescending(x => x.SavedAt).ToList();
+        }
+
+        private static void CreateAutoBackupIfPrimaryDb(string dbPath)
+        {
+            if (string.IsNullOrWhiteSpace(dbPath) || !File.Exists(dbPath)) return;
+            string fileName = Path.GetFileName(dbPath) ?? string.Empty;
+            if (!string.Equals(fileName, "dialplan_db.json", StringComparison.OrdinalIgnoreCase))
+                return;
+
+            string dir = Path.GetDirectoryName(dbPath);
+            if (string.IsNullOrWhiteSpace(dir)) return;
+
+            try
+            {
+                string backupDir = Path.Combine(dir, "backups");
+                if (!Directory.Exists(backupDir))
+                    Directory.CreateDirectory(backupDir);
+
+                string stamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                string dest = Path.Combine(backupDir, "dialplan_db_" + stamp + ".json");
+                int seq = 1;
+                while (File.Exists(dest))
+                {
+                    dest = Path.Combine(backupDir, "dialplan_db_" + stamp + "_" + seq + ".json");
+                    seq++;
+                }
+                File.Copy(dbPath, dest, false);
+
+                var files = Directory.GetFiles(backupDir, "dialplan_db_*.json")
+                    .Select(p => new FileInfo(p))
+                    .OrderByDescending(fi => fi.LastWriteTimeUtc)
+                    .ToList();
+                for (int i = MaxAutoBackups; i < files.Count; i++)
+                {
+                    try { files[i].Delete(); } catch { }
+                }
+            }
+            catch
+            {
+                // Backup rotation failure should not block primary save
+            }
+        }
+
         public static DialPlanDatabase Load(string dbPath)
         {
             if (string.IsNullOrWhiteSpace(dbPath) || !File.Exists(dbPath))
@@ -64,6 +228,8 @@ namespace CmOxeProvisioner.Services
             string dir = Path.GetDirectoryName(dbPath);
             if (!string.IsNullOrWhiteSpace(dir) && !Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
+
+            CreateAutoBackupIfPrimaryDb(dbPath);
 
             var ser = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
             string rawJson = ser.Serialize(db);

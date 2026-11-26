@@ -14,6 +14,11 @@
   - **`AP` 연결 컬럼 (`미사용` / `바로가기`)**: `CM 연동`과 `상세` 사이에 `AP` 컬럼을 두어 URL 미입력 센터는 `미사용`으로 표시하고, 클릭 시 인라인 입력 후 URL이 저장되면 밑줄 강조된 **`바로가기`** 링크 버튼으로 전환되어 클릭으로 브라우저 연결 지원 (우클릭 메뉴로 수정·초기화 가능)
   - **`업무 종료로 이동` 경고 스타일(`WarnBtn`) 적용**: 오작동 방지를 위해 주황/호박색 경고 테두리·배경 스타일 적용 (`업무 종료` 상태에서는 청록색 `운영 중으로 복구`로 전환)
   - **상세 `+ 라인 추가` / `선택 라인 삭제` 편집 트랜잭션 · 예외 루프 버그 수정 (`App`, `DialPlanTabView`)**: 세부 선번 셀 편집 중(`EditItem` 트랜잭션 활성 상태)에 `+ 라인 추가`·`선택 라인 삭제`·필터 전환 시 `CommitEdit`/`CancelEdit` 선행 종료 및 `CollectionViewSource.GetDefaultView().Refresh()` 전환으로 `'DeferRefresh'` 예외 방지, `DispatcherUnhandledException` 재진입 가드로 모달 오류창 연속 팝업 차단
+  - **선번장 조회/편집 모드 분리 · Undo/Redo(`Ctrl+Z`/`Ctrl+Y`) · 일괄 저장 · 자동 백업 (`DialPlanTabView`, `DialPlanEditCommands`, `DialPlanRepository`, `PopupDialogs`, `MainWindow`)**:
+    - 탭 최상단 중앙 **`조회 모드` / `편집 모드`** 전환 바 추가: 기본은 읽기 전용 **`조회 모드 (잠금)`**으로 열어 4개 서브탭 8개 표(`Dial-Plan`, `PRI`, `Entity`, `IP IVR`, `D.V.G`, `PBX`, `GPA`, `110 Block MDF`)와 `AP` 주소 및 수정/삭제 버튼 오동작 차단
+    - **커맨드 패턴 Undo/Redo (`DialPlanCommandHistory`, 최대 150단계)**: `Ctrl+Z`/`Ctrl+Y` 단축키 및 상단 **`↶ 취소` · `↷ 재실행`** 버튼으로 셀 편집·헤더(위치/센터명/상태/메모/VQueue/IVR)·`AP` 주소 수정/초기화·행 추가/삭제(원래 위치 인덱스 보존)를 4개 서브탭 전체에 걸쳐 즉시 되돌리고 다시 실행 가능
+    - **스냅샷 기반 변경 추적 & 안전 이탈 가드 (`PromptSaveDiscardCancel`)**: 결정론적 JSON 스냅샷(`SerializeSnapshot`)으로 미저장 변경 건수를 추적하며 `AP` 주소 편집도 통합 저장에 포함, **`변경사항 되돌리기`**로 마지막 저장 시점 즉시 원복, **`변경사항 저장 (Ctrl+S)`** 또는 저장 없이 `조회 모드` 전환·`+ 센터 추가`·`가져오기`·탭/앱 종료 시 저장/저장 안 함/취소 확인 제공
+    - **자동 백업 & `백업 복원` (`backups\dialplan_db_yyyyMMdd_HHmmss.json`)**: `dialplan_db.json` 저장 직전 최근 **20개**까지 자동 백업을 회전 보관하고(`.gitignore`에 `backups/` 추가), 상단 **`백업 복원`** 창(`PickDialPlanBackup`)에서 타임스탬프·용량 확인 후 원클릭 복원 지원
 
 ## v1.2.0 (2026-11-25)
 - **사이드바 `'선번장 · 센터'` 통합 관리 개편 (`DialPlanTabView`, `CenterAddWindow`, `dialplan_db.json`)**:

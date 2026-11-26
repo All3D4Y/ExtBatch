@@ -1250,5 +1250,140 @@ namespace CmOxeProvisioner.Views
 
             return ShowThemedModal(owner, dlg, txtConfirm, true, false);
         }
+
+        public static MessageBoxResult PromptSaveDiscardCancel(
+            Window owner,
+            string title,
+            string headline,
+            string detail)
+        {
+            StackPanel shell;
+            Window dlg = CreateThemedDialogShell(owner, string.IsNullOrWhiteSpace(title) ? "미저장 변경사항" : title, 470, out shell);
+
+            StackPanel root = new StackPanel();
+            root.Margin = new Thickness(18);
+            root.Children.Add(BuildAlertHeader("Warn", "!", string.IsNullOrWhiteSpace(headline) ? "저장되지 않은 변경사항이 있습니다." : headline, 13.5, detail, null));
+
+            MessageBoxResult chosen = MessageBoxResult.Cancel;
+
+            StackPanel btnRow = new StackPanel();
+            btnRow.Orientation = Orientation.Horizontal;
+            btnRow.HorizontalAlignment = HorizontalAlignment.Right;
+            btnRow.Margin = new Thickness(0, 18, 0, 0);
+
+            Button btnCancel = new Button();
+            btnCancel.Content = "취소";
+            btnCancel.Style = Application.Current.Resources["BaseBtn"] as Style;
+            btnCancel.MinWidth = 74;
+            btnCancel.Margin = new Thickness(0, 0, 8, 0);
+            btnCancel.IsCancel = true;
+            btnCancel.Click += delegate { chosen = MessageBoxResult.Cancel; dlg.DialogResult = false; dlg.Close(); };
+            btnRow.Children.Add(btnCancel);
+
+            Button btnDiscard = new Button();
+            btnDiscard.Content = "변경 버리고 원복";
+            btnDiscard.Style = Application.Current.Resources["WarnBtn"] as Style;
+            btnDiscard.MinWidth = 118;
+            btnDiscard.Margin = new Thickness(0, 0, 8, 0);
+            btnDiscard.Click += delegate { chosen = MessageBoxResult.No; dlg.DialogResult = true; dlg.Close(); };
+            btnRow.Children.Add(btnDiscard);
+
+            Button btnSave = new Button();
+            btnSave.Content = "저장 후 진행";
+            btnSave.Style = Application.Current.Resources["PrimaryBtn"] as Style;
+            btnSave.MinWidth = 104;
+            btnSave.IsDefault = true;
+            btnSave.Click += delegate { chosen = MessageBoxResult.Yes; dlg.DialogResult = true; dlg.Close(); };
+            btnRow.Children.Add(btnSave);
+
+            root.Children.Add(btnRow);
+            shell.Children.Add(root);
+
+            ShowThemedModal(owner, dlg, btnSave, true, false);
+            return chosen;
+        }
+
+        public static DialPlanBackupEntry PickDialPlanBackup(Window owner, IList<DialPlanBackupEntry> backups)
+        {
+            if (backups == null || backups.Count == 0)
+            {
+                ShowSyntaxToast(owner, false, "백업 없음", "저장 시 자동 생성된 백업 파일(backups/)이 아직 없습니다.");
+                return null;
+            }
+
+            StackPanel shell;
+            Window dlg = CreateThemedDialogShell(owner, "자동 백업 시점 복원", 540, out shell);
+
+            StackPanel root = new StackPanel();
+            root.Margin = new Thickness(18);
+            root.Children.Add(BuildAlertHeader(
+                "Ok",
+                "↺",
+                "복원할 자동 백업 시점을 선택하세요",
+                13.5,
+                "선번장을 저장할 때마다 직전 파일이 backups 폴더에 자동 보관됩니다(최대 20건).",
+                null));
+
+            ListBox lb = new ListBox();
+            lb.Height = 230;
+            lb.Margin = new Thickness(0, 12, 0, 0);
+            lb.Background = ResBrush("InputBgBrush", Brushes.White);
+            lb.Foreground = ResBrush("TextBrush", Brushes.Black);
+            lb.BorderBrush = ResBrush("BorderBrush", Brushes.Gray);
+            lb.BorderThickness = new Thickness(1);
+            lb.FontSize = 12;
+            lb.DisplayMemberPath = "DisplayLabel";
+            lb.ItemsSource = backups;
+            lb.SelectedIndex = 0;
+            root.Children.Add(lb);
+
+            DialPlanBackupEntry selected = null;
+
+            StackPanel btnRow = new StackPanel();
+            btnRow.Orientation = Orientation.Horizontal;
+            btnRow.HorizontalAlignment = HorizontalAlignment.Right;
+            btnRow.Margin = new Thickness(0, 14, 0, 0);
+
+            Button btnCancel = new Button();
+            btnCancel.Content = "취소";
+            btnCancel.Style = Application.Current.Resources["BaseBtn"] as Style;
+            btnCancel.MinWidth = 76;
+            btnCancel.Margin = new Thickness(0, 0, 8, 0);
+            btnCancel.IsCancel = true;
+            btnCancel.Click += delegate { dlg.DialogResult = false; dlg.Close(); };
+            btnRow.Children.Add(btnCancel);
+
+            Button btnRestore = new Button();
+            btnRestore.Content = "선택 백업으로 복원";
+            btnRestore.Style = Application.Current.Resources["WarnBtn"] as Style;
+            btnRestore.MinWidth = 135;
+            btnRestore.IsDefault = true;
+            btnRestore.Click += delegate
+            {
+                selected = lb.SelectedItem as DialPlanBackupEntry;
+                if (selected != null)
+                {
+                    dlg.DialogResult = true;
+                    dlg.Close();
+                }
+            };
+            btnRow.Children.Add(btnRestore);
+
+            lb.MouseDoubleClick += delegate
+            {
+                if (lb.SelectedItem is DialPlanBackupEntry)
+                {
+                    selected = lb.SelectedItem as DialPlanBackupEntry;
+                    dlg.DialogResult = true;
+                    dlg.Close();
+                }
+            };
+
+            root.Children.Add(btnRow);
+            shell.Children.Add(root);
+
+            bool ok = ShowThemedModal(owner, dlg, lb, true, false);
+            return ok ? selected : null;
+        }
     }
 }

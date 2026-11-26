@@ -30,6 +30,15 @@
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="TextAlignment" Value="Center"/>
         </Style>
+        <Style TargetType="TextBox" x:Key="DialPlanMetaTextBox" BasedOn="{StaticResource ModernTextBox}">
+            <Style.Triggers>
+                <Trigger Property="IsReadOnly" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource SurfaceAltBrush}"/>
+                    <Setter Property="Opacity" Value="0.88"/>
+                    <Setter Property="Cursor" Value="Arrow"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
         <Style TargetType="DataGridColumnHeader" x:Key="DialPlanCenteredHeaderStyle" BasedOn="{StaticResource ModernDataGridColumnHeader}">
             <Setter Property="Background" Value="{DynamicResource SurfaceAltBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource TableGridLineBrush}"/>
@@ -168,6 +177,7 @@
                                             Tag="{Binding}"
                                             Click="BtnInlineOpenExtCti_Click"/>
                                     <Button Content="{Binding StatusMoveButtonText}"
+                                            IsEnabled="{Binding IsEditMode, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                             Height="27" Padding="10,0" Margin="0,0,6,0"
                                             Tag="{Binding}"
                                             Click="BtnInlineToggleStatus_Click">
@@ -184,6 +194,7 @@
                                         </Button.Style>
                                     </Button>
                                     <Button Style="{StaticResource DangerBtn}"
+                                            IsEnabled="{Binding IsEditMode, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                             Content="완전 삭제 (JSON+CM)"
                                             Height="27" Padding="10,0" Margin="0,0,6,0"
                                             Tag="{Binding}"
@@ -217,22 +228,39 @@
                                               Checked="ChkInlineMergeCells_Changed"
                                               Unchecked="ChkInlineMergeCells_Changed"
                                               ToolTip="연속 행에서 값이 같은 셀을 세로로 합쳐서 표시합니다."/>
-                                    <Button Style="{StaticResource BaseBtn}" Content="+ 라인 추가" Height="27" Padding="9,0" Margin="0,0,5,0" Tag="{Binding}" Click="BtnInlineAddLine_Click"/>
-                                    <Button Style="{StaticResource BaseBtn}" Content="선택 라인 삭제" Height="27" Padding="9,0" Margin="0,0,6,0" Tag="{Binding}" Click="BtnInlineRemoveLine_Click"/>
-                                    <Button Style="{StaticResource PrimaryBtn}" Content="변경 저장 (DB + CM 프리셋)" Height="27" Padding="12,0" Tag="{Binding}" Click="BtnInlineSaveCenter_Click"/>
+                                    <Button Style="{StaticResource BaseBtn}" Content="+ 라인 추가" Height="27" Padding="9,0" Margin="0,0,5,0"
+                                            IsEnabled="{Binding IsEditMode, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            Tag="{Binding}" Click="BtnInlineAddLine_Click"/>
+                                    <Button Style="{StaticResource BaseBtn}" Content="선택 라인 삭제" Height="27" Padding="9,0" Margin="0,0,6,0"
+                                            IsEnabled="{Binding IsEditMode, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            Tag="{Binding}" Click="BtnInlineRemoveLine_Click"/>
+                                    <Button Style="{StaticResource PrimaryBtn}" Content="변경 저장 (DB + CM 프리셋)" Height="27" Padding="12,0"
+                                            IsEnabled="{Binding IsEditMode, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            Tag="{Binding}" Click="BtnInlineSaveCenter_Click"/>
                                 </StackPanel>
 
                                 <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
                                     <TextBlock Text="위치" FontSize="11" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                                    <TextBox Style="{StaticResource ModernTextBox}" Text="{Binding location, UpdateSourceTrigger=PropertyChanged}" Width="84" Height="26" Margin="0,0,8,0"/>
+                                    <TextBox Style="{StaticResource DialPlanMetaTextBox}"
+                                             IsReadOnly="{Binding IsViewMode, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                             Text="{Binding location, UpdateSourceTrigger=PropertyChanged}"
+                                             GotKeyboardFocus="InlineHeaderTextBox_GotFocus" LostKeyboardFocus="InlineHeaderTextBox_LostFocus"
+                                             Width="84" Height="26" Margin="0,0,8,0"/>
 
                                     <TextBlock Text="센터명" FontSize="11" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                                    <TextBox Style="{StaticResource ModernTextBox}" Text="{Binding project, UpdateSourceTrigger=PropertyChanged}" Width="130" Height="26" Margin="0,0,8,0"/>
+                                    <TextBox Style="{StaticResource DialPlanMetaTextBox}"
+                                             IsReadOnly="{Binding IsViewMode, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                             Text="{Binding project, UpdateSourceTrigger=PropertyChanged}"
+                                             GotKeyboardFocus="InlineHeaderTextBox_GotFocus" LostKeyboardFocus="InlineHeaderTextBox_LostFocus"
+                                             Width="130" Height="26" Margin="0,0,8,0"/>
 
                                     <TextBlock Text="상태" FontSize="11" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,4,0"/>
                                     <ComboBox Style="{StaticResource ModernComboBox}"
+                                              IsEnabled="{Binding IsEditMode, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                               SelectedValuePath="Tag"
                                               SelectedValue="{Binding status, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              DropDownOpened="InlineHeaderStatus_DropDownOpened"
+                                              SelectionChanged="InlineHeaderStatus_SelectionChanged"
                                               Width="90" Height="26" Margin="0,0,8,0">
                                         <ComboBoxItem Content="운영 중" Tag="active"/>
                                         <ComboBoxItem Content="테스트용" Tag="test"/>
@@ -240,20 +268,36 @@
                                     </ComboBox>
 
                                     <TextBlock Text="CM연동명" FontSize="11" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                                    <TextBox Style="{StaticResource ModernTextBox}" Text="{Binding cmCustomerName, UpdateSourceTrigger=PropertyChanged}" Width="115" Height="26" Margin="0,0,8,0"/>
+                                    <TextBox Style="{StaticResource DialPlanMetaTextBox}"
+                                             IsReadOnly="{Binding IsViewMode, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                             Text="{Binding cmCustomerName, UpdateSourceTrigger=PropertyChanged}"
+                                             GotKeyboardFocus="InlineHeaderTextBox_GotFocus" LostKeyboardFocus="InlineHeaderTextBox_LostFocus"
+                                             Width="115" Height="26" Margin="0,0,8,0"/>
 
                                     <TextBlock Text="AP URL" FontSize="11" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                                    <TextBox Style="{StaticResource ModernTextBox}" Text="{Binding apUrl, UpdateSourceTrigger=PropertyChanged}" Width="155" Height="26" Margin="0,0,4,0" ToolTip="연동할 AP 웹페이지 주소 (예: https://...)"/>
+                                    <TextBox Style="{StaticResource DialPlanMetaTextBox}"
+                                             IsReadOnly="{Binding IsViewMode, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                             Text="{Binding apUrl, UpdateSourceTrigger=PropertyChanged}"
+                                             GotKeyboardFocus="InlineHeaderTextBox_GotFocus" LostKeyboardFocus="InlineHeaderTextBox_LostFocus"
+                                             Width="155" Height="26" Margin="0,0,4,0" ToolTip="연동할 AP 웹페이지 주소 (예: https://...)"/>
                                     <Button Style="{StaticResource OxeBtn}" Content="↗" Height="26" Width="26" Padding="0" Margin="0,0,8,0"
                                             IsEnabled="{Binding HasApUrl}" Tag="{Binding}" Click="BtnOpenApUrl_Click" ToolTip="AP 웹주소 브라우저로 열기"/>
 
-                                    <CheckBox Style="{StaticResource ModernCheckBox}" Content="VQueue" IsChecked="{Binding useVQueue, Mode=TwoWay}" VerticalAlignment="Center" Margin="0,0,8,0"
+                                    <CheckBox Style="{StaticResource ModernCheckBox}" Content="VQueue" IsChecked="{Binding useVQueue, Mode=TwoWay}"
+                                              IsEnabled="{Binding IsEditMode, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                              Click="InlineHeaderCheckBox_Click" VerticalAlignment="Center" Margin="0,0,8,0"
                                               ToolTip="실제 CM VQueue 폴더 생성/삭제는 내선·CTI → CM 경로 ▾ → 적용하기에서도 실행 가능합니다."/>
-                                    <CheckBox Style="{StaticResource ModernCheckBox}" Content="IVR(PG)" IsChecked="{Binding useIvr, Mode=TwoWay}" VerticalAlignment="Center" Margin="0,0,8,0"
+                                    <CheckBox Style="{StaticResource ModernCheckBox}" Content="IVR(PG)" IsChecked="{Binding useIvr, Mode=TwoWay}"
+                                              IsEnabled="{Binding IsEditMode, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                              Click="InlineHeaderCheckBox_Click" VerticalAlignment="Center" Margin="0,0,8,0"
                                               ToolTip="실제 CM Place Group 생성/삭제는 내선·CTI → CM 경로 ▾ → 적용하기에서도 실행 가능합니다."/>
 
                                     <TextBlock Text="메모" FontSize="11" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                                    <TextBox Style="{StaticResource ModernTextBox}" Text="{Binding notes, UpdateSourceTrigger=PropertyChanged}" Width="135" Height="26"/>
+                                    <TextBox Style="{StaticResource DialPlanMetaTextBox}"
+                                             IsReadOnly="{Binding IsViewMode, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                             Text="{Binding notes, UpdateSourceTrigger=PropertyChanged}"
+                                             GotKeyboardFocus="InlineHeaderTextBox_GotFocus" LostKeyboardFocus="InlineHeaderTextBox_LostFocus"
+                                             Width="135" Height="26"/>
                                 </WrapPanel>
                             </DockPanel>
                         </Border>
@@ -273,7 +317,7 @@
                                   CanUserReorderColumns="False"
                                   AlternationCount="1"
                                   AutoGenerateColumns="False"
-                                  IsReadOnly="False"
+                                  IsReadOnly="{Binding IsViewMode, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                   CanUserAddRows="False"
                                   CanUserDeleteRows="False"
                                   SelectionMode="Single"
@@ -281,6 +325,7 @@
                                   BorderThickness="1,1,0,0"
                                   Initialized="InlineLinesGrid_Initialized"
                                   Loaded="InlineLinesGrid_Loaded"
+                                  BeginningEdit="DataGrid_BeginningEdit"
                                   CellEditEnding="InlineLinesGrid_CellEditEnding">
                             <DataGrid.CellStyle>
                                 <Style TargetType="DataGridCell">
@@ -315,15 +360,151 @@
             </Grid>
         </DataTemplate>
     </UserControl.Resources>
-    <Grid Margin="14,10,14,10">
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Row 0: Sub-Tabs + Global Actions -->
-        <Border Grid.Row="0" Style="{StaticResource CardBorderStyle}" Padding="10,8" Margin="0,0,0,8">
+        <!-- SUB-HEADER BAR (3-Column: Title Left | View/Edit Mode Switcher Center | Undo/Redo/Save/Backup Right) -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="14,8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Left: Title + Work Mode / Dirty Badge -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left">
+                    <Border Style="{StaticResource BlockTitleAccentStyle}"/>
+                    <TextBlock Text="선번장 · 센터 관리" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center"/>
+                    <Border x:Name="BadgeWorkMode"
+                            Background="{DynamicResource SurfaceAltBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="10"
+                            Padding="8,2"
+                            Margin="9,0,0,0"
+                            VerticalAlignment="Center">
+                        <TextBlock x:Name="TxtWorkModeBadge"
+                                   Text="조회 모드 (잠금)"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource MutedBrush}"
+                                   VerticalAlignment="Center"/>
+                    </Border>
+                </StackPanel>
+
+                <!-- Center: Prominent View / Edit Mode Switcher -->
+                <Border x:Name="BorderModeSwitcher"
+                        Grid.Column="1"
+                        Background="{DynamicResource SurfaceAltBrush}"
+                        BorderBrush="{DynamicResource PrimaryBrush}"
+                        BorderThickness="1.5"
+                        CornerRadius="9"
+                        Padding="3"
+                        VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                        <Button x:Name="BtnModeView"
+                                Content="조회 모드 (잠금)"
+                                Click="BtnModeView_Click"
+                                Style="{StaticResource SegmentedBtnStyle}"
+                                FontSize="12.5"
+                                Padding="18,5"/>
+                        <Button x:Name="BtnModeEdit"
+                                Content="편집 모드"
+                                Click="BtnModeEdit_Click"
+                                Style="{StaticResource SegmentedBtnStyle}"
+                                FontSize="12.5"
+                                Padding="18,5"
+                                Margin="3,0,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Right: Undo / Redo / Revert / Save / Backup Restore -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+                    <StackPanel x:Name="PanelEditActions" Orientation="Horizontal" Visibility="Collapsed">
+                        <Button x:Name="BtnUndo"
+                                Style="{StaticResource BaseBtn}"
+                                Content="↶ 취소"
+                                Height="28" Padding="9,0" Margin="0,0,4,0"
+                                IsEnabled="False"
+                                ToolTip="실행 취소 (Ctrl+Z)"
+                                Click="BtnUndo_Click"/>
+                        <Button x:Name="BtnRedo"
+                                Style="{StaticResource BaseBtn}"
+                                Content="↷ 재실행"
+                                Height="28" Padding="9,0" Margin="0,0,6,0"
+                                IsEnabled="False"
+                                ToolTip="다시 실행 (Ctrl+Y)"
+                                Click="BtnRedo_Click"/>
+                        <Button x:Name="BtnRevertAll"
+                                Style="{StaticResource WarnBtn}"
+                                Content="변경사항 되돌리기"
+                                Height="28" Padding="10,0" Margin="0,0,5,0"
+                                IsEnabled="False"
+                                ToolTip="마지막 저장 상태로 미저장 변경사항 모두 되돌리기"
+                                Click="BtnRevertAll_Click"/>
+                        <Button x:Name="BtnSaveAll"
+                                Style="{StaticResource PrimaryBtn}"
+                                Content="변경사항 저장"
+                                Height="28" Padding="12,0" Margin="0,0,6,0"
+                                IsEnabled="False"
+                                ToolTip="모든 변경사항 저장 + 자동 백업 (Ctrl+S)"
+                                Click="BtnSaveAll_Click"/>
+                        <Button x:Name="BtnRestoreBackup"
+                                Style="{StaticResource BaseBtn}"
+                                Content="백업 복원"
+                                Height="28" Padding="9,0"
+                                ToolTip="저장 시 자동 생성된 백업 파일에서 복원"
+                                Click="BtnRestoreBackup_Click"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1" Margin="14,10,14,10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Edit Mode & Unsaved Changes Status Banner -->
+            <Border x:Name="BorderEditBanner"
+                    Grid.Row="0"
+                    Visibility="Collapsed"
+                    Background="{DynamicResource ChipBgBrush}"
+                    BorderBrush="{DynamicResource PrimaryBrush}"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="11,6"
+                    Margin="0,0,0,8">
+                <DockPanel LastChildFill="True">
+                    <TextBlock x:Name="TxtEditBannerRight"
+                               DockPanel.Dock="Right"
+                               Text="Ctrl+Z 실행 취소 · Ctrl+Y 다시 실행 · Ctrl+S 저장"
+                               FontSize="11.5"
+                               Foreground="{DynamicResource MutedBrush}"
+                               VerticalAlignment="Center"
+                               Margin="10,0,0,0"/>
+                    <TextBlock x:Name="TxtEditBannerMain"
+                               Text="편집 모드 활성화됨 — 표 셀 수정, 행 추가/삭제, AP 주소 변경 후 '변경사항 저장'을 누르세요."
+                               FontSize="12"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextBrush}"
+                               VerticalAlignment="Center"/>
+                </DockPanel>
+            </Border>
+
+            <!-- Row 1: Sub-Tabs + Global Actions -->
+            <Border Grid.Row="1" Style="{StaticResource CardBorderStyle}" Padding="10,8" Margin="0,0,0,8">
             <DockPanel LastChildFill="True">
                 <!-- Right: Global Actions -->
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
@@ -375,8 +556,8 @@
             </DockPanel>
         </Border>
 
-        <!-- Row 1: Filter & Search Bar -->
-        <Border Grid.Row="1" Style="{StaticResource CardBorderStyle}" Padding="10,7" Margin="0,0,0,8">
+            <!-- Row 2: Filter & Search Bar -->
+            <Border Grid.Row="2" Style="{StaticResource CardBorderStyle}" Padding="10,7" Margin="0,0,0,8">
             <DockPanel LastChildFill="True">
                 <TextBlock DockPanel.Dock="Right"
                            x:Name="TxtResultSummary"
@@ -431,8 +612,8 @@
             </DockPanel>
         </Border>
 
-        <!-- Row 2: 4 Sub-Tab Views -->
-        <Grid Grid.Row="2">
+            <!-- Row 3: 4 Sub-Tab Views -->
+            <Grid Grid.Row="3">
 
             <!-- SUB-TAB 1: Dial-Plan (Inline Row Expand + Highlight Border) -->
             <Grid x:Name="PanelDialPlan" Visibility="Visible">
@@ -656,7 +837,7 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <DockPanel Grid.Row="0" Margin="0,0,0,6">
-                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" IsEnabled="{Binding IsEditMode, RelativeSource={RelativeSource AncestorType=UserControl}}">
                                 <Button Style="{StaticResource BaseBtn}" Content="+ PRI 추가" Height="26" Padding="9,0" Margin="0,0,5,0" Click="BtnAddPri_Click"/>
                                 <Button Style="{StaticResource BaseBtn}" Content="선택 삭제" Height="26" Padding="9,0" Margin="0,0,5,0" Click="BtnRemovePri_Click"/>
                                 <Button Style="{StaticResource PrimaryBtn}" Content="저장" Height="26" Padding="11,0" Click="BtnSaveAllMaster_Click"/>
@@ -667,7 +848,9 @@
                                   Grid.Row="1"
                                   Style="{StaticResource DialPlanCenteredGridStyle}"
                                   AutoGenerateColumns="False"
-                                  IsReadOnly="False"
+                                  IsReadOnly="{Binding IsViewMode, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                  BeginningEdit="DataGrid_BeginningEdit"
+                                  CellEditEnding="MasterDataGrid_CellEditEnding"
                                   CanUserAddRows="False"
                                   SelectionMode="Single">
                             <DataGrid.Columns>
@@ -698,7 +881,7 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <DockPanel Grid.Row="0" Margin="0,0,0,6">
-                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" IsEnabled="{Binding IsEditMode, RelativeSource={RelativeSource AncestorType=UserControl}}">
                                 <Button Style="{StaticResource BaseBtn}" Content="+ Entity 추가" Height="26" Padding="9,0" Margin="0,0,5,0" Click="BtnAddEntity_Click"/>
                                 <Button Style="{StaticResource BaseBtn}" Content="선택 삭제" Height="26" Padding="9,0" Margin="0,0,5,0" Click="BtnRemoveEntity_Click"/>
                                 <Button Style="{StaticResource PrimaryBtn}" Content="저장" Height="26" Padding="11,0" Click="BtnSaveAllMaster_Click"/>
@@ -709,7 +892,9 @@
                                   Grid.Row="1"
                                   Style="{StaticResource DialPlanCenteredGridStyle}"
                                   AutoGenerateColumns="False"
-                                  IsReadOnly="False"
+                                  IsReadOnly="{Binding IsViewMode, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                  BeginningEdit="DataGrid_BeginningEdit"
+                                  CellEditEnding="MasterDataGrid_CellEditEnding"
                                   CanUserAddRows="False"
                                   SelectionMode="Single">
                             <DataGrid.Columns>
@@ -738,7 +923,7 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <DockPanel Grid.Row="0" Margin="0,0,0,6">
-                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" IsEnabled="{Binding IsEditMode, RelativeSource={RelativeSource AncestorType=UserControl}}">
                                 <Button Style="{StaticResource BaseBtn}" Content="+ IVR 추가" Height="26" Padding="9,0" Margin="0,0,5,0" Click="BtnAddIpIvr_Click"/>
                                 <Button Style="{StaticResource BaseBtn}" Content="선택 삭제" Height="26" Padding="9,0" Margin="0,0,5,0" Click="BtnRemoveIpIvr_Click"/>
                                 <Button Style="{StaticResource PrimaryBtn}" Content="저장" Height="26" Padding="11,0" Click="BtnSaveAllMaster_Click"/>
@@ -749,7 +934,9 @@
                                   Grid.Row="1"
                                   Style="{StaticResource DialPlanCenteredGridStyle}"
                                   AutoGenerateColumns="False"
-                                  IsReadOnly="False"
+                                  IsReadOnly="{Binding IsViewMode, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                  BeginningEdit="DataGrid_BeginningEdit"
+                                  CellEditEnding="MasterDataGrid_CellEditEnding"
                                   CanUserAddRows="False"
                                   SelectionMode="Single">
                             <DataGrid.Columns>
@@ -772,7 +959,7 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <DockPanel Grid.Row="0" Margin="0,0,0,6">
-                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" IsEnabled="{Binding IsEditMode, RelativeSource={RelativeSource AncestorType=UserControl}}">
                                 <Button Style="{StaticResource BaseBtn}" Content="+ 멘트 추가" Height="26" Padding="9,0" Margin="0,0,5,0" Click="BtnAddDvg_Click"/>
                                 <Button Style="{StaticResource BaseBtn}" Content="선택 삭제" Height="26" Padding="9,0" Margin="0,0,5,0" Click="BtnRemoveDvg_Click"/>
                                 <Button Style="{StaticResource PrimaryBtn}" Content="저장" Height="26" Padding="11,0" Click="BtnSaveAllMaster_Click"/>
@@ -783,7 +970,9 @@
                                   Grid.Row="1"
                                   Style="{StaticResource DialPlanCenteredGridStyle}"
                                   AutoGenerateColumns="False"
-                                  IsReadOnly="False"
+                                  IsReadOnly="{Binding IsViewMode, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                  BeginningEdit="DataGrid_BeginningEdit"
+                                  CellEditEnding="MasterDataGrid_CellEditEnding"
                                   CanUserAddRows="False"
                                   SelectionMode="Single">
                             <DataGrid.Columns>
@@ -824,7 +1013,7 @@
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <DockPanel Grid.Row="0" Margin="0,0,0,6">
-                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" IsEnabled="{Binding IsEditMode, RelativeSource={RelativeSource AncestorType=UserControl}}">
                                     <Button Style="{StaticResource BaseBtn}" Content="+ 보드" Height="25" Padding="8,0" Margin="0,0,4,0" Click="BtnAddHw_Click"/>
                                     <Button Style="{StaticResource BaseBtn}" Content="삭제" Height="25" Padding="8,0" Margin="0,0,4,0" Click="BtnRemoveHw_Click"/>
                                     <Button Style="{StaticResource PrimaryBtn}" Content="저장" Height="25" Padding="10,0" Click="BtnSaveAllMaster_Click"/>
@@ -835,7 +1024,9 @@
                                       Grid.Row="1"
                                       Style="{StaticResource DialPlanCenteredGridStyle}"
                                       AutoGenerateColumns="False"
-                                      IsReadOnly="False"
+                                      IsReadOnly="{Binding IsViewMode, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                      BeginningEdit="DataGrid_BeginningEdit"
+                                      CellEditEnding="MasterDataGrid_CellEditEnding"
                                       CanUserAddRows="False"
                                       SelectionMode="Single">
                                 <DataGrid.Columns>
@@ -858,7 +1049,7 @@
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <DockPanel Grid.Row="0" Margin="0,0,0,6">
-                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" IsEnabled="{Binding IsEditMode, RelativeSource={RelativeSource AncestorType=UserControl}}">
                                     <Button Style="{StaticResource BaseBtn}" Content="+ GPA" Height="25" Padding="8,0" Margin="0,0,4,0" Click="BtnAddGpa_Click"/>
                                     <Button Style="{StaticResource BaseBtn}" Content="삭제" Height="25" Padding="8,0" Margin="0,0,4,0" Click="BtnRemoveGpa_Click"/>
                                     <Button Style="{StaticResource PrimaryBtn}" Content="저장" Height="25" Padding="10,0" Click="BtnSaveAllMaster_Click"/>
@@ -869,7 +1060,9 @@
                                       Grid.Row="1"
                                       Style="{StaticResource DialPlanCenteredGridStyle}"
                                       AutoGenerateColumns="False"
-                                      IsReadOnly="False"
+                                      IsReadOnly="{Binding IsViewMode, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                      BeginningEdit="DataGrid_BeginningEdit"
+                                      CellEditEnding="MasterDataGrid_CellEditEnding"
                                       CanUserAddRows="False"
                                       SelectionMode="Single">
                                 <DataGrid.Columns>
@@ -892,20 +1085,25 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <DockPanel Grid.Row="0" Margin="0,0,0,6">
-                            <Button DockPanel.Dock="Right" Style="{StaticResource PrimaryBtn}" Content="MDF 변경 저장" Height="25" Padding="10,0" Click="BtnSaveMdf_Click"/>
-                            <TextBlock Text="MDF / PRI 110 Block 배선 현황 (인라인 편집 가능)" FontSize="13" FontWeight="Bold" VerticalAlignment="Center"/>
+                            <Button DockPanel.Dock="Right" Style="{StaticResource PrimaryBtn}" Content="MDF 변경 저장" Height="25" Padding="10,0"
+                                    IsEnabled="{Binding IsEditMode, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    Click="BtnSaveMdf_Click"/>
+                            <TextBlock Text="MDF / PRI 110 Block 배선 현황" FontSize="13" FontWeight="Bold" VerticalAlignment="Center"/>
                         </DockPanel>
                         <DataGrid x:Name="GridMdf"
                                   Grid.Row="1"
                                   Style="{StaticResource DialPlanCenteredGridStyle}"
                                   AutoGenerateColumns="True"
                                   AutoGeneratingColumn="GridMdf_AutoGeneratingColumn"
-                                  IsReadOnly="False"
+                                  IsReadOnly="{Binding IsViewMode, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                  BeginningEdit="DataGrid_BeginningEdit"
+                                  CellEditEnding="MasterDataGrid_CellEditEnding"
                                   CanUserAddRows="False"
                                   SelectionMode="Single"/>
                     </Grid>
                 </Border>
             </Grid>
+        </Grid>
         </Grid>
     </Grid>
 </UserControl>

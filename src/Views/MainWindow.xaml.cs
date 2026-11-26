@@ -192,6 +192,11 @@ namespace CmOxeProvisioner.Views
 
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            if (DialPlanTabControl != null && !DialPlanTabControl.ConfirmDiscardOrSaveUnsaved("프로그램 종료 전 선번장 저장 확인"))
+            {
+                e.Cancel = true;
+                return;
+            }
             if (_isCmBusy)
             {
                 MessageBoxResult res = MessageBox.Show(
@@ -2723,6 +2728,12 @@ namespace CmOxeProvisioner.Views
 
         private void CloseTab(string tabKey)
         {
+            if (string.Equals(tabKey, "dialplan", StringComparison.OrdinalIgnoreCase) &&
+                DialPlanTabControl != null &&
+                !DialPlanTabControl.ConfirmDiscardOrSaveUnsaved("선번장 · 센터 탭 닫기"))
+            {
+                return;
+            }
             int idx = _openTabs.IndexOf(tabKey);
             if (idx < 0) return;
 

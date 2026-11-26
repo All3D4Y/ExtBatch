@@ -113,6 +113,7 @@
     <Compile Include="Services\CustomerRepository.cs" />
     <Compile Include="Services\ExcelWorkbookCodec.cs" />
     <Compile Include="Services\DialPlanWorkbookMapper.cs" />
+    <Compile Include="Services\DialPlanEditCommands.cs" />
     <Compile Include="Services\DialPlanRepository.cs" />
     <Compile Include="Services\ThemeService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

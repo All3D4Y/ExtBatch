@@ -55,6 +55,7 @@ namespace CmOxeProvisioner.Views
         private DialPlanCenter _expandedCenter = null;
         private DataGrid _expandedLinesGrid = null;
         private DataTable _mdfDataTable = null;
+        private readonly Dictionary<DataRow, MdfBlockRow> _mdfRowMap = new Dictionary<DataRow, MdfBlockRow>();
         private ListCollectionView _centersView = null;
         private string _activeSearchQuery = string.Empty;
         private string _lastMdfQuery = null;
@@ -63,17 +64,256 @@ namespace CmOxeProvisioner.Views
         private string _apUrlEditOrigin = string.Empty;
         private bool _isCancellingApEdit = false;
 
+        // Mode, snapshot dirty tracking & Command-pattern Undo/Redo
+        private readonly DialPlanCommandHistory _cmdHistory = new DialPlanCommandHistory(150);
+        private readonly HashSet<DialPlanCenter> _dirtyCenters = new HashSet<DialPlanCenter>();
+        private string _savedSnapshotJson = string.Empty;
+        private bool _isDirty = false;
+        private bool _isApplyingCommand = false;
+
+        private DataGrid _pendingEditGrid = null;
+        private object _pendingEditItem = null;
+        private string _pendingEditProp = null;
+        private string _pendingEditHeader = null;
+        private object _pendingEditOldValue = null;
+
+        private TextBox _focusedHeaderTb = null;
+        private DialPlanCenter _focusedHeaderCenter = null;
+        private string _focusedHeaderProp = null;
+        private string _focusedHeaderOldVal = null;
+        private string _statusComboPrev = null;
+
         private static readonly IValueConverter HideMergedTextConv = new InverseBoolToVisConverter();
         private static readonly IValueConverter MergeBorderConv = new MergeBottomBorderConverter();
+
+        public static readonly DependencyProperty IsEditModeProperty = DependencyProperty.Register(
+            "IsEditMode",
+            typeof(bool),
+            typeof(DialPlanTabView),
+            new PropertyMetadata(false, OnIsEditModeChanged));
+
+        public static readonly DependencyProperty IsViewModeProperty = DependencyProperty.Register(
+            "IsViewMode",
+            typeof(bool),
+            typeof(DialPlanTabView),
+            new PropertyMetadata(true));
+
+        public bool IsEditMode
+        {
+            get { return (bool)GetValue(IsEditModeProperty); }
+            set { SetValue(IsEditModeProperty, value); }
+        }
+
+        public bool IsViewMode
+        {
+            get { return (bool)GetValue(IsViewModeProperty); }
+            private set { SetValue(IsViewModeProperty, value); }
+        }
+
+        public bool HasUnsavedChanges
+        {
+            get { return _isDirty; }
+        }
+
+        private static void OnIsEditModeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var view = d as DialPlanTabView;
+            if (view == null) return;
+            bool edit = (bool)e.NewValue;
+            view.IsViewMode = !edit;
+            view.UpdateEditModeVisuals();
+        }
 
         public DialPlanTabView()
         {
             InitializeComponent();
             ApplyCenteredTextColumns();
+            _cmdHistory.HistoryChanged += CommandHistory_HistoryChanged;
             _searchDebounceTimer = new DispatcherTimer(DispatcherPriority.Normal, Dispatcher);
             _searchDebounceTimer.Interval = TimeSpan.FromMilliseconds(110);
             _searchDebounceTimer.Tick += SearchDebounceTimer_Tick;
             PreviewKeyDown += DialPlanTabView_PreviewKeyDown;
+            UpdateEditModeVisuals();
+        }
+
+        private void CommandHistory_HistoryChanged(object sender, EventArgs e)
+        {
+            RecalculateDirtyFlag();
+            UpdateEditModeVisuals();
+        }
+
+        private void RecalculateDirtyFlag()
+        {
+            if (_cmdHistory.UndoCount > 0)
+            {
+                _isDirty = true;
+                return;
+            }
+            if (_db == null || string.IsNullOrEmpty(_savedSnapshotJson))
+            {
+                _isDirty = false;
+                return;
+            }
+            _isDirty = !string.Equals(DialPlanRepository.SerializeSnapshot(_db), _savedSnapshotJson, StringComparison.Ordinal);
+        }
+
+        private void UpdateEditModeVisuals()
+        {
+            bool edit = IsEditMode;
+            if (BtnModeView != null) UpdateSegModeBtn(BtnModeView, !edit);
+            if (BtnModeEdit != null) UpdateSegModeBtn(BtnModeEdit, edit);
+
+            if (PanelEditActions != null)
+                PanelEditActions.Visibility = edit ? Visibility.Visible : Visibility.Collapsed;
+            if (BorderEditBanner != null)
+                BorderEditBanner.Visibility = edit ? Visibility.Visible : Visibility.Collapsed;
+
+            if (BtnUndo != null)
+            {
+                BtnUndo.IsEnabled = edit && _cmdHistory.CanUndo;
+                BtnUndo.ToolTip = _cmdHistory.CanUndo
+                    ? ("실행 취소: " + _cmdHistory.NextUndoDescription + " (Ctrl+Z)")
+                    : "실행 취소 (Ctrl+Z)";
+            }
+            if (BtnRedo != null)
+            {
+                BtnRedo.IsEnabled = edit && _cmdHistory.CanRedo;
+                BtnRedo.ToolTip = _cmdHistory.CanRedo
+                    ? ("다시 실행: " + _cmdHistory.NextRedoDescription + " (Ctrl+Y)")
+                    : "다시 실행 (Ctrl+Y)";
+            }
+            if (BtnRevertAll != null)
+                BtnRevertAll.IsEnabled = edit && _isDirty;
+            if (BtnSaveAll != null)
+                BtnSaveAll.IsEnabled = edit && _isDirty;
+
+            if (BadgeWorkMode != null && TxtWorkModeBadge != null)
+            {
+                if (!edit)
+                {
+                    BadgeWorkMode.SetResourceReference(Border.BackgroundProperty, "SurfaceAltBrush");
+                    BadgeWorkMode.SetResourceReference(Border.BorderBrushProperty, "BorderBrush");
+                    TxtWorkModeBadge.SetResourceReference(TextBlock.ForegroundProperty, "MutedBrush");
+                    TxtWorkModeBadge.Text = "조회 모드 (잠금)";
+                }
+                else if (_isDirty)
+                {
+                    BadgeWorkMode.SetResourceReference(Border.BackgroundProperty, "WarnBgBrush");
+                    BadgeWorkMode.SetResourceReference(Border.BorderBrushProperty, "WarnBorderBrush");
+                    TxtWorkModeBadge.SetResourceReference(TextBlock.ForegroundProperty, "WarnFgBrush");
+                    TxtWorkModeBadge.Text = "편집 중 · 변경 " + Math.Max(1, _cmdHistory.UndoCount) + "건";
+                }
+                else
+                {
+                    BadgeWorkMode.SetResourceReference(Border.BackgroundProperty, "ChipBgBrush");
+                    BadgeWorkMode.SetResourceReference(Border.BorderBrushProperty, "PrimaryBrush");
+                    TxtWorkModeBadge.SetResourceReference(TextBlock.ForegroundProperty, "ChipFgBrush");
+                    TxtWorkModeBadge.Text = "편집 모드";
+                }
+            }
+
+            if (BorderModeSwitcher != null)
+            {
+                BorderModeSwitcher.SetResourceReference(
+                    Border.BorderBrushProperty,
+                    (edit && _isDirty) ? "WarnBorderBrush" : "PrimaryBrush");
+            }
+
+            if (BorderEditBanner != null && TxtEditBannerMain != null && TxtEditBannerRight != null)
+            {
+                if (_isDirty)
+                {
+                    BorderEditBanner.SetResourceReference(Border.BackgroundProperty, "WarnBgBrush");
+                    BorderEditBanner.SetResourceReference(Border.BorderBrushProperty, "WarnBorderBrush");
+                    TxtEditBannerMain.SetResourceReference(TextBlock.ForegroundProperty, "WarnFgBrush");
+                    TxtEditBannerMain.Text = "미저장 변경사항 " + Math.Max(1, _cmdHistory.UndoCount) + "건 — 우측 상단 '변경사항 저장'으로 확정하거나 '변경사항 되돌리기'로 원복할 수 있습니다.";
+                    TxtEditBannerRight.Text = (_cmdHistory.CanUndo ? ("최근: " + _cmdHistory.NextUndoDescription + " · ") : "") + "Ctrl+Z 취소 / Ctrl+Y 재실행 / Ctrl+S 저장";
+                }
+                else
+                {
+                    BorderEditBanner.SetResourceReference(Border.BackgroundProperty, "ChipBgBrush");
+                    BorderEditBanner.SetResourceReference(Border.BorderBrushProperty, "PrimaryBrush");
+                    TxtEditBannerMain.SetResourceReference(TextBlock.ForegroundProperty, "TextBrush");
+                    TxtEditBannerMain.Text = "편집 모드 활성화됨 — 셀 수정, 행 추가/삭제, AP 주소 수정 시 자동 추적되며 저장 전까지 파일에 반영되지 않습니다.";
+                    TxtEditBannerRight.Text = "Ctrl+Z 실행 취소 · Ctrl+Y 다시 실행 · Ctrl+S 저장";
+                }
+            }
+        }
+
+        private static void UpdateSegModeBtn(Button btn, bool active)
+        {
+            if (btn == null) return;
+            if (active)
+            {
+                btn.SetResourceReference(Control.BackgroundProperty, "PrimaryBrush");
+                btn.SetResourceReference(Control.ForegroundProperty, "PrimaryFgBrush");
+                btn.FontWeight = FontWeights.Bold;
+            }
+            else
+            {
+                btn.SetResourceReference(Control.BackgroundProperty, "SurfaceAltBrush");
+                btn.SetResourceReference(Control.ForegroundProperty, "MutedBrush");
+                btn.FontWeight = FontWeights.SemiBold;
+            }
+        }
+
+        private void BtnModeView_Click(object sender, RoutedEventArgs e)
+        {
+            SetEditMode(false);
+        }
+
+        private void BtnModeEdit_Click(object sender, RoutedEventArgs e)
+        {
+            SetEditMode(true);
+        }
+
+        public bool SetEditMode(bool editMode)
+        {
+            if (IsEditMode == editMode) return true;
+            if (!editMode)
+            {
+                FlushPendingEdits();
+                if (_isDirty && !ConfirmDiscardOrSaveUnsaved("조회 모드(잠금) 전환"))
+                    return false;
+            }
+            IsEditMode = editMode;
+            return true;
+        }
+
+        public bool ConfirmDiscardOrSaveUnsaved(string contextTitle)
+        {
+            FlushPendingEdits();
+            RecalculateDirtyFlag();
+            if (!_isDirty) return true;
+
+            int changeCount = Math.Max(1, _cmdHistory.UndoCount);
+            MessageBoxResult res = PopupDialogs.PromptSaveDiscardCancel(
+                Window.GetWindow(this),
+                contextTitle ?? "미저장 변경사항 확인",
+                "저장되지 않은 변경사항(" + changeCount + "건)이 있습니다.",
+                "저장하지 않고 진행하면 변경사항이 마지막 저장 상태로 되돌아갑니다.\n계속 진행하기 전에 처리 방식을 선택하세요.");
+
+            if (res == MessageBoxResult.Yes)
+                return SaveAllChanges(showToast: true);
+            if (res == MessageBoxResult.No)
+            {
+                RevertAllChanges(confirm: false, showToast: false);
+                return true;
+            }
+            return false;
+        }
+
+        private void FlushPendingEdits()
+        {
+            FlushFocusedHeaderTextBoxEdit();
+            if (_expandedLinesGrid != null) CommitGridEdits(_expandedLinesGrid);
+            CommitGridEdits(GridPri);
+            CommitGridEdits(GridEntities);
+            CommitGridEdits(GridIpIvr);
+            CommitGridEdits(GridDvg);
+            CommitGridEdits(GridPbxHw);
+            CommitGridEdits(GridGpa);
+            CommitGridEdits(GridMdf);
         }
 
         private void SearchDebounceTimer_Tick(object sender, EventArgs e)
@@ -163,6 +403,9 @@ namespace CmOxeProvisioner.Views
         {
             _expandedCenter = null;
             _expandedLinesGrid = null;
+            _focusedHeaderTb = null;
+            _pendingEditGrid = null;
+            _pendingEditItem = null;
             if (GridCenters != null)
                 GridCenters.RowDetailsVisibilityMode = DataGridRowDetailsVisibilityMode.Collapsed;
             _lastMdfQuery = null;
@@ -176,6 +419,11 @@ namespace CmOxeProvisioner.Views
                         _db.centers[i].EnsureSearchIndexReady();
                 }
             }
+            _savedSnapshotJson = DialPlanRepository.SerializeSnapshot(_db);
+            _cmdHistory.Clear();
+            _dirtyCenters.Clear();
+            _isDirty = false;
+            UpdateEditModeVisuals();
             BindCentersCollectionView();
             PopulateLocationFilter();
             UpdateStatusCounts();
@@ -406,6 +654,7 @@ namespace CmOxeProvisioner.Views
             if (_searchDebounceTimer != null)
                 _searchDebounceTimer.Stop();
             if (_db == null) return;
+            FlushFocusedHeaderTextBoxEdit();
             string q = (TxtSearch != null && TxtSearch.Text != null) ? TxtSearch.Text.Trim() : string.Empty;
             _activeSearchQuery = q;
 
@@ -535,6 +784,7 @@ namespace CmOxeProvisioner.Views
             for (int c = 0; c < maxCols; c++)
                 dt.Columns.Add("C" + c, typeof(string));
 
+            _mdfRowMap.Clear();
             foreach (var m in rows)
             {
                 var dr = dt.NewRow();
@@ -543,12 +793,60 @@ namespace CmOxeProvisioner.Views
                 for (int c = 0; c < maxCols; c++)
                     dr[c + 2] = (m.cells != null && c < m.cells.Count) ? (m.cells[c] ?? string.Empty) : string.Empty;
                 dt.Rows.Add(dr);
+                _mdfRowMap[dr] = m;
             }
 
             _mdfDataTable = dt;
             GridMdf.ItemsSource = dt.DefaultView;
             _lastMdfQuery = q;
             _lastMdfSourceCount = totalRows;
+        }
+
+        private void SyncMdfDataRowToModel(DataRowView drv)
+        {
+            if (drv == null || drv.Row == null) return;
+            MdfBlockRow target;
+            if (!_mdfRowMap.TryGetValue(drv.Row, out target) || target == null)
+            {
+                int rIdx;
+                if (!int.TryParse(Convert.ToString(drv.Row[1], CultureInfo.InvariantCulture), out rIdx)) return;
+                target = _db.mdfBlocks.FirstOrDefault(m => m.rowIndex == rIdx);
+                if (target == null) return;
+            }
+            target.section = Convert.ToString(drv.Row[0], CultureInfo.InvariantCulture) ?? string.Empty;
+            int rNew;
+            if (int.TryParse(Convert.ToString(drv.Row[1], CultureInfo.InvariantCulture), out rNew))
+                target.rowIndex = rNew;
+
+            var cells = new List<string>();
+            for (int c = 2; c < drv.Row.Table.Columns.Count; c++)
+                cells.Add(Convert.ToString(drv.Row[c], CultureInfo.InvariantCulture) ?? string.Empty);
+            while (cells.Count > 0 && string.IsNullOrWhiteSpace(cells[cells.Count - 1]))
+                cells.RemoveAt(cells.Count - 1);
+            target.cells = cells;
+        }
+
+        private void FlushMdfTableToDb()
+        {
+            if (_mdfDataTable == null) return;
+            foreach (DataRow dr in _mdfDataTable.Rows)
+            {
+                var view = _mdfDataTable.DefaultView;
+                MdfBlockRow target;
+                if (_mdfRowMap.TryGetValue(dr, out target) && target != null)
+                {
+                    target.section = Convert.ToString(dr[0], CultureInfo.InvariantCulture) ?? string.Empty;
+                    int rNew;
+                    if (int.TryParse(Convert.ToString(dr[1], CultureInfo.InvariantCulture), out rNew))
+                        target.rowIndex = rNew;
+                    var cells = new List<string>();
+                    for (int c = 2; c < _mdfDataTable.Columns.Count; c++)
+                        cells.Add(Convert.ToString(dr[c], CultureInfo.InvariantCulture) ?? string.Empty);
+                    while (cells.Count > 0 && string.IsNullOrWhiteSpace(cells[cells.Count - 1]))
+                        cells.RemoveAt(cells.Count - 1);
+                    target.cells = cells;
+                }
+            }
         }
 
         private void GridCenters_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -570,6 +868,43 @@ namespace CmOxeProvisioner.Views
 
         private void DialPlanTabView_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            bool ctrl = (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control;
+            bool shift = (Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift;
+
+            if (ctrl && e.Key == Key.Z)
+            {
+                var focusedTb = Keyboard.FocusedElement as TextBox;
+                if (focusedTb != null && !focusedTb.IsReadOnly && !ReferenceEquals(focusedTb, TxtSearch) && focusedTb.CanUndo)
+                    return;
+
+                if (IsEditMode)
+                {
+                    if (shift) ExecuteRedo();
+                    else ExecuteUndo();
+                    e.Handled = true;
+                    return;
+                }
+            }
+            else if (ctrl && e.Key == Key.Y)
+            {
+                var focusedTb = Keyboard.FocusedElement as TextBox;
+                if (focusedTb != null && !focusedTb.IsReadOnly && !ReferenceEquals(focusedTb, TxtSearch) && focusedTb.CanRedo)
+                    return;
+
+                if (IsEditMode)
+                {
+                    ExecuteRedo();
+                    e.Handled = true;
+                    return;
+                }
+            }
+            else if (ctrl && e.Key == Key.S && IsEditMode)
+            {
+                SaveAllChanges(showToast: true);
+                e.Handled = true;
+                return;
+            }
+
             if (e.Key == Key.Escape && _expandedCenter != null && _activeSubTab == "dialplan")
             {
                 if (IsInsideDetailsEditingTextBox(Keyboard.FocusedElement as DependencyObject))
@@ -624,17 +959,331 @@ namespace CmOxeProvisioner.Views
             }
         }
 
+        private static string ResolveColumnPropertyPath(DataGridColumn col)
+        {
+            if (col == null) return null;
+            var bound = col as DataGridBoundColumn;
+            if (bound != null && bound.Binding is Binding)
+                return ((Binding)bound.Binding).Path.Path;
+            return col.SortMemberPath;
+        }
+
+        private void DataGrid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
+        {
+            if (IsViewMode)
+            {
+                e.Cancel = true;
+                return;
+            }
+            if (_isApplyingCommand) return;
+
+            var grid = sender as DataGrid;
+            if (grid == null || e.Row == null) return;
+            string prop = ResolveColumnPropertyPath(e.Column);
+            if (string.IsNullOrWhiteSpace(prop)) return;
+
+            _pendingEditGrid = grid;
+            _pendingEditItem = e.Row.Item;
+            _pendingEditProp = prop;
+            _pendingEditHeader = Convert.ToString(e.Column.Header) ?? prop;
+            _pendingEditOldValue = PropertyEditCommand.ReadValue(e.Row.Item, prop);
+        }
+
+        private void RecordCommittedCellEdit(DataGrid grid, DataGridCellEditEndingEventArgs e, DialPlanCenter ownerCenter)
+        {
+            if (_isApplyingCommand || e == null || e.EditAction != DataGridEditAction.Commit || grid == null || e.Row == null)
+            {
+                _pendingEditGrid = null;
+                _pendingEditItem = null;
+                return;
+            }
+
+            object item = e.Row.Item;
+            string prop = ResolveColumnPropertyPath(e.Column);
+            if (!ReferenceEquals(grid, _pendingEditGrid) || !ReferenceEquals(item, _pendingEditItem) || !string.Equals(prop, _pendingEditProp, StringComparison.Ordinal))
+            {
+                _pendingEditGrid = null;
+                _pendingEditItem = null;
+                return;
+            }
+
+            object oldVal = _pendingEditOldValue;
+            string hdr = _pendingEditHeader ?? prop;
+            _pendingEditGrid = null;
+            _pendingEditItem = null;
+
+            object newVal = null;
+            TextBox tb = e.EditingElement as TextBox;
+            if (tb == null && e.EditingElement != null)
+                tb = FindDescendant<TextBox>(e.EditingElement);
+
+            if (tb != null)
+                newVal = tb.Text ?? string.Empty;
+            else
+                newVal = PropertyEditCommand.ReadValue(item, prop);
+
+            string oldStr = oldVal == null || oldVal == DBNull.Value ? string.Empty : Convert.ToString(oldVal, CultureInfo.InvariantCulture);
+            string newStr = newVal == null || newVal == DBNull.Value ? string.Empty : Convert.ToString(newVal, CultureInfo.InvariantCulture);
+            if (string.Equals(oldStr, newStr, StringComparison.Ordinal))
+                return;
+
+            // Ensure target (especially DataRowView on GridMdf or default-trigger bindings) holds newVal right away
+            PropertyEditCommand.WriteValue(item, prop, newStr);
+            MdfBlockRow mdfModel = null;
+            if (ReferenceEquals(grid, GridMdf))
+            {
+                var drv = item as DataRowView;
+                if (drv != null && drv.Row != null)
+                    _mdfRowMap.TryGetValue(drv.Row, out mdfModel);
+                SyncMdfDataRowToModel(drv);
+            }
+
+            if (ownerCenter != null)
+                _dirtyCenters.Add(ownerCenter);
+
+            var targetGrid = grid;
+            var capturedCenter = ownerCenter;
+            var capturedMdf = mdfModel;
+            var cmd = new PropertyEditCommand(
+                item,
+                prop,
+                oldVal,
+                newStr,
+                (capturedCenter != null ? (capturedCenter.project + " · ") : "") + hdr + " 수정",
+                delegate(bool isUndo)
+                {
+                    if (ReferenceEquals(targetGrid, GridMdf))
+                    {
+                        string appliedStr = isUndo ? oldStr : newStr;
+                        ApplyMdfFieldToModel(capturedMdf, prop, appliedStr);
+                        var drvCur = item as DataRowView;
+                        if (drvCur != null && drvCur.Row != null && drvCur.Row.RowState != DataRowState.Detached)
+                        {
+                            SyncMdfDataRowToModel(drvCur);
+                            RefreshGridRowsVisual(targetGrid, drvCur);
+                        }
+                        else
+                        {
+                            _lastMdfQuery = null;
+                            BindMdfGrid(_activeSearchQuery);
+                        }
+                        return;
+                    }
+                    if (capturedCenter != null)
+                    {
+                        capturedCenter.RefreshLineMergeVisuals(_mergeCellsEnabled);
+                        capturedCenter.NotifySummaryFields();
+                    }
+                    RefreshGridRowsVisual(targetGrid, item);
+                });
+
+            _cmdHistory.PushAlreadyExecuted(cmd);
+        }
+
+        private static void ApplyMdfFieldToModel(MdfBlockRow model, string prop, string value)
+        {
+            if (model == null || string.IsNullOrEmpty(prop)) return;
+            if (string.Equals(prop, "구분", StringComparison.Ordinal))
+            {
+                model.section = value ?? string.Empty;
+                return;
+            }
+            if (string.Equals(prop, "행", StringComparison.Ordinal))
+            {
+                int r;
+                if (int.TryParse(value, out r)) model.rowIndex = r;
+                return;
+            }
+            if (prop.StartsWith("C", StringComparison.Ordinal))
+            {
+                int cIdx;
+                if (int.TryParse(prop.Substring(1), out cIdx) && cIdx >= 0)
+                {
+                    if (model.cells == null) model.cells = new List<string>();
+                    while (model.cells.Count <= cIdx) model.cells.Add(string.Empty);
+                    model.cells[cIdx] = value ?? string.Empty;
+                    while (model.cells.Count > 0 && string.IsNullOrWhiteSpace(model.cells[model.cells.Count - 1]))
+                        model.cells.RemoveAt(model.cells.Count - 1);
+                }
+            }
+        }
+
+        private void MasterDataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            RecordCommittedCellEdit(sender as DataGrid, e, null);
+        }
+
         private void InlineLinesGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
             var grid = sender as DataGrid;
             var center = (grid != null ? grid.DataContext as DialPlanCenter : null) ?? _expandedCenter;
-            if (center == null) return;
+            RecordCommittedCellEdit(grid, e, center);
 
+            if (center == null) return;
             Dispatcher.BeginInvoke(new Action(delegate()
             {
                 center.RefreshLineMergeVisuals(_mergeCellsEnabled);
                 center.NotifySummaryFields();
             }), DispatcherPriority.Background);
+        }
+
+        private void InlineHeaderTextBox_GotFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            var tb = sender as TextBox;
+            if (tb == null || tb.IsReadOnly) return;
+            var center = tb.DataContext as DialPlanCenter;
+            var be = BindingOperations.GetBinding(tb, TextBox.TextProperty);
+            string prop = be != null && be.Path != null ? be.Path.Path : null;
+            if (center == null || string.IsNullOrWhiteSpace(prop)) return;
+
+            _focusedHeaderTb = tb;
+            _focusedHeaderCenter = center;
+            _focusedHeaderProp = prop;
+            _focusedHeaderOldVal = Convert.ToString(PropertyEditCommand.ReadValue(center, prop)) ?? string.Empty;
+        }
+
+        private void InlineHeaderTextBox_LostFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            FlushFocusedHeaderTextBoxEdit();
+        }
+
+        private void FlushFocusedHeaderTextBoxEdit()
+        {
+            var tb = _focusedHeaderTb;
+            var center = _focusedHeaderCenter;
+            string prop = _focusedHeaderProp;
+            string oldVal = _focusedHeaderOldVal ?? string.Empty;
+
+            _focusedHeaderTb = null;
+            _focusedHeaderCenter = null;
+            _focusedHeaderProp = null;
+            _focusedHeaderOldVal = null;
+
+            if (tb == null || center == null || string.IsNullOrWhiteSpace(prop) || _isApplyingCommand || !IsEditMode)
+                return;
+
+            string newVal = tb.Text ?? string.Empty;
+            if (string.Equals(oldVal, newVal, StringComparison.Ordinal))
+                return;
+
+            _dirtyCenters.Add(center);
+            var cmd = new PropertyEditCommand(
+                center,
+                prop,
+                oldVal,
+                newVal,
+                center.project + " · " + prop + " 수정",
+                delegate(bool isUndo)
+                {
+                    center.NotifySummaryFields();
+                    UpdateStatusCounts();
+                });
+            _cmdHistory.PushAlreadyExecuted(cmd);
+        }
+
+        private void InlineHeaderStatus_DropDownOpened(object sender, EventArgs e)
+        {
+            var cb = sender as ComboBox;
+            var center = cb != null ? cb.DataContext as DialPlanCenter : null;
+            if (center != null)
+                _statusComboPrev = center.status;
+        }
+
+        private void InlineHeaderStatus_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_isApplyingCommand || !IsEditMode) return;
+            var cb = sender as ComboBox;
+            if (cb == null || !cb.IsLoaded) return;
+            if (!cb.IsDropDownOpen && !cb.IsKeyboardFocusWithin && !cb.IsMouseCaptured) return;
+            if (e.RemovedItems == null || e.RemovedItems.Count == 0 || e.AddedItems == null || e.AddedItems.Count == 0) return;
+
+            var oldItem = e.RemovedItems[0] as ComboBoxItem;
+            var newItem = e.AddedItems[0] as ComboBoxItem;
+            string oldVal = oldItem != null ? (oldItem.Tag as string) : _statusComboPrev;
+            string newVal = newItem != null ? (newItem.Tag as string) : null;
+            var center = cb.DataContext as DialPlanCenter;
+            if (center == null || string.IsNullOrWhiteSpace(oldVal) || string.IsNullOrWhiteSpace(newVal) || string.Equals(oldVal, newVal, StringComparison.Ordinal))
+                return;
+
+            _dirtyCenters.Add(center);
+            var cmd = new PropertyEditCommand(
+                center,
+                "status",
+                oldVal,
+                newVal,
+                center.project + " · 상태 변경",
+                delegate(bool isUndo)
+                {
+                    center.NotifySummaryFields();
+                    UpdateStatusCounts();
+                    ApplyFiltersAndBind();
+                });
+            _cmdHistory.PushAlreadyExecuted(cmd);
+            UpdateStatusCounts();
+        }
+
+        private void InlineHeaderCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            if (_isApplyingCommand || !IsEditMode) return;
+            var cb = sender as CheckBox;
+            if (cb == null) return;
+            var center = cb.DataContext as DialPlanCenter;
+            var be = BindingOperations.GetBinding(cb, ToggleButton.IsCheckedProperty);
+            string prop = be != null && be.Path != null ? be.Path.Path : null;
+            if (center == null || string.IsNullOrWhiteSpace(prop)) return;
+
+            bool newVal = (cb.IsChecked == true);
+            _dirtyCenters.Add(center);
+            var cmd = new PropertyEditCommand(
+                center,
+                prop,
+                !newVal,
+                newVal,
+                center.project + " · " + Convert.ToString(cb.Content) + " 변경",
+                delegate(bool isUndo)
+                {
+                    center.NotifySummaryFields();
+                });
+            _cmdHistory.PushAlreadyExecuted(cmd);
+        }
+
+        private static T FindDescendant<T>(DependencyObject root) where T : DependencyObject
+        {
+            if (root == null) return null;
+            int count = VisualTreeHelper.GetChildrenCount(root);
+            for (int i = 0; i < count; i++)
+            {
+                var child = VisualTreeHelper.GetChild(root, i);
+                var typed = child as T;
+                if (typed != null) return typed;
+                var deep = FindDescendant<T>(child);
+                if (deep != null) return deep;
+            }
+            return null;
+        }
+
+        private static void RefreshGridRowsVisual(DataGrid grid, object selectItem)
+        {
+            if (grid == null) return;
+            var ecv = grid.Items as IEditableCollectionView;
+            if (ecv != null)
+            {
+                try
+                {
+                    if (ecv.IsEditingItem) ecv.CommitEdit();
+                    if (ecv.IsAddingNew) ecv.CommitNew();
+                }
+                catch { }
+            }
+            try
+            {
+                grid.Items.Refresh();
+            }
+            catch
+            {
+            }
+            if (selectItem != null && grid.Items.Contains(selectItem))
+                grid.SelectedItem = selectItem;
         }
 
         private void ChkInlineMergeCells_Loaded(object sender, RoutedEventArgs e)
@@ -730,6 +1379,7 @@ namespace CmOxeProvisioner.Views
             var col = new DataGridTemplateColumn
             {
                 Header = header,
+                SortMemberPath = propName,
                 Width = new DataGridLength(width)
             };
 
@@ -804,6 +1454,11 @@ namespace CmOxeProvisioner.Views
             }
             else
             {
+                if (!IsEditMode)
+                {
+                    Toast(false, "조회 모드 (잠금)", "AP 웹주소 입력 및 수정은 상단 '편집 모드'로 전환한 뒤 진행하세요.");
+                    return;
+                }
                 BeginInlineApEdit(btn, center);
             }
         }
@@ -827,6 +1482,11 @@ namespace CmOxeProvisioner.Views
 
         private void MenuApEdit_Click(object sender, RoutedEventArgs e)
         {
+            if (!IsEditMode)
+            {
+                Toast(false, "조회 모드 (잠금)", "AP 웹주소 수정은 상단 '편집 모드'로 전환한 뒤 가능합니다.");
+                return;
+            }
             var btn = ResolveApButtonFromMenuItem(sender);
             var center = btn != null ? ((btn.Tag as DialPlanCenter) ?? (btn.DataContext as DialPlanCenter)) : null;
             if (btn != null && center != null)
@@ -837,15 +1497,31 @@ namespace CmOxeProvisioner.Views
 
         private void MenuApClear_Click(object sender, RoutedEventArgs e)
         {
+            if (!IsEditMode)
+            {
+                Toast(false, "조회 모드 (잠금)", "AP 초기화는 상단 '편집 모드'로 전환한 뒤 가능합니다.");
+                return;
+            }
             var btn = ResolveApButtonFromMenuItem(sender);
             var center = btn != null ? ((btn.Tag as DialPlanCenter) ?? (btn.DataContext as DialPlanCenter)) : null;
             if (center == null) return;
 
-            center.apUrl = string.Empty;
-            center.NotifySummaryFields();
-            DialPlanRepository.Save(_dbPath, _db);
-            WriteAudit("AP URL 초기화", "Center=" + center.project);
-            Toast(true, "AP 초기화", "'" + center.project + "' AP가 미사용으로 변경되었습니다.");
+            string oldUrl = center.apUrl ?? string.Empty;
+            if (string.IsNullOrEmpty(oldUrl)) return;
+
+            _dirtyCenters.Add(center);
+            var cmd = new PropertyEditCommand(
+                center,
+                "apUrl",
+                oldUrl,
+                string.Empty,
+                center.project + " · AP 초기화",
+                delegate(bool isUndo)
+                {
+                    center.NotifySummaryFields();
+                });
+            _cmdHistory.ExecuteAndPush(cmd);
+            Toast(true, "AP 초기화 (임시 반영)", "'" + center.project + "' AP가 미사용으로 변경되었습니다. '변경사항 저장' 시 확정됩니다.");
         }
 
         private void BeginInlineApEdit(Button btn, DialPlanCenter center)
@@ -926,19 +1602,28 @@ namespace CmOxeProvisioner.Views
             if (save && center != null)
             {
                 string trimmed = (tb.Text ?? string.Empty).Trim();
-                center.apUrl = trimmed;
-                center.NotifySummaryFields();
-
-                if (!string.Equals(_apUrlEditOrigin ?? string.Empty, trimmed, StringComparison.Ordinal))
+                string oldUrl = _apUrlEditOrigin ?? string.Empty;
+                if (!string.Equals(oldUrl, trimmed, StringComparison.Ordinal))
                 {
                     _apUrlEditOrigin = trimmed;
-                    DialPlanRepository.Save(_dbPath, _db);
-                    WriteAudit("AP URL 수정", "Center=" + center.project + " Url=" + trimmed);
+                    _dirtyCenters.Add(center);
+                    var cmd = new PropertyEditCommand(
+                        center,
+                        "apUrl",
+                        oldUrl,
+                        trimmed,
+                        center.project + " · AP URL 수정",
+                        delegate(bool isUndo)
+                        {
+                            center.NotifySummaryFields();
+                        });
+                    _cmdHistory.ExecuteAndPush(cmd);
+
                     if (showToast)
                     {
-                        Toast(true, "AP 설정 저장", center.HasApUrl
-                            ? ("'" + center.project + "' AP가 '바로가기'로 설정되었습니다.")
-                            : ("'" + center.project + "' AP가 '미사용'으로 설정되었습니다."));
+                        Toast(true, "AP 변경 (임시 반영)", center.HasApUrl
+                            ? ("'" + center.project + "' AP가 '바로가기'로 변경되었습니다. '변경사항 저장' 시 확정됩니다.")
+                            : ("'" + center.project + "' AP가 '미사용'으로 변경되었습니다. '변경사항 저장' 시 확정됩니다."));
                     }
                 }
             }
@@ -1062,46 +1747,39 @@ namespace CmOxeProvisioner.Views
 
         private void BtnInlineAddLine_Click(object sender, RoutedEventArgs e)
         {
+            if (!IsEditMode) return;
             DialPlanCenter center = ExtractCenterFromSender(sender) ?? _expandedCenter;
             if (center == null) return;
             center.EnsureLists();
 
             DataGrid linesGrid = FindLinesGridForSender(sender) ?? _expandedLinesGrid;
+            FlushFocusedHeaderTextBoxEdit();
             CommitGridEdits(linesGrid);
             EnsureCollectionViewNotEditing(center.lines);
 
             var line = new DialPlanLine { subTask = center.project };
-            center.lines.Add(line);
-            center.RefreshLineMergeVisuals(_mergeCellsEnabled);
-            center.NotifySummaryFields();
-
-            if (linesGrid != null)
-            {
-                var view = CollectionViewSource.GetDefaultView(center.lines);
-                if (!ReferenceEquals(linesGrid.ItemsSource, center.lines))
-                    linesGrid.ItemsSource = center.lines;
-                else if (view != null)
-                    view.Refresh();
-                else
-                    linesGrid.Items.Refresh();
-
-                linesGrid.SelectedItem = line;
-                var targetGrid = linesGrid;
-                var targetLine = line;
-                Dispatcher.BeginInvoke(new Action(delegate()
+            _dirtyCenters.Add(center);
+            var cmd = new ListInsertRemoveCommand<DialPlanLine>(
+                center.lines,
+                line,
+                center.lines.Count,
+                true,
+                center.project + " · 라인 추가",
+                delegate(DialPlanLine affected, bool isUndo)
                 {
-                    if (targetGrid.Items.Contains(targetLine))
-                        targetGrid.ScrollIntoView(targetLine);
-                }), DispatcherPriority.Loaded);
-            }
+                    AfterCenterLinesMutated(center, linesGrid, isUndo ? null : affected);
+                });
+            _cmdHistory.ExecuteAndPush(cmd);
         }
 
         private void BtnInlineRemoveLine_Click(object sender, RoutedEventArgs e)
         {
+            if (!IsEditMode) return;
             DialPlanCenter center = ExtractCenterFromSender(sender) ?? _expandedCenter;
             if (center == null) return;
 
             DataGrid linesGrid = FindLinesGridForSender(sender) ?? _expandedLinesGrid;
+            FlushFocusedHeaderTextBoxEdit();
             CommitGridEdits(linesGrid);
             if (center.lines != null)
                 EnsureCollectionViewNotEditing(center.lines);
@@ -1113,56 +1791,78 @@ namespace CmOxeProvisioner.Views
                 return;
             }
 
-            center.lines.Remove(line);
+            int origIdx = center.lines.IndexOf(line);
+            if (origIdx < 0) origIdx = 0;
+
+            _dirtyCenters.Add(center);
+            var cmd = new ListInsertRemoveCommand<DialPlanLine>(
+                center.lines,
+                line,
+                origIdx,
+                false,
+                center.project + " · 라인 삭제",
+                delegate(DialPlanLine affected, bool isUndo)
+                {
+                    AfterCenterLinesMutated(center, linesGrid, isUndo ? affected : null);
+                });
+            _cmdHistory.ExecuteAndPush(cmd);
+            Toast(true, "라인 삭제됨 (임시)", "선택한 라인을 삭제했습니다. (Ctrl+Z로 즉시 복구 · 변경사항 저장 전까지 확정되지 않습니다)");
+        }
+
+        private void AfterCenterLinesMutated(DialPlanCenter center, DataGrid linesGrid, DialPlanLine selectLine)
+        {
+            if (center == null) return;
             center.RefreshLineMergeVisuals(_mergeCellsEnabled);
             center.NotifySummaryFields();
-            if (linesGrid != null)
+
+            DataGrid targetGrid = linesGrid;
+            if (targetGrid == null || !ReferenceEquals(targetGrid.DataContext, center))
+                targetGrid = _expandedCenter == center ? _expandedLinesGrid : null;
+
+            if (targetGrid != null)
             {
+                CommitGridEdits(targetGrid);
+                EnsureCollectionViewNotEditing(center.lines);
                 var view = CollectionViewSource.GetDefaultView(center.lines);
-                if (!ReferenceEquals(linesGrid.ItemsSource, center.lines))
-                    linesGrid.ItemsSource = center.lines;
+                if (!ReferenceEquals(targetGrid.ItemsSource, center.lines))
+                    targetGrid.ItemsSource = center.lines;
                 else if (view != null)
                     view.Refresh();
                 else
-                    linesGrid.Items.Refresh();
+                    targetGrid.Items.Refresh();
+
+                if (selectLine != null && center.lines.Contains(selectLine))
+                {
+                    targetGrid.SelectedItem = selectLine;
+                    var capturedGrid = targetGrid;
+                    var capturedLine = selectLine;
+                    Dispatcher.BeginInvoke(new Action(delegate()
+                    {
+                        if (capturedGrid.Items.Contains(capturedLine))
+                            capturedGrid.ScrollIntoView(capturedLine);
+                    }), DispatcherPriority.Loaded);
+                }
             }
         }
 
         private void BtnInlineSaveCenter_Click(object sender, RoutedEventArgs e)
         {
+            if (!IsEditMode) return;
             DialPlanCenter center = ExtractCenterFromSender(sender) ?? _expandedCenter;
-            if (center == null) return;
-
-            DataGrid linesGrid = FindLinesGridForSender(sender);
-            CommitGridEdits(linesGrid);
-
-            string newProject = (center.project ?? string.Empty).Trim();
-            if (string.IsNullOrWhiteSpace(newProject))
-            {
-                Toast(false, "입력 확인", "센터명은 비워둘 수 없습니다.");
-                return;
-            }
-
-            center.location = (center.location ?? string.Empty).Trim();
-            center.project = newProject;
-            center.cmCustomerName = (center.cmCustomerName ?? string.Empty).Trim();
-            center.apUrl = (center.apUrl ?? string.Empty).Trim();
-            center.notes = (center.notes ?? string.Empty).Trim();
-            center.EnsureLists();
-            center.RefreshLineMergeVisuals(_mergeCellsEnabled);
-            center.NotifySummaryFields();
-
-            SaveDbAndSyncCustomers(center);
-            WriteAudit("선번장 저장", "Center=" + center.project + " Status=" + center.status + " Lines=" + center.LineCount);
-            Toast(true, "저장 완료", "'" + center.project + "' 변경사항 저장 및 CM 프리셋 동기화 완료");
+            if (center != null)
+                _dirtyCenters.Add(center);
+            SaveAllChanges(showToast: true);
         }
 
         private void BtnInlineToggleStatus_Click(object sender, RoutedEventArgs e)
         {
+            if (!IsEditMode) return;
             DialPlanCenter center = ExtractCenterFromSender(sender) ?? _expandedCenter;
             if (center == null) return;
 
-            CommitGridEdits(FindLinesGridForSender(sender));
+            FlushPendingEdits();
+            if (_isDirty && !ConfirmDiscardOrSaveUnsaved("센터 상태 전환 전"))
+                return;
 
             bool movingToClosed = center.status != DialPlanStatus.Closed;
             string nextStatus = movingToClosed ? DialPlanStatus.Closed : DialPlanStatus.Active;
@@ -1178,19 +1878,37 @@ namespace CmOxeProvisioner.Views
                 return;
             }
 
-            center.status = nextStatus;
-            center.closedAt = movingToClosed ? DateTime.Now.ToString("yyyy-MM-dd") : string.Empty;
-            center.NotifySummaryFields();
+            _isApplyingCommand = true;
+            try
+            {
+                center.status = nextStatus;
+                center.closedAt = movingToClosed ? DateTime.Now.ToString("yyyy-MM-dd") : string.Empty;
+                center.NotifySummaryFields();
+            }
+            finally
+            {
+                _isApplyingCommand = false;
+            }
 
-            SaveDbAndSyncCustomers(null);
+            _dirtyCenters.Add(center);
+            SaveDbAndSyncCustomers(center);
+            _savedSnapshotJson = DialPlanRepository.SerializeSnapshot(_db);
+            _cmdHistory.Clear();
+            _dirtyCenters.Clear();
+            _isDirty = false;
+            UpdateEditModeVisuals();
             WriteAudit("선번장 상태변경", "Center=" + center.project + " -> " + nextStatus);
             Toast(true, "상태 변경 완료", "'" + center.project + "' 상태가 '" + DialPlanStatus.ToDisplay(nextStatus) + "'(으)로 변경되었습니다.");
         }
 
         private async void BtnInlineFullDelete_Click(object sender, RoutedEventArgs e)
         {
+            if (!IsEditMode) return;
             DialPlanCenter target = ExtractCenterFromSender(sender) ?? _expandedCenter;
             if (target == null) return;
+
+            if (_isDirty && !ConfirmDiscardOrSaveUnsaved("완전 삭제 실행 전"))
+                return;
 
             var btn = sender as Button;
             string cmTargetDesc = target.HasCmLink
@@ -1261,6 +1979,11 @@ namespace CmOxeProvisioner.Views
             PopulateLocationFilter();
             UpdateStatusCounts();
             ApplyFiltersAndBind();
+            _savedSnapshotJson = DialPlanRepository.SerializeSnapshot(_db);
+            _cmdHistory.Clear();
+            _dirtyCenters.Clear();
+            _isDirty = false;
+            UpdateEditModeVisuals();
             if (_onDatabaseOrCustomerChanged != null) _onDatabaseOrCustomerChanged();
 
             string extra = (outcome != null && outcome.CmExecuted)
@@ -1351,6 +2074,9 @@ namespace CmOxeProvisioner.Views
 
         private void BtnAddCenterPopup_Click(object sender, RoutedEventArgs e)
         {
+            if (_isDirty && !ConfirmDiscardOrSaveUnsaved("새 센터 추가 전"))
+                return;
+
             var win = new CenterAddWindow();
             win.Owner = Window.GetWindow(this);
             var customers = _getCustomers != null ? _getCustomers() : new List<CustomerInfo>();
@@ -1386,6 +2112,9 @@ namespace CmOxeProvisioner.Views
 
         private void BtnImport_Click(object sender, RoutedEventArgs e)
         {
+            if (_isDirty && !ConfirmDiscardOrSaveUnsaved("파일 가져오기 전"))
+                return;
+
             var dlg = new OpenFileDialog
             {
                 Title = "선번장 파일 가져오기 (.xlsx / .csv / .json)",
@@ -1525,168 +2254,363 @@ namespace CmOxeProvisioner.Views
             }
         }
 
+        private void AddMasterRow<T>(IList<T> targetList, DataGrid grid, T row, string label) where T : class
+        {
+            if (!IsEditMode || targetList == null || row == null) return;
+            CommitGridEdits(grid);
+            var cmd = new ListInsertRemoveCommand<T>(
+                targetList,
+                row,
+                targetList.Count,
+                true,
+                label + " 행 추가",
+                delegate(T item, bool isUndo)
+                {
+                    ApplyFiltersAndBind();
+                    if (!isUndo && grid != null && grid.Items.Contains(item))
+                    {
+                        grid.SelectedItem = item;
+                        grid.ScrollIntoView(item);
+                    }
+                });
+            _cmdHistory.ExecuteAndPush(cmd);
+        }
+
+        private void RemoveMasterRow<T>(IList<T> targetList, DataGrid grid, string label) where T : class
+        {
+            if (!IsEditMode || targetList == null || grid == null) return;
+            CommitGridEdits(grid);
+            var sel = grid.SelectedItem as T;
+            if (sel == null)
+            {
+                Toast(false, "선택 필요", "삭제할 " + label + " 행을 먼저 선택하세요.");
+                return;
+            }
+            int idx = targetList.IndexOf(sel);
+            if (idx < 0) idx = 0;
+
+            var cmd = new ListInsertRemoveCommand<T>(
+                targetList,
+                sel,
+                idx,
+                false,
+                label + " 행 삭제",
+                delegate(T item, bool isUndo)
+                {
+                    ApplyFiltersAndBind();
+                    if (isUndo && grid.Items.Contains(item))
+                    {
+                        grid.SelectedItem = item;
+                        grid.ScrollIntoView(item);
+                    }
+                });
+            _cmdHistory.ExecuteAndPush(cmd);
+            Toast(true, label + " 삭제됨 (임시)", "선택한 행을 삭제했습니다. (Ctrl+Z로 즉시 복구 · 변경사항 저장 전까지 확정되지 않습니다)");
+        }
+
         private void BtnAddPri_Click(object sender, RoutedEventArgs e)
         {
-            var row = new PriTrunkRow { status = "Alive" };
-            _db.priTrunks.Add(row);
-            ApplyFiltersAndBind();
-            GridPri.SelectedItem = row;
-            GridPri.ScrollIntoView(row);
+            AddMasterRow(_db.priTrunks, GridPri, new PriTrunkRow { status = "Alive" }, "PRI");
         }
 
         private void BtnRemovePri_Click(object sender, RoutedEventArgs e)
         {
-            var sel = GridPri.SelectedItem as PriTrunkRow;
-            if (sel == null) return;
-            _db.priTrunks.Remove(sel);
-            ApplyFiltersAndBind();
+            RemoveMasterRow(_db.priTrunks, GridPri, "PRI");
         }
 
         private void BtnAddEntity_Click(object sender, RoutedEventArgs e)
         {
-            var row = new EntityMasterRow();
-            _db.entities.Add(row);
-            ApplyFiltersAndBind();
-            GridEntities.SelectedItem = row;
-            GridEntities.ScrollIntoView(row);
+            AddMasterRow(_db.entities, GridEntities, new EntityMasterRow(), "Entity");
         }
 
         private void BtnRemoveEntity_Click(object sender, RoutedEventArgs e)
         {
-            var sel = GridEntities.SelectedItem as EntityMasterRow;
-            if (sel == null) return;
-            _db.entities.Remove(sel);
-            ApplyFiltersAndBind();
+            RemoveMasterRow(_db.entities, GridEntities, "Entity");
         }
 
         private void BtnAddIpIvr_Click(object sender, RoutedEventArgs e)
         {
-            var row = new IpIvrChannelRow { deviceName = "IP IVR 1" };
-            _db.ipIvrChannels.Add(row);
-            ApplyFiltersAndBind();
-            GridIpIvr.SelectedItem = row;
-            GridIpIvr.ScrollIntoView(row);
+            AddMasterRow(_db.ipIvrChannels, GridIpIvr, new IpIvrChannelRow { deviceName = "IP IVR 1" }, "IP IVR");
         }
 
         private void BtnRemoveIpIvr_Click(object sender, RoutedEventArgs e)
         {
-            var sel = GridIpIvr.SelectedItem as IpIvrChannelRow;
-            if (sel == null) return;
-            _db.ipIvrChannels.Remove(sel);
-            ApplyFiltersAndBind();
+            RemoveMasterRow(_db.ipIvrChannels, GridIpIvr, "IP IVR");
         }
 
         private void BtnAddDvg_Click(object sender, RoutedEventArgs e)
         {
-            var row = new DvgPromptRow { band = _dvgBandFilter == "all" ? "700~799" : _dvgBandFilter };
-            _db.dvgPrompts.Add(row);
-            ApplyFiltersAndBind();
-            GridDvg.SelectedItem = row;
-            GridDvg.ScrollIntoView(row);
+            AddMasterRow(_db.dvgPrompts, GridDvg, new DvgPromptRow { band = _dvgBandFilter == "all" ? "700~799" : _dvgBandFilter }, "D.V.G 멘트");
         }
 
         private void BtnRemoveDvg_Click(object sender, RoutedEventArgs e)
         {
-            var sel = GridDvg.SelectedItem as DvgPromptRow;
-            if (sel == null) return;
-            _db.dvgPrompts.Remove(sel);
-            ApplyFiltersAndBind();
+            RemoveMasterRow(_db.dvgPrompts, GridDvg, "D.V.G 멘트");
         }
 
         private void BtnAddHw_Click(object sender, RoutedEventArgs e)
         {
-            var row = new PbxHardwareRow { pbxSet = "MAIN" };
-            _db.pbxHardware.Add(row);
-            ApplyFiltersAndBind();
-            GridPbxHw.SelectedItem = row;
-            GridPbxHw.ScrollIntoView(row);
+            AddMasterRow(_db.pbxHardware, GridPbxHw, new PbxHardwareRow { pbxSet = "MAIN" }, "PBX 보드");
         }
 
         private void BtnRemoveHw_Click(object sender, RoutedEventArgs e)
         {
-            var sel = GridPbxHw.SelectedItem as PbxHardwareRow;
-            if (sel == null) return;
-            _db.pbxHardware.Remove(sel);
-            ApplyFiltersAndBind();
+            RemoveMasterRow(_db.pbxHardware, GridPbxHw, "PBX 보드");
         }
 
         private void BtnAddGpa_Click(object sender, RoutedEventArgs e)
         {
-            var row = new GpaBoardRow();
-            _db.gpaBoards.Add(row);
-            ApplyFiltersAndBind();
-            GridGpa.SelectedItem = row;
-            GridGpa.ScrollIntoView(row);
+            AddMasterRow(_db.gpaBoards, GridGpa, new GpaBoardRow(), "GPA 보드");
         }
 
         private void BtnRemoveGpa_Click(object sender, RoutedEventArgs e)
         {
-            var sel = GridGpa.SelectedItem as GpaBoardRow;
-            if (sel == null) return;
-            _db.gpaBoards.Remove(sel);
-            ApplyFiltersAndBind();
+            RemoveMasterRow(_db.gpaBoards, GridGpa, "GPA 보드");
         }
 
         private void BtnSaveAllMaster_Click(object sender, RoutedEventArgs e)
         {
+            if (!IsEditMode) return;
+            SaveAllChanges(showToast: true);
+        }
+
+        private void BtnSaveMdf_Click(object sender, RoutedEventArgs e)
+        {
+            if (!IsEditMode) return;
+            SaveAllChanges(showToast: true);
+        }
+
+        private void BtnUndo_Click(object sender, RoutedEventArgs e)
+        {
+            ExecuteUndo();
+        }
+
+        private void BtnRedo_Click(object sender, RoutedEventArgs e)
+        {
+            ExecuteRedo();
+        }
+
+        private void ExecuteUndo()
+        {
+            if (!IsEditMode) return;
+            FlushFocusedHeaderTextBoxEdit();
+            if (_expandedLinesGrid != null) CommitGridEdits(_expandedLinesGrid);
             CommitGridEdits(GridPri);
             CommitGridEdits(GridEntities);
             CommitGridEdits(GridIpIvr);
             CommitGridEdits(GridDvg);
             CommitGridEdits(GridPbxHw);
             CommitGridEdits(GridGpa);
-            DialPlanRepository.Save(_dbPath, _db);
-            Toast(true, "저장 완료", "마스터 테이블 변경사항을 저장했습니다.");
+            CommitGridEdits(GridMdf);
+
+            if (!_cmdHistory.CanUndo) return;
+            _isApplyingCommand = true;
+            try
+            {
+                _cmdHistory.Undo();
+            }
+            finally
+            {
+                _isApplyingCommand = false;
+            }
+            RecalculateDirtyFlag();
+            UpdateEditModeVisuals();
         }
 
-        private void BtnSaveMdf_Click(object sender, RoutedEventArgs e)
+        private void ExecuteRedo()
         {
+            if (!IsEditMode) return;
+            FlushFocusedHeaderTextBoxEdit();
+            if (_expandedLinesGrid != null) CommitGridEdits(_expandedLinesGrid);
+            CommitGridEdits(GridPri);
+            CommitGridEdits(GridEntities);
+            CommitGridEdits(GridIpIvr);
+            CommitGridEdits(GridDvg);
+            CommitGridEdits(GridPbxHw);
+            CommitGridEdits(GridGpa);
             CommitGridEdits(GridMdf);
-            if (_mdfDataTable != null)
+
+            if (!_cmdHistory.CanRedo) return;
+            _isApplyingCommand = true;
+            try
             {
-                string q = (TxtSearch.Text ?? string.Empty).Trim();
-                // Rebuild or update visible rows when unfiltered
-                if (string.IsNullOrWhiteSpace(q))
+                _cmdHistory.Redo();
+            }
+            finally
+            {
+                _isApplyingCommand = false;
+            }
+            RecalculateDirtyFlag();
+            UpdateEditModeVisuals();
+        }
+
+        private void BtnRevertAll_Click(object sender, RoutedEventArgs e)
+        {
+            if (!IsEditMode || !_isDirty) return;
+            RevertAllChanges(confirm: true, showToast: true);
+        }
+
+        public void RevertAllChanges(bool confirm, bool showToast)
+        {
+            FlushPendingEdits();
+            if (confirm)
+            {
+                if (!PopupDialogs.ConfirmAction(
+                    Window.GetWindow(this),
+                    "변경사항 되돌리기 확인",
+                    "마지막 저장 상태로 모든 변경사항을 되돌리시겠습니까?",
+                    "편집 모드에서 수정·추가·삭제한 미저장 내용(" + Math.Max(1, _cmdHistory.UndoCount) + "건)이 모두 취소됩니다.",
+                    "되돌리기 실행"))
                 {
-                    var rebuilt = new List<MdfBlockRow>();
-                    foreach (DataRow dr in _mdfDataTable.Rows)
-                    {
-                        int rIdx;
-                        int.TryParse(Convert.ToString(dr[1], CultureInfo.InvariantCulture), out rIdx);
-                        var cells = new List<string>();
-                        for (int c = 2; c < _mdfDataTable.Columns.Count; c++)
-                            cells.Add(Convert.ToString(dr[c], CultureInfo.InvariantCulture) ?? string.Empty);
-                        while (cells.Count > 0 && string.IsNullOrWhiteSpace(cells[cells.Count - 1]))
-                            cells.RemoveAt(cells.Count - 1);
-                        rebuilt.Add(new MdfBlockRow
-                        {
-                            section = Convert.ToString(dr[0], CultureInfo.InvariantCulture) ?? string.Empty,
-                            rowIndex = rIdx,
-                            cells = cells
-                        });
-                    }
-                    _db.mdfBlocks = rebuilt;
+                    return;
                 }
-                else
+            }
+
+            string prevExpandedId = _expandedCenter != null ? _expandedCenter.id : null;
+            _isApplyingCommand = true;
+            try
+            {
+                _db = DialPlanRepository.DeserializeSnapshot(_savedSnapshotJson);
+                if (_db != null && _db.centers != null)
                 {
-                    foreach (DataRow dr in _mdfDataTable.Rows)
+                    for (int i = 0; i < _db.centers.Count; i++)
                     {
-                        int rIdx;
-                        if (!int.TryParse(Convert.ToString(dr[1], CultureInfo.InvariantCulture), out rIdx)) continue;
-                        var target = _db.mdfBlocks.FirstOrDefault(m => m.rowIndex == rIdx);
-                        if (target == null) continue;
-                        target.section = Convert.ToString(dr[0], CultureInfo.InvariantCulture) ?? string.Empty;
-                        var cells = new List<string>();
-                        for (int c = 2; c < _mdfDataTable.Columns.Count; c++)
-                            cells.Add(Convert.ToString(dr[c], CultureInfo.InvariantCulture) ?? string.Empty);
-                        while (cells.Count > 0 && string.IsNullOrWhiteSpace(cells[cells.Count - 1]))
-                            cells.RemoveAt(cells.Count - 1);
-                        target.cells = cells;
+                        if (_db.centers[i] != null)
+                            _db.centers[i].EnsureSearchIndexReady();
+                    }
+                }
+                _lastMdfQuery = null;
+                _lastMdfSourceCount = -1;
+                _expandedCenter = null;
+                _expandedLinesGrid = null;
+                if (GridCenters != null)
+                    GridCenters.RowDetailsVisibilityMode = DataGridRowDetailsVisibilityMode.Collapsed;
+
+                _cmdHistory.Clear();
+                _dirtyCenters.Clear();
+                _isDirty = false;
+
+                BindCentersCollectionView();
+                PopulateLocationFilter();
+                UpdateStatusCounts();
+                ApplyFiltersAndBind();
+
+                if (!string.IsNullOrEmpty(prevExpandedId) && _db != null && _db.centers != null)
+                {
+                    var match = _db.centers.FirstOrDefault(c => string.Equals(c.id, prevExpandedId, StringComparison.Ordinal));
+                    if (match != null)
+                        SetExpandedCenter(match);
+                }
+            }
+            finally
+            {
+                _isApplyingCommand = false;
+            }
+
+            UpdateEditModeVisuals();
+            if (showToast)
+                Toast(true, "원복 완료", "마지막 저장 상태로 모든 변경사항을 되돌렸습니다.");
+        }
+
+        private void BtnSaveAll_Click(object sender, RoutedEventArgs e)
+        {
+            SaveAllChanges(showToast: true);
+        }
+
+        public bool SaveAllChanges(bool showToast)
+        {
+            FlushPendingEdits();
+            FlushMdfTableToDb();
+
+            // Validate dirty or expanded centers do not have empty project names
+            if (_db != null && _db.centers != null)
+            {
+                foreach (var c in _db.centers)
+                {
+                    if (c == null) continue;
+                    if (_dirtyCenters.Contains(c) || c == _expandedCenter)
+                    {
+                        string p = (c.project ?? string.Empty).Trim();
+                        if (string.IsNullOrWhiteSpace(p))
+                        {
+                            Toast(false, "입력 확인", "센터명은 비워둘 수 없습니다.");
+                            return false;
+                        }
+                        c.location = (c.location ?? string.Empty).Trim();
+                        c.project = p;
+                        c.cmCustomerName = (c.cmCustomerName ?? string.Empty).Trim();
+                        c.apUrl = (c.apUrl ?? string.Empty).Trim();
+                        c.notes = (c.notes ?? string.Empty).Trim();
+                        c.EnsureLists();
+                        c.RefreshLineMergeVisuals(_mergeCellsEnabled);
+                        c.NotifySummaryFields();
                     }
                 }
             }
+
             DialPlanRepository.Save(_dbPath, _db);
-            Toast(true, "저장 완료", "MDF / 110 Block 배선 데이터를 저장했습니다.");
+
+            bool customersUpdated = false;
+            if (_getCustomers != null)
+            {
+                var syncList = new HashSet<DialPlanCenter>(_dirtyCenters);
+                if (_expandedCenter != null) syncList.Add(_expandedCenter);
+                if (syncList.Count > 0)
+                {
+                    var customers = _getCustomers();
+                    foreach (var target in syncList)
+                    {
+                        if (DialPlanRepository.SyncCenterToCustomers(target, customers, overwritePresetsIfNonEmpty: true))
+                            customersUpdated = true;
+                    }
+                    if (customersUpdated)
+                        new CustomerRepository().SaveAll(_cmCustomersPath, customers);
+                }
+            }
+
+            _savedSnapshotJson = DialPlanRepository.SerializeSnapshot(_db);
+            int savedSteps = Math.Max(1, _cmdHistory.UndoCount);
+            _cmdHistory.Clear();
+            _dirtyCenters.Clear();
+            _isDirty = false;
+
+            PopulateLocationFilter();
+            UpdateStatusCounts();
+            ApplyFiltersAndBind();
+            UpdateEditModeVisuals();
+            if (_onDatabaseOrCustomerChanged != null)
+                _onDatabaseOrCustomerChanged();
+
+            WriteAudit("선번장 전체 저장", "Changes=" + savedSteps + " Centers=" + (_db != null && _db.centers != null ? _db.centers.Count : 0));
+            if (showToast)
+                Toast(true, "저장 완료", "변경사항을 저장하고 직전 파일을 backups 폴더에 백업했습니다.");
+            return true;
+        }
+
+        private void BtnRestoreBackup_Click(object sender, RoutedEventArgs e)
+        {
+            if (!IsEditMode) return;
+            if (_isDirty && !ConfirmDiscardOrSaveUnsaved("백업 복원 전"))
+                return;
+
+            var backups = DialPlanRepository.ListBackups(_dbPath);
+            var chosen = PopupDialogs.PickDialPlanBackup(Window.GetWindow(this), backups);
+            if (chosen == null) return;
+
+            try
+            {
+                var restored = DialPlanRepository.Load(chosen.FilePath);
+                DialPlanRepository.Save(_dbPath, restored);
+                ReloadFromDisk(null);
+                if (_onDatabaseOrCustomerChanged != null)
+                    _onDatabaseOrCustomerChanged();
+                WriteAudit("선번장 백업 복원", "Backup=" + chosen.FileName + " Centers=" + restored.centers.Count);
+                Toast(true, "백업 복원 완료", chosen.FileName + " 시점(" + restored.centers.Count + "개 센터)으로 복원했습니다.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("백업 파일 복원 중 오류가 발생했습니다:\n" + ex.Message, "백업 복원 오류", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void Toast(bool isSuccess, string title, string message)

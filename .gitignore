@@ -11,8 +11,9 @@ src/obj/
 /ExtBatch.exe
 /ExtBatch.pdb
 
-# 런타임 일일 로그 및 임시 파일
+# 런타임 일일 로그 및 자동 백업/임시 파일
 logs/
+backups/
 *.log
 *.tmp
 *.bak
