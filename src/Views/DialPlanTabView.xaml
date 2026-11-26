@@ -6,6 +6,52 @@
              FontFamily="Malgun Gothic, Segoe UI, sans-serif">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisConverter"/>
+        <Style TargetType="TextBlock" x:Key="DialPlanCenteredTextStyle">
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+        </Style>
+        <Style TargetType="TextBox" x:Key="DialPlanCenteredEditTextStyle">
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="DataGridColumnHeader" x:Key="DialPlanCenteredHeaderStyle" BasedOn="{StaticResource ModernDataGridColumnHeader}">
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="DataGridCell" x:Key="DialPlanCenteredCellStyle" BasedOn="{StaticResource ModernDataGridCell}">
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DataGridCell">
+                        <Border x:Name="CellBd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="CellBd" Property="Background" Value="Transparent"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter TargetName="CellBd" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
+                                <Setter TargetName="CellBd" Property="BorderThickness" Value="1"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="DataGrid" x:Key="DialPlanCenteredGridStyle" BasedOn="{StaticResource ModernDataGrid}">
+            <Setter Property="ColumnHeaderStyle" Value="{StaticResource DialPlanCenteredHeaderStyle}"/>
+            <Setter Property="CellStyle" Value="{StaticResource DialPlanCenteredCellStyle}"/>
+        </Style>
         <DataTemplate x:Key="CenterInlineDetailTemplate">
             <Grid Width="{Binding ViewportWidth, RelativeSource={RelativeSource AncestorType=ScrollViewer}}"
                   HorizontalAlignment="Left"
@@ -156,6 +202,7 @@
                         <DataGrid x:Name="InlineLinesGrid"
                                   Grid.Row="2"
                                   Style="{StaticResource ModernDataGrid}"
+                                  ColumnHeaderStyle="{StaticResource DialPlanCenteredHeaderStyle}"
                                   Background="{DynamicResource SurfaceBrush}"
                                   Foreground="{DynamicResource TextBrush}"
                                   ItemsSource="{Binding lines}"
@@ -326,7 +373,7 @@
             <Grid x:Name="PanelDialPlan" Visibility="Visible">
                 <Border Style="{StaticResource CardBorderStyle}" Padding="0">
                     <DataGrid x:Name="GridCenters"
-                              Style="{StaticResource ModernDataGrid}"
+                              Style="{StaticResource DialPlanCenteredGridStyle}"
                               AutoGenerateColumns="False"
                               IsReadOnly="True"
                               CanUserAddRows="False"
@@ -352,53 +399,78 @@
                         </DataGrid.RowStyle>
 
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="상태" Binding="{Binding StatusBadgeText}" Width="72"/>
                             <DataGridTextColumn Header="위치" Binding="{Binding LocationDisplay}" Width="110"/>
-                            <DataGridTextColumn Header="프로젝트 (센터명)" Binding="{Binding project}" Width="175"/>
-                            <DataGridTextColumn Header="세부업무" Binding="{Binding SubTaskSummary}" Width="145"/>
+                            <DataGridTextColumn Header="프로젝트 (센터명)" Binding="{Binding project}" Width="180"/>
+                            <DataGridTextColumn Header="세부업무" Binding="{Binding SubTaskSummary}" Width="150"/>
                             <DataGridTextColumn Header="대표번호" Binding="{Binding MainNumberSummary}" Width="135"/>
-                            <DataGridTextColumn Header="Entity NO" Binding="{Binding EntitySummary}" Width="130"/>
+                            <DataGridTextColumn Header="Entity NO" Binding="{Binding EntitySummary}" Width="125"/>
                             <DataGridTextColumn Header="Agent PG" Binding="{Binding PgSummary}" Width="105"/>
                             <DataGridTextColumn Header="Phone 내선" Binding="{Binding ExtRangeSummary}" Width="130"/>
                             <DataGridTextColumn Header="Login-ID" Binding="{Binding LoginRangeSummary}" Width="130"/>
-                            <DataGridTextColumn Header="라인" Binding="{Binding LineCount}" Width="46"/>
-                            <DataGridTextColumn Header="CM 연동" Binding="{Binding CmLinkedSummary}" Width="120"/>
-                            <DataGridTemplateColumn Header="AP 주소 (연결)" Width="175">
+                            <DataGridTextColumn Header="라인" Binding="{Binding LineCount}" Width="50"/>
+                            <DataGridTextColumn Header="CM 연동" Binding="{Binding CmLinkedSummary}" Width="130"/>
+                            <DataGridTemplateColumn Header="AP" Width="90">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Grid Margin="2,1">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBox Grid.Column="0"
-                                                     Text="{Binding apUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        <Grid x:Name="ApCellRoot" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="2,1">
+                                            <Button x:Name="BtnApLink"
+                                                    Content="{Binding ApDisplayText}"
+                                                    ToolTip="{Binding ApToolTipText}"
+                                                    Cursor="Hand"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    Padding="6,2"
+                                                    Tag="{Binding}"
+                                                    Click="BtnApLink_Click">
+                                                <Button.ContextMenu>
+                                                    <ContextMenu>
+                                                        <MenuItem Header="브라우저로 열기" Tag="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}" Click="MenuApOpen_Click"/>
+                                                        <MenuItem Header="AP 주소 입력 / 수정" Tag="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}" Click="MenuApEdit_Click"/>
+                                                        <MenuItem Header="AP 미사용으로 초기화" Tag="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}" Click="MenuApClear_Click"/>
+                                                    </ContextMenu>
+                                                </Button.ContextMenu>
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Border x:Name="ApBd" Background="Transparent" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                                                            <TextBlock x:Name="ApTxt"
+                                                                       Text="{TemplateBinding Content}"
+                                                                       FontSize="12"
+                                                                       TextAlignment="Center"
+                                                                       HorizontalAlignment="Center"
+                                                                       VerticalAlignment="Center"/>
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <DataTrigger Binding="{Binding HasApUrl}" Value="False">
+                                                                <Setter TargetName="ApTxt" Property="Foreground" Value="{DynamicResource MutedBrush}"/>
+                                                                <Setter TargetName="ApTxt" Property="FontWeight" Value="Normal"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding HasApUrl}" Value="True">
+                                                                <Setter TargetName="ApTxt" Property="Foreground" Value="{DynamicResource PrimaryBrush}"/>
+                                                                <Setter TargetName="ApTxt" Property="FontWeight" Value="Bold"/>
+                                                                <Setter TargetName="ApTxt" Property="TextDecorations" Value="Underline"/>
+                                                            </DataTrigger>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter TargetName="ApBd" Property="Background" Value="{DynamicResource ChipBgBrush}"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                            </Button>
+
+                                            <TextBox x:Name="TxtApInline"
+                                                     Visibility="Collapsed"
                                                      Background="{DynamicResource InputBgBrush}"
                                                      Foreground="{DynamicResource TextBrush}"
-                                                     BorderBrush="{DynamicResource BorderBrush}"
+                                                     BorderBrush="{DynamicResource PrimaryBrush}"
                                                      BorderThickness="1"
                                                      FontSize="11.5"
-                                                     Padding="5,2"
                                                      Height="24"
+                                                     Padding="4,1"
+                                                     TextAlignment="Center"
                                                      VerticalContentAlignment="Center"
                                                      Tag="{Binding}"
-                                                     GotFocus="TxtApUrl_GotFocus"
-                                                     LostFocus="TxtApUrl_LostFocus"
-                                                     KeyDown="TxtApUrl_KeyDown"
-                                                     ToolTip="AP 웹주소를 입력하고 Enter 또는 포커스 이동 시 자동 저장됩니다."/>
-                                            <Button Grid.Column="1"
-                                                    Style="{StaticResource OxeBtn}"
-                                                    Content="↗"
-                                                    Width="24" Height="24"
-                                                    Padding="0"
-                                                    Margin="4,0,0,0"
-                                                    FontSize="12"
-                                                    FontWeight="Bold"
-                                                    Cursor="Hand"
-                                                    IsEnabled="{Binding HasApUrl}"
-                                                    Tag="{Binding}"
-                                                    Click="BtnOpenApUrl_Click"
-                                                    ToolTip="입력된 AP 웹주소로 기본 브라우저 연결"/>
+                                                     LostFocus="TxtApInline_LostFocus"
+                                                     KeyDown="TxtApInline_KeyDown"/>
                                         </Grid>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
@@ -407,6 +479,8 @@
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Button Content="{Binding ExpandButtonText}"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
                                                 Height="23"
                                                 Padding="7,0"
                                                 FontSize="11.5"
@@ -478,7 +552,7 @@
                         </DockPanel>
                         <DataGrid x:Name="GridPri"
                                   Grid.Row="1"
-                                  Style="{StaticResource ModernDataGrid}"
+                                  Style="{StaticResource DialPlanCenteredGridStyle}"
                                   AutoGenerateColumns="False"
                                   IsReadOnly="False"
                                   CanUserAddRows="False"
@@ -520,7 +594,7 @@
                         </DockPanel>
                         <DataGrid x:Name="GridEntities"
                                   Grid.Row="1"
-                                  Style="{StaticResource ModernDataGrid}"
+                                  Style="{StaticResource DialPlanCenteredGridStyle}"
                                   AutoGenerateColumns="False"
                                   IsReadOnly="False"
                                   CanUserAddRows="False"
@@ -560,7 +634,7 @@
                         </DockPanel>
                         <DataGrid x:Name="GridIpIvr"
                                   Grid.Row="1"
-                                  Style="{StaticResource ModernDataGrid}"
+                                  Style="{StaticResource DialPlanCenteredGridStyle}"
                                   AutoGenerateColumns="False"
                                   IsReadOnly="False"
                                   CanUserAddRows="False"
@@ -594,7 +668,7 @@
                         </DockPanel>
                         <DataGrid x:Name="GridDvg"
                                   Grid.Row="1"
-                                  Style="{StaticResource ModernDataGrid}"
+                                  Style="{StaticResource DialPlanCenteredGridStyle}"
                                   AutoGenerateColumns="False"
                                   IsReadOnly="False"
                                   CanUserAddRows="False"
@@ -646,7 +720,7 @@
                             </DockPanel>
                             <DataGrid x:Name="GridPbxHw"
                                       Grid.Row="1"
-                                      Style="{StaticResource ModernDataGrid}"
+                                      Style="{StaticResource DialPlanCenteredGridStyle}"
                                       AutoGenerateColumns="False"
                                       IsReadOnly="False"
                                       CanUserAddRows="False"
@@ -680,7 +754,7 @@
                             </DockPanel>
                             <DataGrid x:Name="GridGpa"
                                       Grid.Row="1"
-                                      Style="{StaticResource ModernDataGrid}"
+                                      Style="{StaticResource DialPlanCenteredGridStyle}"
                                       AutoGenerateColumns="False"
                                       IsReadOnly="False"
                                       CanUserAddRows="False"
@@ -710,8 +784,9 @@
                         </DockPanel>
                         <DataGrid x:Name="GridMdf"
                                   Grid.Row="1"
-                                  Style="{StaticResource ModernDataGrid}"
+                                  Style="{StaticResource DialPlanCenteredGridStyle}"
                                   AutoGenerateColumns="True"
+                                  AutoGeneratingColumn="GridMdf_AutoGeneratingColumn"
                                   IsReadOnly="False"
                                   CanUserAddRows="False"
                                   SelectionMode="Single"/>

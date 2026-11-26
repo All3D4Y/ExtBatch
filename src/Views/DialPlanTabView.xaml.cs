@@ -55,6 +55,7 @@ namespace CmOxeProvisioner.Views
         private DataGrid _expandedLinesGrid = null;
         private DataTable _mdfDataTable = null;
         private string _apUrlEditOrigin = string.Empty;
+        private bool _isCancellingApEdit = false;
 
         private static readonly IValueConverter HideMergedTextConv = new InverseBoolToVisConverter();
         private static readonly IValueConverter MergeBorderConv = new MergeBottomBorderConverter();
@@ -62,7 +63,42 @@ namespace CmOxeProvisioner.Views
         public DialPlanTabView()
         {
             InitializeComponent();
+            ApplyCenteredTextColumns();
             PreviewKeyDown += DialPlanTabView_PreviewKeyDown;
+        }
+
+        private void ApplyCenteredTextColumns()
+        {
+            var textStyle = TryFindResource("DialPlanCenteredTextStyle") as Style;
+            var editStyle = TryFindResource("DialPlanCenteredEditTextStyle") as Style;
+            DataGrid[] grids = new[]
+            {
+                GridCenters, GridPri, GridEntities, GridIpIvr, GridDvg, GridPbxHw, GridGpa
+            };
+            foreach (var grid in grids)
+            {
+                if (grid == null) continue;
+                foreach (var col in grid.Columns)
+                {
+                    ApplyCenteredStyleToTextColumn(col as DataGridTextColumn, textStyle, editStyle);
+                }
+            }
+        }
+
+        private static void ApplyCenteredStyleToTextColumn(DataGridTextColumn textCol, Style textStyle, Style editStyle)
+        {
+            if (textCol == null) return;
+            if (textStyle != null) textCol.ElementStyle = textStyle;
+            if (editStyle != null) textCol.EditingElementStyle = editStyle;
+        }
+
+        private void GridMdf_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
+        {
+            var textCol = e.Column as DataGridTextColumn;
+            if (textCol == null) return;
+            var textStyle = TryFindResource("DialPlanCenteredTextStyle") as Style;
+            var editStyle = TryFindResource("DialPlanCenteredEditTextStyle") as Style;
+            ApplyCenteredStyleToTextColumn(textCol, textStyle, editStyle);
         }
 
         public void Initialize(
@@ -510,7 +546,9 @@ namespace CmOxeProvisioner.Views
             textFactory.SetBinding(TextBlock.TextProperty, new Binding(propName));
             textFactory.SetBinding(UIElement.VisibilityProperty,
                 new Binding("Merge[" + propName + "].SameAsAbove") { Converter = HideMergedTextConv });
+            textFactory.SetValue(FrameworkElement.HorizontalAlignmentProperty, HorizontalAlignment.Center);
             textFactory.SetValue(FrameworkElement.VerticalAlignmentProperty, VerticalAlignment.Center);
+            textFactory.SetValue(TextBlock.TextAlignmentProperty, TextAlignment.Center);
             textFactory.SetValue(TextBlock.TextWrappingProperty, TextWrapping.Wrap);
 
             borderFactory.AppendChild(textFactory);
@@ -524,6 +562,7 @@ namespace CmOxeProvisioner.Views
             tbFactory.SetValue(Control.PaddingProperty, new Thickness(5, 3, 5, 3));
             tbFactory.SetValue(Control.BorderThicknessProperty, new Thickness(1));
             tbFactory.SetValue(Control.VerticalContentAlignmentProperty, VerticalAlignment.Center);
+            tbFactory.SetValue(TextBox.TextAlignmentProperty, TextAlignment.Center);
             tbFactory.AddHandler(FrameworkElement.LoadedEvent, new RoutedEventHandler(delegate(object s, RoutedEventArgs ev)
             {
                 var tb = s as TextBox;
@@ -540,51 +579,144 @@ namespace CmOxeProvisioner.Views
             return col;
         }
 
-        private void TxtApUrl_GotFocus(object sender, RoutedEventArgs e)
+        private void BtnApLink_Click(object sender, RoutedEventArgs e)
+        {
+            e.Handled = true;
+            var btn = sender as Button;
+            if (btn == null) return;
+            var center = (btn.Tag as DialPlanCenter) ?? (btn.DataContext as DialPlanCenter);
+            if (center == null) return;
+
+            if (center.HasApUrl)
+            {
+                OpenApUrlForCenter(center);
+            }
+            else
+            {
+                BeginInlineApEdit(btn, center);
+            }
+        }
+
+        private void MenuApOpen_Click(object sender, RoutedEventArgs e)
+        {
+            var mi = sender as MenuItem;
+            var btn = mi != null ? mi.Tag as Button : null;
+            var center = btn != null ? ((btn.Tag as DialPlanCenter) ?? (btn.DataContext as DialPlanCenter)) : null;
+            OpenApUrlForCenter(center);
+        }
+
+        private void MenuApEdit_Click(object sender, RoutedEventArgs e)
+        {
+            var mi = sender as MenuItem;
+            var btn = mi != null ? mi.Tag as Button : null;
+            var center = btn != null ? ((btn.Tag as DialPlanCenter) ?? (btn.DataContext as DialPlanCenter)) : null;
+            if (btn != null && center != null)
+            {
+                BeginInlineApEdit(btn, center);
+            }
+        }
+
+        private void MenuApClear_Click(object sender, RoutedEventArgs e)
+        {
+            var mi = sender as MenuItem;
+            var btn = mi != null ? mi.Tag as Button : null;
+            var center = btn != null ? ((btn.Tag as DialPlanCenter) ?? (btn.DataContext as DialPlanCenter)) : null;
+            if (center == null) return;
+
+            center.apUrl = string.Empty;
+            center.NotifySummaryFields();
+            DialPlanRepository.Save(_dbPath, _db);
+            WriteAudit("AP URL 초기화", "Center=" + center.project);
+            Toast(true, "AP 초기화", "'" + center.project + "' AP가 미사용으로 변경되었습니다.");
+        }
+
+        private void BeginInlineApEdit(Button btn, DialPlanCenter center)
+        {
+            var root = btn != null ? btn.Parent as Grid : null;
+            if (root == null || center == null) return;
+            var tb = FindNamedDescendant<TextBox>(root, "TxtApInline");
+            if (tb == null) return;
+
+            _isCancellingApEdit = false;
+            _apUrlEditOrigin = (center.apUrl ?? string.Empty).Trim();
+            tb.Text = _apUrlEditOrigin;
+            btn.Visibility = Visibility.Collapsed;
+            tb.Visibility = Visibility.Visible;
+
+            Dispatcher.BeginInvoke(new Action(delegate()
+            {
+                tb.Focus();
+                tb.SelectAll();
+            }), DispatcherPriority.Input);
+        }
+
+        private void TxtApInline_LostFocus(object sender, RoutedEventArgs e)
         {
             var tb = sender as TextBox;
-            _apUrlEditOrigin = tb != null ? (tb.Text ?? string.Empty).Trim() : string.Empty;
+            if (tb == null || tb.Visibility != Visibility.Visible) return;
+            FinishInlineApEdit(tb, save: !_isCancellingApEdit, showToast: false);
+            _isCancellingApEdit = false;
         }
 
-        private void TxtApUrl_LostFocus(object sender, RoutedEventArgs e)
+        private void TxtApInline_KeyDown(object sender, KeyEventArgs e)
         {
-            CommitApUrlFromTextBox(sender as TextBox, showToast: false);
-        }
+            var tb = sender as TextBox;
+            if (tb == null) return;
 
-        private void TxtApUrl_KeyDown(object sender, KeyEventArgs e)
-        {
             if (e.Key == Key.Enter)
             {
-                CommitApUrlFromTextBox(sender as TextBox, showToast: true);
-                Keyboard.ClearFocus();
+                _isCancellingApEdit = false;
+                FinishInlineApEdit(tb, save: true, showToast: true);
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Escape)
+            {
+                _isCancellingApEdit = true;
+                FinishInlineApEdit(tb, save: false, showToast: false);
                 e.Handled = true;
             }
         }
 
-        private void CommitApUrlFromTextBox(TextBox tb, bool showToast)
+        private void FinishInlineApEdit(TextBox tb, bool save, bool showToast)
         {
             if (tb == null) return;
+            var root = tb.Parent as Grid;
+            var btn = root != null ? FindNamedDescendant<Button>(root, "BtnApLink") : null;
             var center = (tb.Tag as DialPlanCenter) ?? (tb.DataContext as DialPlanCenter);
-            if (center == null) return;
 
-            string trimmed = (tb.Text ?? string.Empty).Trim();
-            center.apUrl = trimmed;
-            center.NotifySummaryFields();
-
-            if (!string.Equals(_apUrlEditOrigin ?? string.Empty, trimmed, StringComparison.Ordinal))
+            if (save && center != null)
             {
-                _apUrlEditOrigin = trimmed;
-                DialPlanRepository.Save(_dbPath, _db);
-                WriteAudit("AP URL 수정", "Center=" + center.project + " Url=" + trimmed);
-                if (showToast)
-                    Toast(true, "AP 주소 저장", "'" + center.project + "' AP URL을 저장했습니다.");
+                string trimmed = (tb.Text ?? string.Empty).Trim();
+                center.apUrl = trimmed;
+                center.NotifySummaryFields();
+
+                if (!string.Equals(_apUrlEditOrigin ?? string.Empty, trimmed, StringComparison.Ordinal))
+                {
+                    _apUrlEditOrigin = trimmed;
+                    DialPlanRepository.Save(_dbPath, _db);
+                    WriteAudit("AP URL 수정", "Center=" + center.project + " Url=" + trimmed);
+                    if (showToast)
+                    {
+                        Toast(true, "AP 설정 저장", center.HasApUrl
+                            ? ("'" + center.project + "' AP가 '바로가기'로 설정되었습니다.")
+                            : ("'" + center.project + "' AP가 '미사용'으로 설정되었습니다."));
+                    }
+                }
             }
+
+            tb.Visibility = Visibility.Collapsed;
+            if (btn != null) btn.Visibility = Visibility.Visible;
         }
 
         private void BtnOpenApUrl_Click(object sender, RoutedEventArgs e)
         {
             e.Handled = true;
             DialPlanCenter center = ExtractCenterFromSender(sender) ?? _expandedCenter;
+            OpenApUrlForCenter(center);
+        }
+
+        private void OpenApUrlForCenter(DialPlanCenter center)
+        {
             if (center == null) return;
 
             string raw = (center.apUrl ?? string.Empty).Trim();

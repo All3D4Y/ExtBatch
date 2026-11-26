@@ -183,6 +183,8 @@ namespace CmOxeProvisioner.Models
             OnPropertyChanged("HasCmLink");
             OnPropertyChanged("CmLinkedSummary");
             OnPropertyChanged("HasApUrl");
+            OnPropertyChanged("ApDisplayText");
+            OnPropertyChanged("ApToolTipText");
             OnPropertyChanged("apUrl");
             OnPropertyChanged("SubTaskSummary");
             OnPropertyChanged("MainNumberSummary");
@@ -233,6 +235,20 @@ namespace CmOxeProvisioner.Models
 
         [ScriptIgnore]
         public bool HasApUrl { get { return !string.IsNullOrWhiteSpace(apUrl); } }
+
+        [ScriptIgnore]
+        public string ApDisplayText { get { return HasApUrl ? "바로가기" : "미사용"; } }
+
+        [ScriptIgnore]
+        public string ApToolTipText
+        {
+            get
+            {
+                return HasApUrl
+                    ? ("브라우저로 연결: " + apUrl + "\n(우클릭: 주소 수정 / 초기화)")
+                    : "클릭하여 AP 웹주소를 입력합니다.";
+            }
+        }
 
         [ScriptIgnore]
         public string SubTaskSummary { get { return JoinDistinct(lines, l => l.subTask, ", ", 3); } }
