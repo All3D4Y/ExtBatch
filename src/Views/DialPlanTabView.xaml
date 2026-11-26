@@ -51,7 +51,16 @@
         <Style TargetType="DataGrid" x:Key="DialPlanCenteredGridStyle" BasedOn="{StaticResource ModernDataGrid}">
             <Setter Property="ColumnHeaderStyle" Value="{StaticResource DialPlanCenteredHeaderStyle}"/>
             <Setter Property="CellStyle" Value="{StaticResource DialPlanCenteredCellStyle}"/>
+            <Setter Property="EnableRowVirtualization" Value="True"/>
+            <Setter Property="EnableColumnVirtualization" Value="False"/>
+            <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True"/>
+            <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling"/>
         </Style>
+        <ContextMenu x:Key="ApCellContextMenu">
+            <MenuItem Header="브라우저로 열기" Tag="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}" Click="MenuApOpen_Click"/>
+            <MenuItem Header="AP 주소 입력 / 수정" Tag="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}" Click="MenuApEdit_Click"/>
+            <MenuItem Header="AP 미사용으로 초기화" Tag="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}" Click="MenuApClear_Click"/>
+        </ContextMenu>
         <DataTemplate x:Key="CenterInlineDetailTemplate">
             <Grid Width="{Binding ViewportWidth, RelativeSource={RelativeSource AncestorType=ScrollViewer}}"
                   HorizontalAlignment="Left"
@@ -354,8 +363,9 @@
                         <TextBox x:Name="TxtSearch"
                                  Style="{StaticResource ModernTextBox}"
                                  Width="260" Height="28"
-                                 ToolTip="센터명, 대표번호, 착신번호, RSI, PG, 내선, Entity, DID, 멘트 내용 검색"
-                                 TextChanged="TxtSearch_TextChanged"/>
+                                 ToolTip="센터명, 대표번호, 착신번호, RSI, PG, 내선, Entity, DID, 멘트 내용 검색 (Enter 즉시검색 · Esc 초기화)"
+                                 TextChanged="TxtSearch_TextChanged"
+                                 KeyDown="TxtSearch_KeyDown"/>
                         <Button x:Name="BtnClearSearch"
                                 Style="{StaticResource BaseBtn}"
                                 Content="초기화"
@@ -381,7 +391,7 @@
                               SelectionMode="Single"
                               SelectionUnit="FullRow"
                               GridLinesVisibility="Horizontal"
-                              RowDetailsVisibilityMode="Visible"
+                              RowDetailsVisibilityMode="Collapsed"
                               SelectionChanged="GridCenters_SelectionChanged"
                               MouseDoubleClick="GridCenters_MouseDoubleClick">
                         <DataGrid.RowStyle>
@@ -399,36 +409,80 @@
                         </DataGrid.RowStyle>
 
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="위치" Binding="{Binding LocationDisplay}" Width="110"/>
-                            <DataGridTextColumn Header="프로젝트 (센터명)" Binding="{Binding project}" Width="180"/>
-                            <DataGridTextColumn Header="세부업무" Binding="{Binding SubTaskSummary}" Width="150"/>
-                            <DataGridTextColumn Header="대표번호" Binding="{Binding MainNumberSummary}" Width="135"/>
-                            <DataGridTextColumn Header="Entity NO" Binding="{Binding EntitySummary}" Width="125"/>
-                            <DataGridTextColumn Header="Agent PG" Binding="{Binding PgSummary}" Width="105"/>
-                            <DataGridTextColumn Header="Phone 내선" Binding="{Binding ExtRangeSummary}" Width="130"/>
-                            <DataGridTextColumn Header="Login-ID" Binding="{Binding LoginRangeSummary}" Width="130"/>
-                            <DataGridTextColumn Header="라인" Binding="{Binding LineCount}" Width="50"/>
-                            <DataGridTextColumn Header="CM 연동" Binding="{Binding CmLinkedSummary}" Width="130"/>
-                            <DataGridTemplateColumn Header="AP" Width="90">
+                            <DataGridTemplateColumn Header="상태" Width="84" SortMemberPath="StatusBadgeText">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border x:Name="StatusPill"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                Background="{DynamicResource SurfaceAltBrush}"
+                                                BorderBrush="{DynamicResource BorderBrush}"
+                                                BorderThickness="1"
+                                                CornerRadius="9"
+                                                Padding="7,2"
+                                                MinWidth="64">
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                <Ellipse x:Name="StatusDot"
+                                                         Width="5.5" Height="5.5"
+                                                         Fill="{DynamicResource MutedBrush}"
+                                                         Margin="0,0,5,0"
+                                                         VerticalAlignment="Center"/>
+                                                <TextBlock x:Name="StatusTxt"
+                                                           Text="{Binding StatusBadgeText}"
+                                                           Foreground="{DynamicResource MutedBrush}"
+                                                           FontSize="10.5"
+                                                           FontWeight="SemiBold"
+                                                           TextAlignment="Center"
+                                                           VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <DataTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding status}" Value="active">
+                                                <Setter TargetName="StatusPill" Property="Background" Value="{DynamicResource OkBgBrush}"/>
+                                                <Setter TargetName="StatusPill" Property="BorderBrush" Value="{DynamicResource OkBorderBrush}"/>
+                                                <Setter TargetName="StatusDot" Property="Fill" Value="{DynamicResource OkFgBrush}"/>
+                                                <Setter TargetName="StatusTxt" Property="Foreground" Value="{DynamicResource OkFgBrush}"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding status}" Value="test">
+                                                <Setter TargetName="StatusPill" Property="Background" Value="{DynamicResource WarnBgBrush}"/>
+                                                <Setter TargetName="StatusPill" Property="BorderBrush" Value="{DynamicResource WarnBorderBrush}"/>
+                                                <Setter TargetName="StatusDot" Property="Fill" Value="{DynamicResource WarnFgBrush}"/>
+                                                <Setter TargetName="StatusTxt" Property="Foreground" Value="{DynamicResource WarnFgBrush}"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding status}" Value="closed">
+                                                <Setter TargetName="StatusPill" Property="Background" Value="{DynamicResource ErrBgBrush}"/>
+                                                <Setter TargetName="StatusPill" Property="BorderBrush" Value="{DynamicResource ErrBorderBrush}"/>
+                                                <Setter TargetName="StatusDot" Property="Fill" Value="{DynamicResource ErrFgBrush}"/>
+                                                <Setter TargetName="StatusTxt" Property="Foreground" Value="{DynamicResource ErrFgBrush}"/>
+                                            </DataTrigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="위치" Binding="{Binding LocationDisplay}" Width="105"/>
+                            <DataGridTextColumn Header="프로젝트 (센터명)" Binding="{Binding project}" Width="175"/>
+                            <DataGridTextColumn Header="세부업무" Binding="{Binding SubTaskSummary}" Width="145"/>
+                            <DataGridTextColumn Header="대표번호" Binding="{Binding MainNumberSummary}" Width="130"/>
+                            <DataGridTextColumn Header="Entity NO" Binding="{Binding EntitySummary}" Width="120"/>
+                            <DataGridTextColumn Header="Agent PG" Binding="{Binding PgSummary}" Width="100"/>
+                            <DataGridTextColumn Header="Phone 내선" Binding="{Binding ExtRangeSummary}" Width="125"/>
+                            <DataGridTextColumn Header="Login-ID" Binding="{Binding LoginRangeSummary}" Width="125"/>
+                            <DataGridTextColumn Header="라인" Binding="{Binding LineCount}" Width="48"/>
+                            <DataGridTextColumn Header="CM 연동" Binding="{Binding CmLinkedSummary}" Width="125"/>
+                            <DataGridTemplateColumn Header="AP" Width="88">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Grid x:Name="ApCellRoot" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="2,1">
                                             <Button x:Name="BtnApLink"
                                                     Content="{Binding ApDisplayText}"
                                                     ToolTip="{Binding ApToolTipText}"
+                                                    ContextMenu="{StaticResource ApCellContextMenu}"
                                                     Cursor="Hand"
                                                     HorizontalAlignment="Center"
                                                     VerticalAlignment="Center"
                                                     Padding="6,2"
                                                     Tag="{Binding}"
                                                     Click="BtnApLink_Click">
-                                                <Button.ContextMenu>
-                                                    <ContextMenu>
-                                                        <MenuItem Header="브라우저로 열기" Tag="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}" Click="MenuApOpen_Click"/>
-                                                        <MenuItem Header="AP 주소 입력 / 수정" Tag="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}" Click="MenuApEdit_Click"/>
-                                                        <MenuItem Header="AP 미사용으로 초기화" Tag="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}" Click="MenuApClear_Click"/>
-                                                    </ContextMenu>
-                                                </Button.ContextMenu>
                                                 <Button.Template>
                                                     <ControlTemplate TargetType="Button">
                                                         <Border x:Name="ApBd" Background="Transparent" CornerRadius="4" Padding="{TemplateBinding Padding}">
@@ -456,21 +510,6 @@
                                                     </ControlTemplate>
                                                 </Button.Template>
                                             </Button>
-
-                                            <TextBox x:Name="TxtApInline"
-                                                     Visibility="Collapsed"
-                                                     Background="{DynamicResource InputBgBrush}"
-                                                     Foreground="{DynamicResource TextBrush}"
-                                                     BorderBrush="{DynamicResource PrimaryBrush}"
-                                                     BorderThickness="1"
-                                                     FontSize="11.5"
-                                                     Height="24"
-                                                     Padding="4,1"
-                                                     TextAlignment="Center"
-                                                     VerticalContentAlignment="Center"
-                                                     Tag="{Binding}"
-                                                     LostFocus="TxtApInline_LostFocus"
-                                                     KeyDown="TxtApInline_KeyDown"/>
                                         </Grid>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Globalization;
@@ -54,6 +55,11 @@ namespace CmOxeProvisioner.Views
         private DialPlanCenter _expandedCenter = null;
         private DataGrid _expandedLinesGrid = null;
         private DataTable _mdfDataTable = null;
+        private ListCollectionView _centersView = null;
+        private string _activeSearchQuery = string.Empty;
+        private string _lastMdfQuery = null;
+        private int _lastMdfSourceCount = -1;
+        private DispatcherTimer _searchDebounceTimer = null;
         private string _apUrlEditOrigin = string.Empty;
         private bool _isCancellingApEdit = false;
 
@@ -64,7 +70,17 @@ namespace CmOxeProvisioner.Views
         {
             InitializeComponent();
             ApplyCenteredTextColumns();
+            _searchDebounceTimer = new DispatcherTimer(DispatcherPriority.Normal, Dispatcher);
+            _searchDebounceTimer.Interval = TimeSpan.FromMilliseconds(110);
+            _searchDebounceTimer.Tick += SearchDebounceTimer_Tick;
             PreviewKeyDown += DialPlanTabView_PreviewKeyDown;
+        }
+
+        private void SearchDebounceTimer_Tick(object sender, EventArgs e)
+        {
+            if (_searchDebounceTimer != null)
+                _searchDebounceTimer.Stop();
+            ApplyFiltersAndBind();
         }
 
         private void ApplyCenteredTextColumns()
@@ -139,7 +155,20 @@ namespace CmOxeProvisioner.Views
         {
             _expandedCenter = null;
             _expandedLinesGrid = null;
+            if (GridCenters != null)
+                GridCenters.RowDetailsVisibilityMode = DataGridRowDetailsVisibilityMode.Collapsed;
+            _lastMdfQuery = null;
+            _lastMdfSourceCount = -1;
             _db = DialPlanRepository.Load(_dbPath);
+            if (_db != null && _db.centers != null)
+            {
+                for (int i = 0; i < _db.centers.Count; i++)
+                {
+                    if (_db.centers[i] != null)
+                        _db.centers[i].EnsureSearchIndexReady();
+                }
+            }
+            BindCentersCollectionView();
             PopulateLocationFilter();
             UpdateStatusCounts();
             ApplyFiltersAndBind();
@@ -283,91 +312,181 @@ namespace CmOxeProvisioner.Views
             ApplyFiltersAndBind();
         }
 
+        private void BindCentersCollectionView()
+        {
+            if (_db == null) return;
+            _db.EnsureLists();
+            _centersView = new ListCollectionView(_db.centers);
+            _centersView.Filter = FilterCenterObject;
+            GridCenters.ItemsSource = _centersView;
+        }
+
+        private bool FilterCenterObject(object obj)
+        {
+            var c = obj as DialPlanCenter;
+            return c != null && MatchesCurrentDialPlanFilter(c, _activeSearchQuery);
+        }
+
+        private bool MatchesCurrentDialPlanFilter(DialPlanCenter c, string q)
+        {
+            if (c == null) return false;
+            if (_statusFilter != "all" && !string.Equals(c.status, _statusFilter, StringComparison.OrdinalIgnoreCase))
+                return false;
+            if (!string.IsNullOrWhiteSpace(_selectedLocation) && _selectedLocation != "전체 위치")
+            {
+                if (!string.Equals((c.location ?? string.Empty).Trim(), _selectedLocation, StringComparison.OrdinalIgnoreCase))
+                    return false;
+            }
+            if (!string.IsNullOrWhiteSpace(q))
+                return c.MatchesSearchQuery(q);
+            return true;
+        }
+
         private void TxtSearch_TextChanged(object sender, TextChangedEventArgs e)
         {
-            ApplyFiltersAndBind();
+            if (_searchDebounceTimer != null && TxtSearch != null &&
+                TxtSearch.IsKeyboardFocusWithin && !string.IsNullOrWhiteSpace(TxtSearch.Text))
+            {
+                _searchDebounceTimer.Stop();
+                _searchDebounceTimer.Start();
+            }
+            else
+            {
+                if (_searchDebounceTimer != null) _searchDebounceTimer.Stop();
+                ApplyFiltersAndBind();
+            }
+        }
+
+        private void TxtSearch_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                if (_searchDebounceTimer != null) _searchDebounceTimer.Stop();
+                ApplyFiltersAndBind();
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Escape && TxtSearch != null && !string.IsNullOrEmpty(TxtSearch.Text))
+            {
+                if (_searchDebounceTimer != null) _searchDebounceTimer.Stop();
+                TxtSearch.Text = string.Empty;
+                e.Handled = true;
+            }
         }
 
         private void BtnClearSearch_Click(object sender, RoutedEventArgs e)
         {
+            if (_searchDebounceTimer != null) _searchDebounceTimer.Stop();
             TxtSearch.Text = string.Empty;
             if (CmbLocationFilter.Items.Count > 0)
-                CmbLocationFilter.SelectedIndex = 0;
+            {
+                _suppressSelectionEvents = true;
+                try
+                {
+                    CmbLocationFilter.SelectedIndex = 0;
+                    _selectedLocation = "전체 위치";
+                }
+                finally
+                {
+                    _suppressSelectionEvents = false;
+                }
+            }
             ApplyFiltersAndBind();
         }
 
         private void ApplyFiltersAndBind()
         {
-            string q = (TxtSearch.Text ?? string.Empty).Trim();
+            if (_searchDebounceTimer != null)
+                _searchDebounceTimer.Stop();
+            if (_db == null) return;
+            string q = (TxtSearch != null && TxtSearch.Text != null) ? TxtSearch.Text.Trim() : string.Empty;
+            _activeSearchQuery = q;
 
             if (_activeSubTab == "dialplan")
             {
-                var filtered = _db.centers.Where(c =>
+                if (_centersView == null || !ReferenceEquals(_centersView.SourceCollection, _db.centers))
                 {
-                    if (_statusFilter != "all" && !string.Equals(c.status, _statusFilter, StringComparison.OrdinalIgnoreCase))
-                        return false;
-                    if (!string.IsNullOrWhiteSpace(_selectedLocation) && _selectedLocation != "전체 위치")
-                    {
-                        if (!string.Equals((c.location ?? string.Empty).Trim(), _selectedLocation, StringComparison.OrdinalIgnoreCase))
-                            return false;
-                    }
-                    if (!string.IsNullOrWhiteSpace(q))
-                        return MatchesCenterQuery(c, q);
-                    return true;
-                }).ToList();
+                    BindCentersCollectionView();
+                }
 
-                var prevSelId = _selectedCenter != null ? _selectedCenter.id : null;
-                if (_expandedCenter != null && !filtered.Contains(_expandedCenter))
+                string prevSelId = _selectedCenter != null ? _selectedCenter.id : null;
+                _centersView.Refresh();
+
+                int filteredCount = 0;
+                int totalLines = 0;
+                bool expandedVisible = false;
+                DialPlanCenter selMatch = null;
+                for (int i = 0; i < _db.centers.Count; i++)
+                {
+                    var c = _db.centers[i];
+                    if (!MatchesCurrentDialPlanFilter(c, q)) continue;
+                    filteredCount++;
+                    totalLines += c.LineCount;
+                    if (c == _expandedCenter) expandedVisible = true;
+                    if (selMatch == null && !string.IsNullOrEmpty(prevSelId) && string.Equals(c.id, prevSelId, StringComparison.Ordinal))
+                        selMatch = c;
+                }
+
+                if (_expandedCenter != null && !expandedVisible)
                 {
                     _expandedCenter = null;
                     _expandedLinesGrid = null;
+                    if (GridCenters != null)
+                        GridCenters.RowDetailsVisibilityMode = DataGridRowDetailsVisibilityMode.Collapsed;
                 }
 
-                GridCenters.ItemsSource = filtered;
                 RefreshExpandFocusVisuals();
+                TxtResultSummary.Text = "센터 " + filteredCount + "개 · 선번 " + totalLines + "행";
 
-                int totalLines = filtered.Sum(c => c.LineCount);
-                TxtResultSummary.Text = "센터 " + filtered.Count + "개 · 선번 " + totalLines + "행";
-
-                if (!string.IsNullOrEmpty(prevSelId))
+                if (selMatch != null && !ReferenceEquals(GridCenters.SelectedItem, selMatch))
                 {
-                    var match = filtered.FirstOrDefault(c => c.id == prevSelId);
-                    if (match != null)
-                        GridCenters.SelectedItem = match;
+                    GridCenters.SelectedItem = selMatch;
                 }
             }
             else if (_activeSubTab == "pri")
             {
-                var pris = _db.priTrunks.Where(p => string.IsNullOrWhiteSpace(q) || ContainsAny(q,
-                    p.boardSlot, p.tgNew, p.centerName, p.trunkGroupName, p.didRange, p.carrier, p.subscriberNo, p.relayNo, p.note)).ToList();
-                var ents = _db.entities.Where(e => string.IsNullOrWhiteSpace(q) || ContainsAny(q,
-                    e.entityNo, e.entityName, e.discNum, e.note)).ToList();
+                bool hasQ = !string.IsNullOrWhiteSpace(q);
+                var pris = hasQ
+                    ? _db.priTrunks.Where(p => ContainsCI(p.boardSlot, q) || ContainsCI(p.tgNew, q) || ContainsCI(p.centerName, q) ||
+                        ContainsCI(p.trunkGroupName, q) || ContainsCI(p.didRange, q) || ContainsCI(p.carrier, q) ||
+                        ContainsCI(p.subscriberNo, q) || ContainsCI(p.relayNo, q) || ContainsCI(p.note, q)).ToList()
+                    : _db.priTrunks;
+                var ents = hasQ
+                    ? _db.entities.Where(e => ContainsCI(e.entityNo, q) || ContainsCI(e.entityName, q) || ContainsCI(e.discNum, q) || ContainsCI(e.note, q)).ToList()
+                    : _db.entities;
                 GridPri.ItemsSource = pris;
                 GridEntities.ItemsSource = ents;
                 TxtResultSummary.Text = "PRI " + pris.Count + "건 · Entity " + ents.Count + "건";
             }
             else if (_activeSubTab == "ivr")
             {
-                var ivrs = _db.ipIvrChannels.Where(x => string.IsNullOrWhiteSpace(q) || ContainsAny(q,
-                    x.deviceName, x.ivrDn, x.centerName, x.note)).ToList();
-                var dvgs = _db.dvgPrompts.Where(d =>
-                {
-                    if (_dvgBandFilter != "all" && !(d.band ?? string.Empty).Contains(_dvgBandFilter))
-                        return false;
-                    if (!string.IsNullOrWhiteSpace(q))
-                        return ContainsAny(q, d.band, d.dvgNo, d.category, d.subCategory, d.content, d.board, d.note);
-                    return true;
-                }).ToList();
+                bool hasQ = !string.IsNullOrWhiteSpace(q);
+                var ivrs = hasQ
+                    ? _db.ipIvrChannels.Where(x => ContainsCI(x.deviceName, q) || ContainsCI(x.ivrDn, q) || ContainsCI(x.centerName, q) || ContainsCI(x.note, q)).ToList()
+                    : _db.ipIvrChannels;
+                var dvgs = (_dvgBandFilter == "all" && !hasQ)
+                    ? _db.dvgPrompts
+                    : _db.dvgPrompts.Where(d =>
+                    {
+                        if (_dvgBandFilter != "all" && (d.band == null || d.band.IndexOf(_dvgBandFilter, StringComparison.OrdinalIgnoreCase) < 0))
+                            return false;
+                        if (!hasQ) return true;
+                        return ContainsCI(d.band, q) || ContainsCI(d.dvgNo, q) || ContainsCI(d.category, q) ||
+                               ContainsCI(d.subCategory, q) || ContainsCI(d.content, q) || ContainsCI(d.board, q) || ContainsCI(d.note, q);
+                    }).ToList();
                 GridIpIvr.ItemsSource = ivrs;
                 GridDvg.ItemsSource = dvgs;
                 TxtResultSummary.Text = "IP IVR " + ivrs.Count + "건 · D.V.G 멘트 " + dvgs.Count + "건";
             }
             else if (_activeSubTab == "hw")
             {
-                var hws = _db.pbxHardware.Where(h => string.IsNullOrWhiteSpace(q) || ContainsAny(q,
-                    h.pbxSet, h.boardSlot, h.boardName, h.ipAddress, h.macAddress, h.note)).ToList();
-                var gpas = _db.gpaBoards.Where(g => string.IsNullOrWhiteSpace(q) || ContainsAny(q,
-                    g.boardLocation, g.remainingTime, g.note)).ToList();
+                bool hasQ = !string.IsNullOrWhiteSpace(q);
+                var hws = hasQ
+                    ? _db.pbxHardware.Where(h => ContainsCI(h.pbxSet, q) || ContainsCI(h.boardSlot, q) || ContainsCI(h.boardName, q) ||
+                        ContainsCI(h.ipAddress, q) || ContainsCI(h.macAddress, q) || ContainsCI(h.note, q)).ToList()
+                    : _db.pbxHardware;
+                var gpas = hasQ
+                    ? _db.gpaBoards.Where(g => ContainsCI(g.boardLocation, q) || ContainsCI(g.remainingTime, q) || ContainsCI(g.note, q)).ToList()
+                    : _db.gpaBoards;
                 GridPbxHw.ItemsSource = hws;
                 GridGpa.ItemsSource = gpas;
                 BindMdfGrid(q);
@@ -377,9 +496,15 @@ namespace CmOxeProvisioner.Views
 
         private void BindMdfGrid(string query)
         {
-            var rows = _db.mdfBlocks.Where(m =>
-                string.IsNullOrWhiteSpace(query) ||
-                ContainsAny(query, m.section, m.CellsSummary)).ToList();
+            string q = query ?? string.Empty;
+            int totalRows = _db.mdfBlocks != null ? _db.mdfBlocks.Count : 0;
+            if (GridMdf.ItemsSource != null && string.Equals(_lastMdfQuery, q, StringComparison.Ordinal) && _lastMdfSourceCount == totalRows)
+                return;
+
+            bool hasQ = !string.IsNullOrWhiteSpace(q);
+            var rows = hasQ
+                ? _db.mdfBlocks.Where(m => ContainsCI(m.section, q) || ContainsCI(m.CellsSummary, q)).ToList()
+                : _db.mdfBlocks;
 
             int maxCols = rows.Count > 0 ? Math.Max(1, rows.Max(m => m.cells != null ? m.cells.Count : 0)) : 25;
             if (maxCols > 26) maxCols = 26;
@@ -402,6 +527,8 @@ namespace CmOxeProvisioner.Views
 
             _mdfDataTable = dt;
             GridMdf.ItemsSource = dt.DefaultView;
+            _lastMdfQuery = q;
+            _lastMdfSourceCount = totalRows;
         }
 
         private void GridCenters_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -597,18 +724,26 @@ namespace CmOxeProvisioner.Views
             }
         }
 
-        private void MenuApOpen_Click(object sender, RoutedEventArgs e)
+        private static Button ResolveApButtonFromMenuItem(object sender)
         {
             var mi = sender as MenuItem;
-            var btn = mi != null ? mi.Tag as Button : null;
+            if (mi == null) return null;
+            var cm = mi.Parent as ContextMenu;
+            if (cm != null && cm.PlacementTarget is Button)
+                return cm.PlacementTarget as Button;
+            return mi.Tag as Button;
+        }
+
+        private void MenuApOpen_Click(object sender, RoutedEventArgs e)
+        {
+            var btn = ResolveApButtonFromMenuItem(sender);
             var center = btn != null ? ((btn.Tag as DialPlanCenter) ?? (btn.DataContext as DialPlanCenter)) : null;
             OpenApUrlForCenter(center);
         }
 
         private void MenuApEdit_Click(object sender, RoutedEventArgs e)
         {
-            var mi = sender as MenuItem;
-            var btn = mi != null ? mi.Tag as Button : null;
+            var btn = ResolveApButtonFromMenuItem(sender);
             var center = btn != null ? ((btn.Tag as DialPlanCenter) ?? (btn.DataContext as DialPlanCenter)) : null;
             if (btn != null && center != null)
             {
@@ -618,8 +753,7 @@ namespace CmOxeProvisioner.Views
 
         private void MenuApClear_Click(object sender, RoutedEventArgs e)
         {
-            var mi = sender as MenuItem;
-            var btn = mi != null ? mi.Tag as Button : null;
+            var btn = ResolveApButtonFromMenuItem(sender);
             var center = btn != null ? ((btn.Tag as DialPlanCenter) ?? (btn.DataContext as DialPlanCenter)) : null;
             if (center == null) return;
 
@@ -634,9 +768,30 @@ namespace CmOxeProvisioner.Views
         {
             var root = btn != null ? btn.Parent as Grid : null;
             if (root == null || center == null) return;
-            var tb = FindNamedDescendant<TextBox>(root, "TxtApInline");
-            if (tb == null) return;
 
+            var tb = FindNamedDescendant<TextBox>(root, "TxtApInline");
+            if (tb == null)
+            {
+                tb = new TextBox
+                {
+                    Name = "TxtApInline",
+                    Visibility = Visibility.Collapsed,
+                    BorderThickness = new Thickness(1),
+                    FontSize = 11.5,
+                    Height = 24,
+                    Padding = new Thickness(4, 1, 4, 1),
+                    TextAlignment = TextAlignment.Center,
+                    VerticalContentAlignment = VerticalAlignment.Center
+                };
+                tb.SetResourceReference(Control.BackgroundProperty, "InputBgBrush");
+                tb.SetResourceReference(Control.ForegroundProperty, "TextBrush");
+                tb.SetResourceReference(Control.BorderBrushProperty, "PrimaryBrush");
+                tb.LostFocus += TxtApInline_LostFocus;
+                tb.KeyDown += TxtApInline_KeyDown;
+                root.Children.Add(tb);
+            }
+
+            tb.Tag = center;
             _isCancellingApEdit = false;
             _apUrlEditOrigin = (center.apUrl ?? string.Empty).Trim();
             tb.Text = _apUrlEditOrigin;
@@ -782,6 +937,13 @@ namespace CmOxeProvisioner.Views
             if (center == null)
             {
                 _expandedLinesGrid = null;
+            }
+
+            if (GridCenters != null)
+            {
+                GridCenters.RowDetailsVisibilityMode = center != null
+                    ? DataGridRowDetailsVisibilityMode.Visible
+                    : DataGridRowDetailsVisibilityMode.Collapsed;
             }
 
             RefreshExpandFocusVisuals();
@@ -978,7 +1140,10 @@ namespace CmOxeProvisioner.Views
             if (_expandedCenter == target) _expandedCenter = null;
             if (_selectedCenter == target) _selectedCenter = null;
             _expandedLinesGrid = null;
+            if (GridCenters != null && _expandedCenter == null)
+                GridCenters.RowDetailsVisibilityMode = DataGridRowDetailsVisibilityMode.Collapsed;
 
+            BindCentersCollectionView();
             PopulateLocationFilter();
             UpdateStatusCounts();
             ApplyFiltersAndBind();
@@ -1491,20 +1656,13 @@ namespace CmOxeProvisioner.Views
 
         private static bool MatchesCenterQuery(DialPlanCenter c, string q)
         {
-            if (ContainsAny(q, c.location, c.project, c.cmCustomerName, c.apUrl, c.notes, c.StatusBadgeText))
-                return true;
-            foreach (var l in c.lines)
-            {
-                if (ContainsAny(q,
-                    l.subTask, l.mainNumber, l.carrier, l.ownerName, l.incomingNumber,
-                    l.inboundRsi, l.ivrPdsChannel, l.ivrFwPilot, l.agentTransferRsi,
-                    l.agentPilot, l.agentQueue, l.agentPg, l.phoneExt, l.loginId,
-                    l.entityNo, l.trunkGroupNo, l.testIvrDn, l.note))
-                {
-                    return true;
-                }
-            }
-            return false;
+            return c != null && c.MatchesSearchQuery(q);
+        }
+
+        private static bool ContainsCI(string field, string needle)
+        {
+            if (string.IsNullOrEmpty(needle)) return true;
+            return !string.IsNullOrEmpty(field) && field.IndexOf(needle, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         private static bool ContainsAny(string needle, params string[] fields)
