@@ -121,7 +121,9 @@
                         CornerRadius="0,0,6,6"
                         Margin="4,2,12,8"
                         Padding="12,10">
-                    <Grid x:Name="InlineDetailRoot">
+                    <Grid x:Name="InlineDetailRoot"
+                          CommandManager.CanExecute="InlineDetailRoot_CanExecute"
+                          CommandManager.Executed="InlineDetailRoot_Executed">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>

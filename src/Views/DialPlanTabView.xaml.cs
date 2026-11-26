@@ -411,6 +411,11 @@ namespace CmOxeProvisioner.Views
 
             if (_activeSubTab == "dialplan")
             {
+                if (_expandedLinesGrid != null)
+                    CommitGridEdits(_expandedLinesGrid);
+                if (_expandedCenter != null)
+                    EnsureCollectionViewNotEditing(_expandedCenter.lines);
+
                 if (_centersView == null || !ReferenceEquals(_centersView.SourceCollection, _db.centers))
                 {
                     BindCentersCollectionView();
@@ -452,6 +457,8 @@ namespace CmOxeProvisioner.Views
             }
             else if (_activeSubTab == "pri")
             {
+                CommitGridEdits(GridPri);
+                CommitGridEdits(GridEntities);
                 bool hasQ = !string.IsNullOrWhiteSpace(q);
                 var pris = hasQ
                     ? _db.priTrunks.Where(p => ContainsCI(p.boardSlot, q) || ContainsCI(p.tgNew, q) || ContainsCI(p.centerName, q) ||
@@ -467,6 +474,8 @@ namespace CmOxeProvisioner.Views
             }
             else if (_activeSubTab == "ivr")
             {
+                CommitGridEdits(GridIpIvr);
+                CommitGridEdits(GridDvg);
                 bool hasQ = !string.IsNullOrWhiteSpace(q);
                 var ivrs = hasQ
                     ? _db.ipIvrChannels.Where(x => ContainsCI(x.deviceName, q) || ContainsCI(x.ivrDn, q) || ContainsCI(x.centerName, q) || ContainsCI(x.note, q)).ToList()
@@ -487,6 +496,9 @@ namespace CmOxeProvisioner.Views
             }
             else if (_activeSubTab == "hw")
             {
+                CommitGridEdits(GridPbxHw);
+                CommitGridEdits(GridGpa);
+                CommitGridEdits(GridMdf);
                 bool hasQ = !string.IsNullOrWhiteSpace(q);
                 var hws = hasQ
                     ? _db.pbxHardware.Where(h => ContainsCI(h.pbxSet, q) || ContainsCI(h.boardSlot, q) || ContainsCI(h.boardName, q) ||
@@ -564,6 +576,28 @@ namespace CmOxeProvisioner.Views
                     return;
 
                 SetExpandedCenter(null);
+                e.Handled = true;
+            }
+        }
+
+        private void InlineDetailRoot_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            if (e.Command == DataGrid.BeginEditCommand ||
+                e.Command == DataGrid.CommitEditCommand ||
+                e.Command == DataGrid.CancelEditCommand)
+            {
+                e.CanExecute = false;
+                e.ContinueRouting = false;
+                e.Handled = true;
+            }
+        }
+
+        private void InlineDetailRoot_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (e.Command == DataGrid.BeginEditCommand ||
+                e.Command == DataGrid.CommitEditCommand ||
+                e.Command == DataGrid.CancelEditCommand)
+            {
                 e.Handled = true;
             }
         }
@@ -977,9 +1011,15 @@ namespace CmOxeProvisioner.Views
 
         private void SetExpandedCenter(DialPlanCenter center)
         {
+            if (_expandedLinesGrid != null)
+                CommitGridEdits(_expandedLinesGrid);
+            if (_expandedCenter != null && _expandedCenter.lines != null)
+                EnsureCollectionViewNotEditing(_expandedCenter.lines);
+
             if (center != null)
             {
                 center.EnsureLists();
+                EnsureCollectionViewNotEditing(center.lines);
                 center.RefreshLineMergeVisuals(_mergeCellsEnabled);
             }
 
@@ -1026,18 +1066,33 @@ namespace CmOxeProvisioner.Views
             if (center == null) return;
             center.EnsureLists();
 
+            DataGrid linesGrid = FindLinesGridForSender(sender) ?? _expandedLinesGrid;
+            CommitGridEdits(linesGrid);
+            EnsureCollectionViewNotEditing(center.lines);
+
             var line = new DialPlanLine { subTask = center.project };
             center.lines.Add(line);
             center.RefreshLineMergeVisuals(_mergeCellsEnabled);
             center.NotifySummaryFields();
 
-            DataGrid linesGrid = FindLinesGridForSender(sender);
             if (linesGrid != null)
             {
-                linesGrid.ItemsSource = null;
-                linesGrid.ItemsSource = center.lines;
+                var view = CollectionViewSource.GetDefaultView(center.lines);
+                if (!ReferenceEquals(linesGrid.ItemsSource, center.lines))
+                    linesGrid.ItemsSource = center.lines;
+                else if (view != null)
+                    view.Refresh();
+                else
+                    linesGrid.Items.Refresh();
+
                 linesGrid.SelectedItem = line;
-                linesGrid.ScrollIntoView(line);
+                var targetGrid = linesGrid;
+                var targetLine = line;
+                Dispatcher.BeginInvoke(new Action(delegate()
+                {
+                    if (targetGrid.Items.Contains(targetLine))
+                        targetGrid.ScrollIntoView(targetLine);
+                }), DispatcherPriority.Loaded);
             }
         }
 
@@ -1046,7 +1101,11 @@ namespace CmOxeProvisioner.Views
             DialPlanCenter center = ExtractCenterFromSender(sender) ?? _expandedCenter;
             if (center == null) return;
 
-            DataGrid linesGrid = FindLinesGridForSender(sender);
+            DataGrid linesGrid = FindLinesGridForSender(sender) ?? _expandedLinesGrid;
+            CommitGridEdits(linesGrid);
+            if (center.lines != null)
+                EnsureCollectionViewNotEditing(center.lines);
+
             var line = linesGrid != null ? linesGrid.SelectedItem as DialPlanLine : null;
             if (line == null)
             {
@@ -1059,8 +1118,13 @@ namespace CmOxeProvisioner.Views
             center.NotifySummaryFields();
             if (linesGrid != null)
             {
-                linesGrid.ItemsSource = null;
-                linesGrid.ItemsSource = center.lines;
+                var view = CollectionViewSource.GetDefaultView(center.lines);
+                if (!ReferenceEquals(linesGrid.ItemsSource, center.lines))
+                    linesGrid.ItemsSource = center.lines;
+                else if (view != null)
+                    view.Refresh();
+                else
+                    linesGrid.Items.Refresh();
             }
         }
 
@@ -1690,18 +1754,67 @@ namespace CmOxeProvisioner.Views
             }
         }
 
+        private static void EnsureCollectionViewNotEditing(object source)
+        {
+            if (source == null) return;
+            var ecv = CollectionViewSource.GetDefaultView(source) as IEditableCollectionView;
+            if (ecv == null) return;
+            try
+            {
+                if (ecv.IsEditingItem) ecv.CommitEdit();
+                if (ecv.IsAddingNew) ecv.CommitNew();
+            }
+            catch
+            {
+            }
+            try
+            {
+                if (ecv.IsEditingItem) ecv.CancelEdit();
+                if (ecv.IsAddingNew) ecv.CancelNew();
+            }
+            catch
+            {
+            }
+        }
+
         private static void CommitGridEdits(DataGrid grid)
         {
             if (grid == null) return;
             try
             {
                 grid.CommitEdit(DataGridEditingUnit.Cell, true);
-                grid.CommitEdit(DataGridEditingUnit.Row, true);
             }
             catch
             {
                 // Ignore commit warnings when no active edit cell
             }
+
+            // Avoid calling DataGrid.CommitEdit(Row, true) on nested DataGrids inside RowDetails,
+            // because WPF's CommitRowItem can invoke CommitNew on an un-addable CollectionView
+            // and force parent GridCenters row container regeneration.
+            var ecv = grid.Items as IEditableCollectionView;
+            if (ecv != null)
+            {
+                try
+                {
+                    if (ecv.IsEditingItem) ecv.CommitEdit();
+                    if (ecv.IsAddingNew) ecv.CommitNew();
+                }
+                catch
+                {
+                }
+                try
+                {
+                    if (ecv.IsEditingItem) ecv.CancelEdit();
+                    if (ecv.IsAddingNew) ecv.CancelNew();
+                }
+                catch
+                {
+                }
+            }
+
+            if (grid.ItemsSource != null)
+                EnsureCollectionViewNotEditing(grid.ItemsSource);
         }
 
         private static bool MatchesCenterQuery(DialPlanCenter c, string q)

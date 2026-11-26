@@ -13,6 +13,7 @@
   - **검색 속도 · 렌더링 최적화**: 센터 검색 인덱스(`MatchesSearchQuery`)·요약 속성 캐싱, 정규식 컴파일, 입력 디바운스(`110ms` / `Enter` 즉시 검색 · `Esc` 초기화), `ListCollectionView` 필터 재사용, 지연 `TxtApInline` 및 미펼침 시 `RowDetailsVisibilityMode="Collapsed"` 유지로 한글 입력 지연 대폭 개선
   - **`AP` 연결 컬럼 (`미사용` / `바로가기`)**: `CM 연동`과 `상세` 사이에 `AP` 컬럼을 두어 URL 미입력 센터는 `미사용`으로 표시하고, 클릭 시 인라인 입력 후 URL이 저장되면 밑줄 강조된 **`바로가기`** 링크 버튼으로 전환되어 클릭으로 브라우저 연결 지원 (우클릭 메뉴로 수정·초기화 가능)
   - **`업무 종료로 이동` 경고 스타일(`WarnBtn`) 적용**: 오작동 방지를 위해 주황/호박색 경고 테두리·배경 스타일 적용 (`업무 종료` 상태에서는 청록색 `운영 중으로 복구`로 전환)
+  - **상세 `+ 라인 추가` / `선택 라인 삭제` 편집 트랜잭션 · 예외 루프 버그 수정 (`App`, `DialPlanTabView`)**: 세부 선번 셀 편집 중(`EditItem` 트랜잭션 활성 상태)에 `+ 라인 추가`·`선택 라인 삭제`·필터 전환 시 `CommitEdit`/`CancelEdit` 선행 종료 및 `CollectionViewSource.GetDefaultView().Refresh()` 전환으로 `'DeferRefresh'` 예외 방지, `DispatcherUnhandledException` 재진입 가드로 모달 오류창 연속 팝업 차단
 
 ## v1.2.0 (2026-11-25)
 - **사이드바 `'선번장 · 센터'` 통합 관리 개편 (`DialPlanTabView`, `CenterAddWindow`, `dialplan_db.json`)**:

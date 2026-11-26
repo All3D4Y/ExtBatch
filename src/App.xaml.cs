@@ -8,18 +8,31 @@ namespace CmOxeProvisioner
 {
     public partial class App : Application
     {
+        private bool _isHandlingDispatcherException = false;
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
             this.DispatcherUnhandledException += delegate(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs args)
             {
-                MessageBox.Show(
-                    "예기치 않은 오류가 발생했습니다:\n" + args.Exception.Message,
-                    "ExtBatch",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
                 args.Handled = true;
+                if (_isHandlingDispatcherException)
+                    return;
+
+                _isHandlingDispatcherException = true;
+                try
+                {
+                    MessageBox.Show(
+                        "예기치 않은 오류가 발생했습니다:\n" + args.Exception.Message,
+                        "ExtBatch",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                }
+                finally
+                {
+                    _isHandlingDispatcherException = false;
+                }
             };
 
             SettingsService settingsService = new SettingsService();
