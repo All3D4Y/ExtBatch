@@ -86,6 +86,7 @@ namespace CmOxeProvisioner.Views
         private void ApplyCenteredTextColumns()
         {
             var textStyle = TryFindResource("DialPlanCenteredTextStyle") as Style;
+            var numStyle = TryFindResource("DialPlanNumericTextStyle") as Style;
             var editStyle = TryFindResource("DialPlanCenteredEditTextStyle") as Style;
             DataGrid[] grids = new[]
             {
@@ -96,7 +97,14 @@ namespace CmOxeProvisioner.Views
                 if (grid == null) continue;
                 foreach (var col in grid.Columns)
                 {
-                    ApplyCenteredStyleToTextColumn(col as DataGridTextColumn, textStyle, editStyle);
+                    var tc = col as DataGridTextColumn;
+                    if (tc == null) continue;
+                    string hdr = Convert.ToString(tc.Header) ?? string.Empty;
+                    bool isNumericCol =
+                        hdr == "Logical" || hdr == "TG신규" || hdr == "가입자번호" || hdr == "중계번호" || hdr == "개통일" ||
+                        hdr == "Entity NO" || hdr == "Disc.Num" || hdr == "신규 IVR DN" || hdr == "채널 수" ||
+                        hdr == "D.V.G" || hdr == "시간(Sec)" || hdr == "IP 정보" || hdr == "MAC 정보" || hdr == "실장보드";
+                    ApplyCenteredStyleToTextColumn(tc, tc.ElementStyle ?? (isNumericCol && numStyle != null ? numStyle : textStyle), editStyle);
                 }
             }
         }
@@ -104,8 +112,8 @@ namespace CmOxeProvisioner.Views
         private static void ApplyCenteredStyleToTextColumn(DataGridTextColumn textCol, Style textStyle, Style editStyle)
         {
             if (textCol == null) return;
-            if (textStyle != null) textCol.ElementStyle = textStyle;
-            if (editStyle != null) textCol.EditingElementStyle = editStyle;
+            if (textCol.ElementStyle == null && textStyle != null) textCol.ElementStyle = textStyle;
+            if (textCol.EditingElementStyle == null && editStyle != null) textCol.EditingElementStyle = editStyle;
         }
 
         private void GridMdf_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
@@ -612,43 +620,78 @@ namespace CmOxeProvisioner.Views
             }
         }
 
+        private static readonly Brush GroupInboundBrush = CreateFrozenBrush("#3B82F6");
+        private static readonly Brush GroupAgentBrush = CreateFrozenBrush("#0D9488");
+        private static readonly Brush GroupOxeBrush = CreateFrozenBrush("#6366F1");
+        private static readonly Brush GroupLegacyBrush = CreateFrozenBrush("#94A3B8");
+        private static readonly FontFamily InlineMonoFont = new FontFamily("Consolas, Malgun Gothic, Segoe UI");
+
+        private static Brush CreateFrozenBrush(string hex)
+        {
+            var b = new SolidColorBrush((Color)ColorConverter.ConvertFromString(hex));
+            b.Freeze();
+            return b;
+        }
+
+        private Style BuildInlineGroupHeaderStyle(Style baseStyle, Brush accentBrush, string groupName, string headerTitle)
+        {
+            var st = baseStyle != null ? new Style(typeof(DataGridColumnHeader), baseStyle) : new Style(typeof(DataGridColumnHeader));
+            st.Setters.Add(new Setter(FrameworkElement.TagProperty, accentBrush));
+            st.Setters.Add(new Setter(FrameworkElement.ToolTipProperty, "[" + groupName + "] " + headerTitle));
+            return st;
+        }
+
         private void EnsureMergeableLineColumns(DataGrid grid)
         {
             if (grid == null || grid.Columns.Count > 0) return;
 
+            var baseGroupHdrStyle = TryFindResource("InlineGroupedHeaderStyle") as Style;
+            var groupStyles = new[]
+            {
+                Tuple.Create("인입 · IVR", GroupInboundBrush),
+                Tuple.Create("상담 · Agent", GroupAgentBrush),
+                Tuple.Create("OXE · 기타", GroupOxeBrush),
+                Tuple.Create("구버전 레거시", GroupLegacyBrush)
+            };
+
+            // GroupId: 0=Inbound/IVR, 1=Agent, 2=OXE/Other, 3=Legacy
+            // Bold / Numeric flags for typography hierarchy
             var specs = new[]
             {
-                Tuple.Create("(세부업무)", "subTask", 130.0),
-                Tuple.Create("대표번호", "mainNumber", 115.0),
-                Tuple.Create("통신사", "carrier", 75.0),
-                Tuple.Create("명의", "ownerName", 90.0),
-                Tuple.Create("착신번호", "incomingNumber", 115.0),
-                Tuple.Create("인입 RSI", "inboundRsi", 75.0),
-                Tuple.Create("IVR (PDS) 채널", "ivrPdsChannel", 125.0),
-                Tuple.Create("IVR-Fw Pilot", "ivrFwPilot", 90.0),
-                Tuple.Create("상담연결 RSI", "agentTransferRsi", 110.0),
-                Tuple.Create("Agent Pilot", "agentPilot", 85.0),
-                Tuple.Create("Agent Queue", "agentQueue", 90.0),
-                Tuple.Create("Agent PG", "agentPg", 80.0),
-                Tuple.Create("Phone 내선", "phoneExt", 125.0),
-                Tuple.Create("Login-ID", "loginId", 125.0),
-                Tuple.Create("Call Type", "callType", 75.0),
-                Tuple.Create("Entity NO", "entityNo", 120.0),
-                Tuple.Create("Trunk 그룹 NO", "trunkGroupNo", 115.0),
-                Tuple.Create("테스트 IVR DN", "testIvrDn", 105.0),
-                Tuple.Create("비고", "note", 180.0),
-                Tuple.Create("구 IVR RSI", "legacyIvrRsi", 85.0),
-                Tuple.Create("구 IVR Pilot", "legacyIvrPilot", 95.0),
-                Tuple.Create("구 RSI 특징", "legacyRsiNote", 100.0)
+                Tuple.Create("(세부업무)", "subTask", 132.0, 0, true, false),
+                Tuple.Create("대표번호", "mainNumber", 118.0, 0, false, true),
+                Tuple.Create("통신사", "carrier", 74.0, 0, false, false),
+                Tuple.Create("명의", "ownerName", 90.0, 0, false, false),
+                Tuple.Create("착신번호", "incomingNumber", 118.0, 0, false, true),
+                Tuple.Create("인입 RSI", "inboundRsi", 78.0, 0, false, true),
+                Tuple.Create("IVR (PDS) 채널", "ivrPdsChannel", 125.0, 0, false, true),
+                Tuple.Create("IVR-Fw Pilot", "ivrFwPilot", 92.0, 0, false, true),
+                Tuple.Create("상담연결 RSI", "agentTransferRsi", 108.0, 1, false, true),
+                Tuple.Create("Agent Pilot", "agentPilot", 88.0, 1, false, true),
+                Tuple.Create("Agent Queue", "agentQueue", 92.0, 1, false, true),
+                Tuple.Create("Agent PG", "agentPg", 84.0, 1, false, true),
+                Tuple.Create("Phone 내선", "phoneExt", 126.0, 1, false, true),
+                Tuple.Create("Login-ID", "loginId", 126.0, 1, false, true),
+                Tuple.Create("Call Type", "callType", 78.0, 2, false, false),
+                Tuple.Create("Entity NO", "entityNo", 122.0, 2, false, true),
+                Tuple.Create("Trunk 그룹 NO", "trunkGroupNo", 118.0, 2, false, true),
+                Tuple.Create("테스트 IVR DN", "testIvrDn", 108.0, 2, false, true),
+                Tuple.Create("비고", "note", 180.0, 2, false, false),
+                Tuple.Create("구 IVR RSI", "legacyIvrRsi", 86.0, 3, false, true),
+                Tuple.Create("구 IVR Pilot", "legacyIvrPilot", 96.0, 3, false, true),
+                Tuple.Create("구 RSI 특징", "legacyRsiNote", 105.0, 3, false, false)
             };
 
             foreach (var sp in specs)
             {
-                grid.Columns.Add(BuildMergeableLineColumn(sp.Item1, sp.Item2, sp.Item3));
+                var grp = groupStyles[sp.Item4];
+                var col = BuildMergeableLineColumn(sp.Item1, sp.Item2, sp.Item3, sp.Item5, sp.Item6);
+                col.HeaderStyle = BuildInlineGroupHeaderStyle(baseGroupHdrStyle, grp.Item2, grp.Item1, sp.Item1);
+                grid.Columns.Add(col);
             }
         }
 
-        private static DataGridTemplateColumn BuildMergeableLineColumn(string header, string propName, double width)
+        private static DataGridTemplateColumn BuildMergeableLineColumn(string header, string propName, double width, bool isBold, bool isNumeric)
         {
             var col = new DataGridTemplateColumn
             {
@@ -659,14 +702,14 @@ namespace CmOxeProvisioner.Views
             var displayTemplate = new DataTemplate(typeof(DialPlanLine));
             var borderFactory = new FrameworkElementFactory(typeof(Border));
             borderFactory.SetValue(Border.BackgroundProperty, Brushes.Transparent);
-            borderFactory.SetValue(Border.PaddingProperty, new Thickness(7, 4, 7, 4));
+            borderFactory.SetValue(Border.PaddingProperty, new Thickness(7, 5, 7, 5));
             borderFactory.SetBinding(FrameworkElement.ToolTipProperty, new Binding(propName));
             borderFactory.SetBinding(Border.BorderThicknessProperty,
                 new Binding("Merge[" + propName + "].SameAsBelow") { Converter = MergeBorderConv });
             borderFactory.AddHandler(FrameworkElement.LoadedEvent, new RoutedEventHandler(delegate(object s, RoutedEventArgs ev)
             {
                 var b = s as Border;
-                if (b != null) b.SetResourceReference(Border.BorderBrushProperty, "BorderBrush");
+                if (b != null) b.SetResourceReference(Border.BorderBrushProperty, "TableGridLineBrush");
             }));
 
             var textFactory = new FrameworkElementFactory(typeof(TextBlock));
@@ -677,6 +720,13 @@ namespace CmOxeProvisioner.Views
             textFactory.SetValue(FrameworkElement.VerticalAlignmentProperty, VerticalAlignment.Center);
             textFactory.SetValue(TextBlock.TextAlignmentProperty, TextAlignment.Center);
             textFactory.SetValue(TextBlock.TextWrappingProperty, TextWrapping.Wrap);
+            if (isBold)
+                textFactory.SetValue(TextBlock.FontWeightProperty, FontWeights.SemiBold);
+            if (isNumeric)
+            {
+                textFactory.SetValue(TextBlock.FontFamilyProperty, InlineMonoFont);
+                textFactory.SetValue(TextBlock.FontSizeProperty, 11.5);
+            }
 
             borderFactory.AppendChild(textFactory);
             displayTemplate.VisualTree = borderFactory;

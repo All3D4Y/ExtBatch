@@ -80,6 +80,7 @@ namespace CmOxeProvisioner.Services
                     p["ErrBg"] = "#FFF1F2"; p["ErrFg"] = "#BE123C"; p["ErrBorder"] = "#FECDD3";
                     p["DangerBg"] = "#C26B76"; p["DangerFg"] = "#FFFFFF"; p["DangerBorder"] = "#B05B66";
                     p["ConsoleBg"] = "#0F172A"; p["ConsoleFg"] = "#E2E8F0";
+                    p["TableAltRow"] = "#F7F9FC"; p["TableGridLine"] = "#E2E8F0";
                     break;
 
                 case "legacy-dark":
@@ -92,6 +93,7 @@ namespace CmOxeProvisioner.Services
                     p["ErrBg"] = "#3B161B"; p["ErrFg"] = "#FCA5A5"; p["ErrBorder"] = "#7F1D1D";
                     p["DangerBg"] = "#AD5D68"; p["DangerFg"] = "#FFFFFF"; p["DangerBorder"] = "#994F59";
                     p["ConsoleBg"] = "#111111"; p["ConsoleFg"] = "#D4D4D4";
+                    p["TableAltRow"] = "#2A2A2E"; p["TableGridLine"] = "#343438";
                     break;
 
                 case "nord":
@@ -104,6 +106,7 @@ namespace CmOxeProvisioner.Services
                     p["ErrBg"] = "#3F292E"; p["ErrFg"] = "#E5989B"; p["ErrBorder"] = "#BF616A";
                     p["DangerBg"] = "#A95A63"; p["DangerFg"] = "#FFFFFF"; p["DangerBorder"] = "#954B54";
                     p["ConsoleBg"] = "#20252E"; p["ConsoleFg"] = "#E5E9F0";
+                    p["TableAltRow"] = "#353B4A"; p["TableGridLine"] = "#465063";
                     break;
 
                 case "tokyo-night":
@@ -116,6 +119,7 @@ namespace CmOxeProvisioner.Services
                     p["ErrBg"] = "#361B26"; p["ErrFg"] = "#F7768E"; p["ErrBorder"] = "#9E3B52";
                     p["DangerBg"] = "#B55E70"; p["DangerFg"] = "#FFFFFF"; p["DangerBorder"] = "#A04E5F";
                     p["ConsoleBg"] = "#12131A"; p["ConsoleFg"] = "#C0CAF5";
+                    p["TableAltRow"] = "#1F2335"; p["TableGridLine"] = "#2F354F";
                     break;
 
                 case "tokyo-night-storm":
@@ -128,6 +132,7 @@ namespace CmOxeProvisioner.Services
                     p["ErrBg"] = "#3B202C"; p["ErrFg"] = "#F7768E"; p["ErrBorder"] = "#9E3B52";
                     p["DangerBg"] = "#B55E70"; p["DangerFg"] = "#FFFFFF"; p["DangerBorder"] = "#A04E5F";
                     p["ConsoleBg"] = "#191C2B"; p["ConsoleFg"] = "#C0CAF5";
+                    p["TableAltRow"] = "#282D42"; p["TableGridLine"] = "#39405E";
                     break;
 
                 case "tokyo-night-light":
@@ -140,6 +145,7 @@ namespace CmOxeProvisioner.Services
                     p["ErrBg"] = "#FCE8EC"; p["ErrFg"] = "#8C2B3D"; p["ErrBorder"] = "#E6A9B5";
                     p["DangerBg"] = "#B35E6C"; p["DangerFg"] = "#FFFFFF"; p["DangerBorder"] = "#9E4E5C";
                     p["ConsoleBg"] = "#1A1B26"; p["ConsoleFg"] = "#C0CAF5";
+                    p["TableAltRow"] = "#ECEFF5"; p["TableGridLine"] = "#CFD3E0";
                     break;
 
                 case "solarized-dark":
@@ -152,6 +158,7 @@ namespace CmOxeProvisioner.Services
                     p["ErrBg"] = "#421417"; p["ErrFg"] = "#F87171"; p["ErrBorder"] = "#991B1B";
                     p["DangerBg"] = "#B55D5B"; p["DangerFg"] = "#FFFFFF"; p["DangerBorder"] = "#9E4E4C";
                     p["ConsoleBg"] = "#001B22"; p["ConsoleFg"] = "#EEE8D5";
+                    p["TableAltRow"] = "#052E39"; p["TableGridLine"] = "#124350";
                     break;
 
                 case "solarized-light":
@@ -164,6 +171,7 @@ namespace CmOxeProvisioner.Services
                     p["ErrBg"] = "#FAE4E0"; p["ErrFg"] = "#B91C1C"; p["ErrBorder"] = "#EAA79D";
                     p["DangerBg"] = "#B55D5B"; p["DangerFg"] = "#FFFFFF"; p["DangerBorder"] = "#9E4E4C";
                     p["ConsoleBg"] = "#002B36"; p["ConsoleFg"] = "#EEE8D5";
+                    p["TableAltRow"] = "#F7F0DF"; p["TableGridLine"] = "#DBD3BF";
                     break;
 
                 case "high-contrast-dark":
@@ -176,6 +184,7 @@ namespace CmOxeProvisioner.Services
                     p["ErrBg"] = "#2D060D"; p["ErrFg"] = "#FDA4AF"; p["ErrBorder"] = "#FB7185";
                     p["DangerBg"] = "#B84A58"; p["DangerFg"] = "#FFFFFF"; p["DangerBorder"] = "#E11D48";
                     p["ConsoleBg"] = "#000000"; p["ConsoleFg"] = "#FFFFFF";
+                    p["TableAltRow"] = "#121212"; p["TableGridLine"] = "#355E75";
                     break;
 
                 default: // antigravity-dark
@@ -188,6 +197,7 @@ namespace CmOxeProvisioner.Services
                     p["ErrBg"] = "#331018"; p["ErrFg"] = "#FDA4AF"; p["ErrBorder"] = "#9F1239";
                     p["DangerBg"] = "#B25F6B"; p["DangerFg"] = "#FFFFFF"; p["DangerBorder"] = "#9E4E5A";
                     p["ConsoleBg"] = "#080A0F"; p["ConsoleFg"] = "#CBD5E1";
+                    p["TableAltRow"] = "#131620"; p["TableGridLine"] = "#252B3B";
                     break;
             }
             return p;

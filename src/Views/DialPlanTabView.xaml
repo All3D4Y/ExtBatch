@@ -6,11 +6,24 @@
              FontFamily="Malgun Gothic, Segoe UI, sans-serif">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisConverter"/>
+        <FontFamily x:Key="DialPlanMonoFont">Consolas, Malgun Gothic, Segoe UI</FontFamily>
         <Style TargetType="TextBlock" x:Key="DialPlanCenteredTextStyle">
             <Setter Property="HorizontalAlignment" Value="Center"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="TextAlignment" Value="Center"/>
             <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+            <Style.Triggers>
+                <Trigger Property="Text" Value="-">
+                    <Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="TextBlock" x:Key="DialPlanBoldTextStyle" BasedOn="{StaticResource DialPlanCenteredTextStyle}">
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        <Style TargetType="TextBlock" x:Key="DialPlanNumericTextStyle" BasedOn="{StaticResource DialPlanCenteredTextStyle}">
+            <Setter Property="FontFamily" Value="{StaticResource DialPlanMonoFont}"/>
+            <Setter Property="FontSize" Value="11.5"/>
         </Style>
         <Style TargetType="TextBox" x:Key="DialPlanCenteredEditTextStyle">
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -18,10 +31,40 @@
             <Setter Property="TextAlignment" Value="Center"/>
         </Style>
         <Style TargetType="DataGridColumnHeader" x:Key="DialPlanCenteredHeaderStyle" BasedOn="{StaticResource ModernDataGridColumnHeader}">
+            <Setter Property="Background" Value="{DynamicResource SurfaceAltBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource TableGridLineBrush}"/>
+            <Setter Property="BorderThickness" Value="0,0,1,2"/>
+            <Setter Property="Padding" Value="8,8"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
+        <Style TargetType="DataGridColumnHeader" x:Key="InlineGroupedHeaderStyle" BasedOn="{StaticResource DialPlanCenteredHeaderStyle}">
+            <Setter Property="Padding" Value="6,8,6,7"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DataGridColumnHeader">
+                        <Grid>
+                            <Border Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                            </Border>
+                            <Border VerticalAlignment="Top"
+                                    Height="3"
+                                    Background="{TemplateBinding Tag}"
+                                    SnapsToDevicePixels="True"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="DataGridRow" x:Key="DialPlanCenteredRowStyle" BasedOn="{StaticResource ModernDataGridRow}">
+            <Setter Property="MinHeight" Value="35"/>
+        </Style>
         <Style TargetType="DataGridCell" x:Key="DialPlanCenteredCellStyle" BasedOn="{StaticResource ModernDataGridCell}">
+            <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=DataGridRow}}"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="TextBlock.TextAlignment" Value="Center"/>
@@ -49,7 +92,13 @@
             </Setter>
         </Style>
         <Style TargetType="DataGrid" x:Key="DialPlanCenteredGridStyle" BasedOn="{StaticResource ModernDataGrid}">
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+            <Setter Property="GridLinesVisibility" Value="All"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource TableGridLineBrush}"/>
+            <Setter Property="VerticalGridLinesBrush" Value="{DynamicResource TableGridLineBrush}"/>
+            <Setter Property="CanUserReorderColumns" Value="False"/>
             <Setter Property="ColumnHeaderStyle" Value="{StaticResource DialPlanCenteredHeaderStyle}"/>
+            <Setter Property="RowStyle" Value="{StaticResource DialPlanCenteredRowStyle}"/>
             <Setter Property="CellStyle" Value="{StaticResource DialPlanCenteredCellStyle}"/>
             <Setter Property="EnableRowVirtualization" Value="True"/>
             <Setter Property="EnableColumnVirtualization" Value="False"/>
@@ -214,9 +263,13 @@
                                   ColumnHeaderStyle="{StaticResource DialPlanCenteredHeaderStyle}"
                                   Background="{DynamicResource SurfaceBrush}"
                                   Foreground="{DynamicResource TextBrush}"
+                                  BorderBrush="{DynamicResource TableGridLineBrush}"
                                   ItemsSource="{Binding lines}"
                                   MinHeight="96"
                                   MaxHeight="280"
+                                  FrozenColumnCount="2"
+                                  CanUserReorderColumns="False"
+                                  AlternationCount="1"
                                   AutoGenerateColumns="False"
                                   IsReadOnly="False"
                                   CanUserAddRows="False"
@@ -388,15 +441,18 @@
                               IsReadOnly="True"
                               CanUserAddRows="False"
                               CanUserDeleteRows="False"
+                              FrozenColumnCount="3"
                               SelectionMode="Single"
                               SelectionUnit="FullRow"
-                              GridLinesVisibility="Horizontal"
                               RowDetailsVisibilityMode="Collapsed"
                               SelectionChanged="GridCenters_SelectionChanged"
                               MouseDoubleClick="GridCenters_MouseDoubleClick">
                         <DataGrid.RowStyle>
-                            <Style TargetType="DataGridRow" BasedOn="{StaticResource ModernDataGridRow}">
+                            <Style TargetType="DataGridRow" BasedOn="{StaticResource DialPlanCenteredRowStyle}">
                                 <Style.Triggers>
+                                    <DataTrigger Binding="{Binding status}" Value="closed">
+                                        <Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/>
+                                    </DataTrigger>
                                     <DataTrigger Binding="{Binding IsDetailExpanded}" Value="True">
                                         <Setter Property="Background" Value="{DynamicResource ChipBgBrush}"/>
                                         <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
@@ -459,17 +515,33 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="위치" Binding="{Binding LocationDisplay}" Width="105"/>
-                            <DataGridTextColumn Header="프로젝트 (센터명)" Binding="{Binding project}" Width="175"/>
-                            <DataGridTextColumn Header="세부업무" Binding="{Binding SubTaskSummary}" Width="145"/>
-                            <DataGridTextColumn Header="대표번호" Binding="{Binding MainNumberSummary}" Width="130"/>
-                            <DataGridTextColumn Header="Entity NO" Binding="{Binding EntitySummary}" Width="120"/>
-                            <DataGridTextColumn Header="Agent PG" Binding="{Binding PgSummary}" Width="100"/>
-                            <DataGridTextColumn Header="Phone 내선" Binding="{Binding ExtRangeSummary}" Width="125"/>
-                            <DataGridTextColumn Header="Login-ID" Binding="{Binding LoginRangeSummary}" Width="125"/>
-                            <DataGridTextColumn Header="라인" Binding="{Binding LineCount}" Width="48"/>
-                            <DataGridTextColumn Header="CM 연동" Binding="{Binding CmLinkedSummary}" Width="125"/>
-                            <DataGridTemplateColumn Header="AP" Width="88">
+                            <DataGridTextColumn Header="위치" Binding="{Binding LocationDisplay}" Width="94"/>
+                            <DataGridTextColumn Header="프로젝트 (센터명)" Binding="{Binding project}" Width="1.4*" MinWidth="155" ElementStyle="{StaticResource DialPlanBoldTextStyle}"/>
+                            <DataGridTextColumn Header="세부업무" Binding="{Binding SubTaskSummary}" Width="1.15*" MinWidth="130"/>
+                            <DataGridTextColumn Header="대표번호" Binding="{Binding MainNumberSummary}" Width="1.15*" MinWidth="125" ElementStyle="{StaticResource DialPlanNumericTextStyle}"/>
+                            <DataGridTextColumn Header="Entity NO" Binding="{Binding EntitySummary}" Width="0.95*" MinWidth="105" ElementStyle="{StaticResource DialPlanNumericTextStyle}"/>
+                            <DataGridTextColumn Header="Agent PG" Binding="{Binding PgSummary}" Width="0.85*" MinWidth="92" ElementStyle="{StaticResource DialPlanNumericTextStyle}"/>
+                            <DataGridTextColumn Header="Phone 내선" Binding="{Binding ExtRangeSummary}" Width="1.05*" MinWidth="112" ElementStyle="{StaticResource DialPlanNumericTextStyle}"/>
+                            <DataGridTextColumn Header="Login-ID" Binding="{Binding LoginRangeSummary}" Width="1.05*" MinWidth="112" ElementStyle="{StaticResource DialPlanNumericTextStyle}"/>
+                            <DataGridTextColumn Header="라인" Binding="{Binding LineCount}" Width="48" ElementStyle="{StaticResource DialPlanNumericTextStyle}"/>
+                            <DataGridTemplateColumn Header="CM 연동" Width="1.05*" MinWidth="112" SortMemberPath="CmLinkedSummary">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2,0">
+                                            <Ellipse x:Name="CmDot" Width="5" Height="5" Fill="{DynamicResource OxeBrush}" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                            <TextBlock x:Name="CmTxt" Text="{Binding CmLinkedSummary}" FontSize="12" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                        <DataTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding HasCmLink}" Value="False">
+                                                <Setter TargetName="CmDot" Property="Visibility" Value="Collapsed"/>
+                                                <Setter TargetName="CmTxt" Property="Foreground" Value="{DynamicResource MutedBrush}"/>
+                                                <Setter TargetName="CmTxt" Property="FontWeight" Value="Normal"/>
+                                            </DataTrigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="AP" Width="84">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Grid x:Name="ApCellRoot" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="2,1">

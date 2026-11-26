@@ -32,6 +32,8 @@
       <SolidColorBrush x:Key="DangerBorderBrush" Color="#9E4E5A" />
       <SolidColorBrush x:Key="ConsoleBgBrush" Color="#080A0F" />
       <SolidColorBrush x:Key="ConsoleFgBrush" Color="#CBD5E1" />
+      <SolidColorBrush x:Key="TableAltRowBrush" Color="#131620" />
+      <SolidColorBrush x:Key="TableGridLineBrush" Color="#232837" />
 
       <Style x:Key="CardBorderStyle" TargetType="Border">
         <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
@@ -543,10 +545,10 @@
         <Setter Property="BorderThickness" Value="0" />
         <Style.Triggers>
           <Trigger Property="ItemsControl.AlternationIndex" Value="1">
-            <Setter Property="Background" Value="{DynamicResource InputBgBrush}" />
+            <Setter Property="Background" Value="{DynamicResource TableAltRowBrush}" />
           </Trigger>
           <Trigger Property="IsMouseOver" Value="True">
-            <Setter Property="Background" Value="{DynamicResource SurfaceAltBrush}" />
+            <Setter Property="Background" Value="{DynamicResource ChipBgBrush}" />
           </Trigger>
           <Trigger Property="IsSelected" Value="True">
             <Setter Property="Background" Value="{DynamicResource ChipBgBrush}" />
