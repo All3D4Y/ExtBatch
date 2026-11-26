@@ -61,11 +61,22 @@
                                             Height="27" Padding="10,0" Margin="0,0,6,0"
                                             Tag="{Binding}"
                                             Click="BtnInlineOpenExtCti_Click"/>
-                                    <Button Style="{StaticResource BaseBtn}"
-                                            Content="{Binding StatusMoveButtonText}"
+                                    <Button Content="{Binding StatusMoveButtonText}"
                                             Height="27" Padding="10,0" Margin="0,0,6,0"
                                             Tag="{Binding}"
-                                            Click="BtnInlineToggleStatus_Click"/>
+                                            Click="BtnInlineToggleStatus_Click">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource WarnBtn}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsClosedStatus}" Value="True">
+                                                        <Setter Property="Background" Value="{DynamicResource OxeBrush}"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource OxeFgBrush}"/>
+                                                        <Setter Property="BorderThickness" Value="0"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
                                     <Button Style="{StaticResource DangerBtn}"
                                             Content="완전 삭제 (JSON+CM)"
                                             Height="27" Padding="10,0" Margin="0,0,6,0"
@@ -90,6 +101,16 @@
                                 Margin="0,0,0,8">
                             <DockPanel LastChildFill="True">
                                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <CheckBox x:Name="ChkInlineMergeCells"
+                                              Style="{StaticResource ModernCheckBox}"
+                                              Content="동일 셀 병합"
+                                              IsChecked="True"
+                                              VerticalAlignment="Center"
+                                              Margin="0,0,10,0"
+                                              Loaded="ChkInlineMergeCells_Loaded"
+                                              Checked="ChkInlineMergeCells_Changed"
+                                              Unchecked="ChkInlineMergeCells_Changed"
+                                              ToolTip="연속 행에서 값이 같은 셀을 세로로 합쳐서 표시합니다."/>
                                     <Button Style="{StaticResource BaseBtn}" Content="+ 라인 추가" Height="27" Padding="9,0" Margin="0,0,5,0" Tag="{Binding}" Click="BtnInlineAddLine_Click"/>
                                     <Button Style="{StaticResource BaseBtn}" Content="선택 라인 삭제" Height="27" Padding="9,0" Margin="0,0,6,0" Tag="{Binding}" Click="BtnInlineRemoveLine_Click"/>
                                     <Button Style="{StaticResource PrimaryBtn}" Content="변경 저장 (DB + CM 프리셋)" Height="27" Padding="12,0" Tag="{Binding}" Click="BtnInlineSaveCenter_Click"/>
@@ -97,36 +118,41 @@
 
                                 <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
                                     <TextBlock Text="위치" FontSize="11" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                                    <TextBox Style="{StaticResource ModernTextBox}" Text="{Binding location, UpdateSourceTrigger=PropertyChanged}" Width="92" Height="26" Margin="0,0,8,0"/>
+                                    <TextBox Style="{StaticResource ModernTextBox}" Text="{Binding location, UpdateSourceTrigger=PropertyChanged}" Width="84" Height="26" Margin="0,0,8,0"/>
 
                                     <TextBlock Text="센터명" FontSize="11" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                                    <TextBox Style="{StaticResource ModernTextBox}" Text="{Binding project, UpdateSourceTrigger=PropertyChanged}" Width="140" Height="26" Margin="0,0,8,0"/>
+                                    <TextBox Style="{StaticResource ModernTextBox}" Text="{Binding project, UpdateSourceTrigger=PropertyChanged}" Width="130" Height="26" Margin="0,0,8,0"/>
 
                                     <TextBlock Text="상태" FontSize="11" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,4,0"/>
                                     <ComboBox Style="{StaticResource ModernComboBox}"
                                               SelectedValuePath="Tag"
                                               SelectedValue="{Binding status, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                              Width="94" Height="26" Margin="0,0,8,0">
+                                              Width="90" Height="26" Margin="0,0,8,0">
                                         <ComboBoxItem Content="운영 중" Tag="active"/>
                                         <ComboBoxItem Content="테스트용" Tag="test"/>
                                         <ComboBoxItem Content="업무 종료" Tag="closed"/>
                                     </ComboBox>
 
                                     <TextBlock Text="CM연동명" FontSize="11" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                                    <TextBox Style="{StaticResource ModernTextBox}" Text="{Binding cmCustomerName, UpdateSourceTrigger=PropertyChanged}" Width="125" Height="26" Margin="0,0,8,0"/>
+                                    <TextBox Style="{StaticResource ModernTextBox}" Text="{Binding cmCustomerName, UpdateSourceTrigger=PropertyChanged}" Width="115" Height="26" Margin="0,0,8,0"/>
 
-                                    <CheckBox Style="{StaticResource ModernCheckBox}" Content="VQueue" IsChecked="{Binding useVQueue, Mode=TwoWay}" VerticalAlignment="Center" Margin="0,0,10,0"
+                                    <TextBlock Text="AP URL" FontSize="11" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                    <TextBox Style="{StaticResource ModernTextBox}" Text="{Binding apUrl, UpdateSourceTrigger=PropertyChanged}" Width="155" Height="26" Margin="0,0,4,0" ToolTip="연동할 AP 웹페이지 주소 (예: https://...)"/>
+                                    <Button Style="{StaticResource OxeBtn}" Content="↗" Height="26" Width="26" Padding="0" Margin="0,0,8,0"
+                                            IsEnabled="{Binding HasApUrl}" Tag="{Binding}" Click="BtnOpenApUrl_Click" ToolTip="AP 웹주소 브라우저로 열기"/>
+
+                                    <CheckBox Style="{StaticResource ModernCheckBox}" Content="VQueue" IsChecked="{Binding useVQueue, Mode=TwoWay}" VerticalAlignment="Center" Margin="0,0,8,0"
                                               ToolTip="실제 CM VQueue 폴더 생성/삭제는 내선·CTI → CM 경로 ▾ → 적용하기에서도 실행 가능합니다."/>
-                                    <CheckBox Style="{StaticResource ModernCheckBox}" Content="IVR(PG)" IsChecked="{Binding useIvr, Mode=TwoWay}" VerticalAlignment="Center" Margin="0,0,10,0"
+                                    <CheckBox Style="{StaticResource ModernCheckBox}" Content="IVR(PG)" IsChecked="{Binding useIvr, Mode=TwoWay}" VerticalAlignment="Center" Margin="0,0,8,0"
                                               ToolTip="실제 CM Place Group 생성/삭제는 내선·CTI → CM 경로 ▾ → 적용하기에서도 실행 가능합니다."/>
 
                                     <TextBlock Text="메모" FontSize="11" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                                    <TextBox Style="{StaticResource ModernTextBox}" Text="{Binding notes, UpdateSourceTrigger=PropertyChanged}" Width="155" Height="26"/>
+                                    <TextBox Style="{StaticResource ModernTextBox}" Text="{Binding notes, UpdateSourceTrigger=PropertyChanged}" Width="135" Height="26"/>
                                 </WrapPanel>
                             </DockPanel>
                         </Border>
 
-                        <!-- 21-Column Inline Editable Dial-Plan Lines Grid -->
+                        <!-- 21-Column Inline Editable Dial-Plan Lines Grid (Columns Built Dynamically with Vertical Merge Support) -->
                         <DataGrid x:Name="InlineLinesGrid"
                                   Grid.Row="2"
                                   Style="{StaticResource ModernDataGrid}"
@@ -134,38 +160,44 @@
                                   Foreground="{DynamicResource TextBrush}"
                                   ItemsSource="{Binding lines}"
                                   MinHeight="96"
-                                  MaxHeight="270"
+                                  MaxHeight="280"
                                   AutoGenerateColumns="False"
                                   IsReadOnly="False"
                                   CanUserAddRows="False"
                                   CanUserDeleteRows="False"
                                   SelectionMode="Single"
-                                  GridLinesVisibility="All"
-                                  Loaded="InlineLinesGrid_Loaded">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="(세부업무)" Binding="{Binding subTask, UpdateSourceTrigger=PropertyChanged}" Width="130"/>
-                                <DataGridTextColumn Header="대표번호" Binding="{Binding mainNumber, UpdateSourceTrigger=PropertyChanged}" Width="115"/>
-                                <DataGridTextColumn Header="통신사" Binding="{Binding carrier, UpdateSourceTrigger=PropertyChanged}" Width="75"/>
-                                <DataGridTextColumn Header="명의" Binding="{Binding ownerName, UpdateSourceTrigger=PropertyChanged}" Width="90"/>
-                                <DataGridTextColumn Header="착신번호" Binding="{Binding incomingNumber, UpdateSourceTrigger=PropertyChanged}" Width="115"/>
-                                <DataGridTextColumn Header="인입 RSI" Binding="{Binding inboundRsi, UpdateSourceTrigger=PropertyChanged}" Width="75"/>
-                                <DataGridTextColumn Header="IVR (PDS) 채널" Binding="{Binding ivrPdsChannel, UpdateSourceTrigger=PropertyChanged}" Width="125"/>
-                                <DataGridTextColumn Header="IVR-Fw Pilot" Binding="{Binding ivrFwPilot, UpdateSourceTrigger=PropertyChanged}" Width="90"/>
-                                <DataGridTextColumn Header="상담연결 RSI" Binding="{Binding agentTransferRsi, UpdateSourceTrigger=PropertyChanged}" Width="110"/>
-                                <DataGridTextColumn Header="Agent Pilot" Binding="{Binding agentPilot, UpdateSourceTrigger=PropertyChanged}" Width="85"/>
-                                <DataGridTextColumn Header="Agent Queue" Binding="{Binding agentQueue, UpdateSourceTrigger=PropertyChanged}" Width="90"/>
-                                <DataGridTextColumn Header="Agent PG" Binding="{Binding agentPg, UpdateSourceTrigger=PropertyChanged}" Width="80"/>
-                                <DataGridTextColumn Header="Phone 내선" Binding="{Binding phoneExt, UpdateSourceTrigger=PropertyChanged}" Width="125"/>
-                                <DataGridTextColumn Header="Login-ID" Binding="{Binding loginId, UpdateSourceTrigger=PropertyChanged}" Width="125"/>
-                                <DataGridTextColumn Header="Call Type" Binding="{Binding callType, UpdateSourceTrigger=PropertyChanged}" Width="75"/>
-                                <DataGridTextColumn Header="Entity NO" Binding="{Binding entityNo, UpdateSourceTrigger=PropertyChanged}" Width="120"/>
-                                <DataGridTextColumn Header="Trunk 그룹 NO" Binding="{Binding trunkGroupNo, UpdateSourceTrigger=PropertyChanged}" Width="115"/>
-                                <DataGridTextColumn Header="테스트 IVR DN" Binding="{Binding testIvrDn, UpdateSourceTrigger=PropertyChanged}" Width="105"/>
-                                <DataGridTextColumn Header="비고" Binding="{Binding note, UpdateSourceTrigger=PropertyChanged}" Width="180"/>
-                                <DataGridTextColumn Header="구 IVR RSI" Binding="{Binding legacyIvrRsi, UpdateSourceTrigger=PropertyChanged}" Width="85"/>
-                                <DataGridTextColumn Header="구 IVR Pilot" Binding="{Binding legacyIvrPilot, UpdateSourceTrigger=PropertyChanged}" Width="95"/>
-                                <DataGridTextColumn Header="구 RSI 특징" Binding="{Binding legacyRsiNote, UpdateSourceTrigger=PropertyChanged}" Width="100"/>
-                            </DataGrid.Columns>
+                                  GridLinesVisibility="None"
+                                  BorderThickness="1,1,0,0"
+                                  Initialized="InlineLinesGrid_Initialized"
+                                  Loaded="InlineLinesGrid_Loaded"
+                                  CellEditEnding="InlineLinesGrid_CellEditEnding">
+                            <DataGrid.CellStyle>
+                                <Style TargetType="DataGridCell">
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="Padding" Value="0"/>
+                                    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="DataGridCell">
+                                                <Border x:Name="CellFrame"
+                                                        Background="{TemplateBinding Background}"
+                                                        BorderBrush="Transparent"
+                                                        BorderThickness="0">
+                                                    <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                                        <Setter TargetName="CellFrame" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
+                                                        <Setter TargetName="CellFrame" Property="BorderThickness" Value="1"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </DataGrid.CellStyle>
                         </DataGrid>
                     </Grid>
                 </Border>
@@ -329,8 +361,48 @@
                             <DataGridTextColumn Header="Agent PG" Binding="{Binding PgSummary}" Width="105"/>
                             <DataGridTextColumn Header="Phone 내선" Binding="{Binding ExtRangeSummary}" Width="130"/>
                             <DataGridTextColumn Header="Login-ID" Binding="{Binding LoginRangeSummary}" Width="130"/>
-                            <DataGridTextColumn Header="라인" Binding="{Binding LineCount}" Width="48"/>
-                            <DataGridTextColumn Header="CM 연동" Binding="{Binding CmLinkedSummary}" Width="130"/>
+                            <DataGridTextColumn Header="라인" Binding="{Binding LineCount}" Width="46"/>
+                            <DataGridTextColumn Header="CM 연동" Binding="{Binding CmLinkedSummary}" Width="120"/>
+                            <DataGridTemplateColumn Header="AP 주소 (연결)" Width="175">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="2,1">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBox Grid.Column="0"
+                                                     Text="{Binding apUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                     Background="{DynamicResource InputBgBrush}"
+                                                     Foreground="{DynamicResource TextBrush}"
+                                                     BorderBrush="{DynamicResource BorderBrush}"
+                                                     BorderThickness="1"
+                                                     FontSize="11.5"
+                                                     Padding="5,2"
+                                                     Height="24"
+                                                     VerticalContentAlignment="Center"
+                                                     Tag="{Binding}"
+                                                     GotFocus="TxtApUrl_GotFocus"
+                                                     LostFocus="TxtApUrl_LostFocus"
+                                                     KeyDown="TxtApUrl_KeyDown"
+                                                     ToolTip="AP 웹주소를 입력하고 Enter 또는 포커스 이동 시 자동 저장됩니다."/>
+                                            <Button Grid.Column="1"
+                                                    Style="{StaticResource OxeBtn}"
+                                                    Content="↗"
+                                                    Width="24" Height="24"
+                                                    Padding="0"
+                                                    Margin="4,0,0,0"
+                                                    FontSize="12"
+                                                    FontWeight="Bold"
+                                                    Cursor="Hand"
+                                                    IsEnabled="{Binding HasApUrl}"
+                                                    Tag="{Binding}"
+                                                    Click="BtnOpenApUrl_Click"
+                                                    ToolTip="입력된 AP 웹주소로 기본 브라우저 연결"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                             <DataGridTemplateColumn Header="상세" Width="76">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>

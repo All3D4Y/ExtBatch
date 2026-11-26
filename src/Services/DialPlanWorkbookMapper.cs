@@ -243,6 +243,7 @@ namespace CmOxeProvisioner.Services
                             location = loc.Trim(),
                             project = proj.Trim(),
                             cmCustomerName = GetCsvMapped(row, colMap, "CM연동", -1).Trim(),
+                            apUrl = GetCsvMapped(row, colMap, "AP URL", -1).Trim(),
                             useVQueue = ParseBoolLoose(GetCsvMapped(row, colMap, "VQueue", -1)),
                             useIvr = ParseBoolLoose(GetCsvMapped(row, colMap, "IVR사용", -1)),
                             sourceSheet = "CSV"
@@ -297,7 +298,7 @@ namespace CmOxeProvisioner.Services
                 "상담연결 RSI", "Agent Pilot", "Agent Queue", "Agent PG", "Phone 내선",
                 "Login-ID", "Call Type", "Entity NO", "Trunk 그룹 NO", "테스트 IVR DN",
                 "CM연동", "VQueue", "IVR사용", "비고",
-                "구_IVR_RSI", "구_IVR_Pilot", "구_IVR_Queue", "구_IVR_PG", "구_RSI특징"
+                "구_IVR_RSI", "구_IVR_Pilot", "구_IVR_Queue", "구_IVR_PG", "구_RSI특징", "AP URL"
             };
 
             var activeAndTest = db.centers
@@ -479,7 +480,8 @@ namespace CmOxeProvisioner.Services
                         S(ln.legacyIvrPilot),
                         S(ln.legacyIvrQueue),
                         S(ln.legacyIvrPg),
-                        S(ln.legacyRsiNote)
+                        S(ln.legacyRsiNote),
+                        S(c.apUrl)
                     });
                 }
             }
@@ -665,6 +667,7 @@ namespace CmOxeProvisioner.Services
             string cmName = CleanCell(sheet.GetCell(r, 21));
             bool vq = ParseBoolLoose(sheet.GetCell(r, 22));
             bool ivr = ParseBoolLoose(sheet.GetCell(r, 23));
+            string apUrl = CleanCell(sheet.GetCell(r, 30));
 
             if (!string.IsNullOrWhiteSpace(proj))
             {
@@ -680,6 +683,7 @@ namespace CmOxeProvisioner.Services
                         location = loc,
                         project = proj,
                         cmCustomerName = cmName,
+                        apUrl = apUrl,
                         useVQueue = vq,
                         useIvr = ivr,
                         sourceSheet = sourceSheetName
@@ -690,6 +694,7 @@ namespace CmOxeProvisioner.Services
                 {
                     if (string.IsNullOrWhiteSpace(found.location) && !string.IsNullOrWhiteSpace(loc)) found.location = loc;
                     if (string.IsNullOrWhiteSpace(found.cmCustomerName) && !string.IsNullOrWhiteSpace(cmName)) found.cmCustomerName = cmName;
+                    if (string.IsNullOrWhiteSpace(found.apUrl) && !string.IsNullOrWhiteSpace(apUrl)) found.apUrl = apUrl;
                     found.useVQueue = found.useVQueue || vq;
                     found.useIvr = found.useIvr || ivr;
                 }

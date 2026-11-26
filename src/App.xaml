@@ -209,6 +209,14 @@
         <Setter Property="BorderThickness" Value="0" />
       </Style>
 
+      <Style TargetType="Button" x:Key="WarnBtn" BasedOn="{StaticResource BaseBtn}">
+        <Setter Property="Background" Value="{DynamicResource WarnBgBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource WarnFgBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource WarnBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1.5" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+      </Style>
+
       <Style TargetType="Button" x:Key="CmTogglePillStyle">
         <Setter Property="MinWidth" Value="108" />
         <Setter Property="Height" Value="28" />

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -47,10 +49,15 @@ namespace CmOxeProvisioner.Views
         private string _dvgBandFilter = "all";
         private string _selectedLocation = "전체 위치";
         private bool _suppressSelectionEvents = false;
+        private bool _mergeCellsEnabled = true;
         private DialPlanCenter _selectedCenter = null;
         private DialPlanCenter _expandedCenter = null;
         private DataGrid _expandedLinesGrid = null;
         private DataTable _mdfDataTable = null;
+        private string _apUrlEditOrigin = string.Empty;
+
+        private static readonly IValueConverter HideMergedTextConv = new InverseBoolToVisConverter();
+        private static readonly IValueConverter MergeBorderConv = new MergeBottomBorderConverter();
 
         public DialPlanTabView()
         {
@@ -390,12 +397,223 @@ namespace CmOxeProvisioner.Views
             }
         }
 
+        private void InlineLinesGrid_Initialized(object sender, EventArgs e)
+        {
+            EnsureMergeableLineColumns(sender as DataGrid);
+        }
+
         private void InlineLinesGrid_Loaded(object sender, RoutedEventArgs e)
         {
             var grid = sender as DataGrid;
-            if (grid != null && grid.DataContext == _expandedCenter)
+            if (grid == null) return;
+
+            EnsureMergeableLineColumns(grid);
+            var center = grid.DataContext as DialPlanCenter;
+            if (center != null)
+            {
+                center.RefreshLineMergeVisuals(_mergeCellsEnabled);
+            }
+            if (center == _expandedCenter)
             {
                 _expandedLinesGrid = grid;
+            }
+        }
+
+        private void InlineLinesGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            var grid = sender as DataGrid;
+            var center = (grid != null ? grid.DataContext as DialPlanCenter : null) ?? _expandedCenter;
+            if (center == null) return;
+
+            Dispatcher.BeginInvoke(new Action(delegate()
+            {
+                center.RefreshLineMergeVisuals(_mergeCellsEnabled);
+                center.NotifySummaryFields();
+            }), DispatcherPriority.Background);
+        }
+
+        private void ChkInlineMergeCells_Loaded(object sender, RoutedEventArgs e)
+        {
+            var cb = sender as CheckBox;
+            if (cb != null) cb.IsChecked = _mergeCellsEnabled;
+        }
+
+        private void ChkInlineMergeCells_Changed(object sender, RoutedEventArgs e)
+        {
+            var cb = sender as CheckBox;
+            if (cb == null) return;
+            _mergeCellsEnabled = (cb.IsChecked == true);
+            if (_expandedCenter != null)
+            {
+                _expandedCenter.RefreshLineMergeVisuals(_mergeCellsEnabled);
+            }
+        }
+
+        private void EnsureMergeableLineColumns(DataGrid grid)
+        {
+            if (grid == null || grid.Columns.Count > 0) return;
+
+            var specs = new[]
+            {
+                Tuple.Create("(세부업무)", "subTask", 130.0),
+                Tuple.Create("대표번호", "mainNumber", 115.0),
+                Tuple.Create("통신사", "carrier", 75.0),
+                Tuple.Create("명의", "ownerName", 90.0),
+                Tuple.Create("착신번호", "incomingNumber", 115.0),
+                Tuple.Create("인입 RSI", "inboundRsi", 75.0),
+                Tuple.Create("IVR (PDS) 채널", "ivrPdsChannel", 125.0),
+                Tuple.Create("IVR-Fw Pilot", "ivrFwPilot", 90.0),
+                Tuple.Create("상담연결 RSI", "agentTransferRsi", 110.0),
+                Tuple.Create("Agent Pilot", "agentPilot", 85.0),
+                Tuple.Create("Agent Queue", "agentQueue", 90.0),
+                Tuple.Create("Agent PG", "agentPg", 80.0),
+                Tuple.Create("Phone 내선", "phoneExt", 125.0),
+                Tuple.Create("Login-ID", "loginId", 125.0),
+                Tuple.Create("Call Type", "callType", 75.0),
+                Tuple.Create("Entity NO", "entityNo", 120.0),
+                Tuple.Create("Trunk 그룹 NO", "trunkGroupNo", 115.0),
+                Tuple.Create("테스트 IVR DN", "testIvrDn", 105.0),
+                Tuple.Create("비고", "note", 180.0),
+                Tuple.Create("구 IVR RSI", "legacyIvrRsi", 85.0),
+                Tuple.Create("구 IVR Pilot", "legacyIvrPilot", 95.0),
+                Tuple.Create("구 RSI 특징", "legacyRsiNote", 100.0)
+            };
+
+            foreach (var sp in specs)
+            {
+                grid.Columns.Add(BuildMergeableLineColumn(sp.Item1, sp.Item2, sp.Item3));
+            }
+        }
+
+        private static DataGridTemplateColumn BuildMergeableLineColumn(string header, string propName, double width)
+        {
+            var col = new DataGridTemplateColumn
+            {
+                Header = header,
+                Width = new DataGridLength(width)
+            };
+
+            var displayTemplate = new DataTemplate(typeof(DialPlanLine));
+            var borderFactory = new FrameworkElementFactory(typeof(Border));
+            borderFactory.SetValue(Border.BackgroundProperty, Brushes.Transparent);
+            borderFactory.SetValue(Border.PaddingProperty, new Thickness(7, 4, 7, 4));
+            borderFactory.SetBinding(FrameworkElement.ToolTipProperty, new Binding(propName));
+            borderFactory.SetBinding(Border.BorderThicknessProperty,
+                new Binding("Merge[" + propName + "].SameAsBelow") { Converter = MergeBorderConv });
+            borderFactory.AddHandler(FrameworkElement.LoadedEvent, new RoutedEventHandler(delegate(object s, RoutedEventArgs ev)
+            {
+                var b = s as Border;
+                if (b != null) b.SetResourceReference(Border.BorderBrushProperty, "BorderBrush");
+            }));
+
+            var textFactory = new FrameworkElementFactory(typeof(TextBlock));
+            textFactory.SetBinding(TextBlock.TextProperty, new Binding(propName));
+            textFactory.SetBinding(UIElement.VisibilityProperty,
+                new Binding("Merge[" + propName + "].SameAsAbove") { Converter = HideMergedTextConv });
+            textFactory.SetValue(FrameworkElement.VerticalAlignmentProperty, VerticalAlignment.Center);
+            textFactory.SetValue(TextBlock.TextWrappingProperty, TextWrapping.Wrap);
+
+            borderFactory.AppendChild(textFactory);
+            displayTemplate.VisualTree = borderFactory;
+            col.CellTemplate = displayTemplate;
+
+            var editTemplate = new DataTemplate(typeof(DialPlanLine));
+            var tbFactory = new FrameworkElementFactory(typeof(TextBox));
+            tbFactory.SetBinding(TextBox.TextProperty,
+                new Binding(propName) { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged });
+            tbFactory.SetValue(Control.PaddingProperty, new Thickness(5, 3, 5, 3));
+            tbFactory.SetValue(Control.BorderThicknessProperty, new Thickness(1));
+            tbFactory.SetValue(Control.VerticalContentAlignmentProperty, VerticalAlignment.Center);
+            tbFactory.AddHandler(FrameworkElement.LoadedEvent, new RoutedEventHandler(delegate(object s, RoutedEventArgs ev)
+            {
+                var tb = s as TextBox;
+                if (tb == null) return;
+                tb.SetResourceReference(Control.BackgroundProperty, "InputBgBrush");
+                tb.SetResourceReference(Control.ForegroundProperty, "TextBrush");
+                tb.SetResourceReference(Control.BorderBrushProperty, "PrimaryBrush");
+                tb.Focus();
+                tb.SelectAll();
+            }));
+            editTemplate.VisualTree = tbFactory;
+            col.CellEditingTemplate = editTemplate;
+
+            return col;
+        }
+
+        private void TxtApUrl_GotFocus(object sender, RoutedEventArgs e)
+        {
+            var tb = sender as TextBox;
+            _apUrlEditOrigin = tb != null ? (tb.Text ?? string.Empty).Trim() : string.Empty;
+        }
+
+        private void TxtApUrl_LostFocus(object sender, RoutedEventArgs e)
+        {
+            CommitApUrlFromTextBox(sender as TextBox, showToast: false);
+        }
+
+        private void TxtApUrl_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                CommitApUrlFromTextBox(sender as TextBox, showToast: true);
+                Keyboard.ClearFocus();
+                e.Handled = true;
+            }
+        }
+
+        private void CommitApUrlFromTextBox(TextBox tb, bool showToast)
+        {
+            if (tb == null) return;
+            var center = (tb.Tag as DialPlanCenter) ?? (tb.DataContext as DialPlanCenter);
+            if (center == null) return;
+
+            string trimmed = (tb.Text ?? string.Empty).Trim();
+            center.apUrl = trimmed;
+            center.NotifySummaryFields();
+
+            if (!string.Equals(_apUrlEditOrigin ?? string.Empty, trimmed, StringComparison.Ordinal))
+            {
+                _apUrlEditOrigin = trimmed;
+                DialPlanRepository.Save(_dbPath, _db);
+                WriteAudit("AP URL 수정", "Center=" + center.project + " Url=" + trimmed);
+                if (showToast)
+                    Toast(true, "AP 주소 저장", "'" + center.project + "' AP URL을 저장했습니다.");
+            }
+        }
+
+        private void BtnOpenApUrl_Click(object sender, RoutedEventArgs e)
+        {
+            e.Handled = true;
+            DialPlanCenter center = ExtractCenterFromSender(sender) ?? _expandedCenter;
+            if (center == null) return;
+
+            string raw = (center.apUrl ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(raw))
+            {
+                Toast(false, "AP 주소 없음", "먼저 AP 웹주소를 입력하세요.");
+                return;
+            }
+
+            if (raw.IndexOf("://", StringComparison.Ordinal) < 0)
+            {
+                raw = "http://" + raw;
+            }
+
+            Uri uri;
+            if (!Uri.TryCreate(raw, UriKind.Absolute, out uri) ||
+                (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+            {
+                Toast(false, "URL 형식 오류", "유효한 http:// 또는 https:// 웹주소를 입력하세요: " + raw);
+                return;
+            }
+
+            try
+            {
+                Process.Start(new ProcessStartInfo(uri.AbsoluteUri) { UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("브라우저를 열지 못했습니다:\n" + ex.Message, "AP 연결 오류", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -425,6 +643,7 @@ namespace CmOxeProvisioner.Views
             if (center != null)
             {
                 center.EnsureLists();
+                center.RefreshLineMergeVisuals(_mergeCellsEnabled);
             }
 
             _expandedCenter = center;
@@ -465,6 +684,7 @@ namespace CmOxeProvisioner.Views
 
             var line = new DialPlanLine { subTask = center.project };
             center.lines.Add(line);
+            center.RefreshLineMergeVisuals(_mergeCellsEnabled);
             center.NotifySummaryFields();
 
             DataGrid linesGrid = FindLinesGridForSender(sender);
@@ -491,6 +711,7 @@ namespace CmOxeProvisioner.Views
             }
 
             center.lines.Remove(line);
+            center.RefreshLineMergeVisuals(_mergeCellsEnabled);
             center.NotifySummaryFields();
             if (linesGrid != null)
             {
@@ -517,8 +738,10 @@ namespace CmOxeProvisioner.Views
             center.location = (center.location ?? string.Empty).Trim();
             center.project = newProject;
             center.cmCustomerName = (center.cmCustomerName ?? string.Empty).Trim();
+            center.apUrl = (center.apUrl ?? string.Empty).Trim();
             center.notes = (center.notes ?? string.Empty).Trim();
             center.EnsureLists();
+            center.RefreshLineMergeVisuals(_mergeCellsEnabled);
             center.NotifySummaryFields();
 
             SaveDbAndSyncCustomers(center);
@@ -855,7 +1078,7 @@ namespace CmOxeProvisioner.Views
                         "대표번호 명의", "착신번호", "인입 RSI", "IVR (PDS) 채널", "IVR-Fw Pilot",
                         "상담연결 RSI", "Agent Pilot", "Agent Queue", "Agent PG", "Phone 내선",
                         "Login-ID", "Call Type", "Entity NO", "Trunk 그룹 NO", "테스트 IVR DN",
-                        "CM연동", "VQueue", "IVR사용", "비고"
+                        "CM연동", "VQueue", "IVR사용", "비고", "AP URL"
                     };
                     var rows = new List<IList<string>>();
                     foreach (var c in _db.centers)
@@ -870,7 +1093,7 @@ namespace CmOxeProvisioner.Views
                                 l.ivrPdsChannel ?? "", l.ivrFwPilot ?? "", l.agentTransferRsi ?? "", l.agentPilot ?? "",
                                 l.agentQueue ?? "", l.agentPg ?? "", l.phoneExt ?? "", l.loginId ?? "", l.callType ?? "",
                                 l.entityNo ?? "", l.trunkGroupNo ?? "", l.testIvrDn ?? "", c.cmCustomerName ?? "",
-                                c.useVQueue ? "Y" : "N", c.useIvr ? "Y" : "N", l.note ?? ""
+                                c.useVQueue ? "Y" : "N", c.useIvr ? "Y" : "N", l.note ?? "", c.apUrl ?? ""
                             });
                         }
                     }
@@ -1136,7 +1359,7 @@ namespace CmOxeProvisioner.Views
 
         private static bool MatchesCenterQuery(DialPlanCenter c, string q)
         {
-            if (ContainsAny(q, c.location, c.project, c.cmCustomerName, c.notes, c.StatusBadgeText))
+            if (ContainsAny(q, c.location, c.project, c.cmCustomerName, c.apUrl, c.notes, c.StatusBadgeText))
                 return true;
             foreach (var l in c.lines)
             {
@@ -1161,6 +1384,33 @@ namespace CmOxeProvisioner.Views
                     return true;
             }
             return false;
+        }
+    }
+
+    internal sealed class InverseBoolToVisConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return (value is bool && (bool)value) ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+    }
+
+    internal sealed class MergeBottomBorderConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool sameBelow = (value is bool && (bool)value);
+            return sameBelow ? new Thickness(0, 0, 1, 0) : new Thickness(0, 0, 1, 1);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
         }
     }
 }
